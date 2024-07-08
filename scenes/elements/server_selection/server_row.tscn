@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dqdfkbbbwnpuu"]
+
+[node name="local_server" type="HBoxContainer"]
+
+[node name="del" type="Button" parent="."]
+layout_mode = 2
+disabled = true
+text = "Del"
+
+[node name="name" type="Label" parent="."]
+layout_mode = 2
+text = "Local server"
+
+[node name="ip" type="Label" parent="."]
+layout_mode = 2
+text = "(localhost)"
+
+[node name="enter" type="Button" parent="."]
+layout_mode = 2
+text = "Enter"
