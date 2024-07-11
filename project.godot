@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Global="*res://scripts/singletons/Global.gd"
+Server="*res://scripts/singletons/Server.gd"
 
 [editor_plugins]
 
