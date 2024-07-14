@@ -1,4 +1,4 @@
-from server.app import app, redis_client
+from server.app import app, redis_client, db
 from flask import request
 import uuid
 
@@ -22,4 +22,13 @@ def auth() -> str:
 
 @app.route("/register", methods = ["POST"])
 def register():
-    pass
+    username = request.headers.get('user-login')
+    password = request.headers.get('user-password')
+
+    db.users.insert_one({"username": username, "password": password})
+    
+    token = str(uuid.uuid4())
+    redis_client.set(f"user_{username}_auth_token", token, ex = 1800, nx = True)
+    token = redis_client.get(f"user_{username}_auth_token").decode()
+
+    return {"result": 1, "token": token}
