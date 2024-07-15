@@ -1,4 +1,0 @@
-res://scenes/server_selection.tscn
-res://scripts/singletons/Server.gd
-res://scripts/scenes/server_selection.gd
-res://scripts/singletons/Global.gd
