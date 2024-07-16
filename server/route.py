@@ -1,6 +1,6 @@
 from server.app import app, redis_client, db
 from flask import request
-import uuid
+import uuid, base64
 
 
     
@@ -13,12 +13,25 @@ def user_already_exist(username: str) -> bool:
 def get_user(token: str) -> dict:
     return db.users.find_one({"token": token})
 
+def check_token(token: str) -> bool:
+    user = db.users.find_one({"token": token})
+    if not user:
+        return False
+    if not redis_client.get(f"user/{user['username']}"):
+        return False
+    return True
 
-# ====================================== $
-# USER REGISTRATION AND AUTHENTIFICATION #
-# ====================================== $
+# RETURS CODES:
+# 10 - Wrong login or password
+# 11 - Registration Forbidden
+# 12 - This login already use
+# 13 - Who you are?
+# 14 - Wrong token
+# ============================================== #
+# === USER REGISTRATION AND AUTHENTIFICATION === #
+# ============================================== #
 
-@app.route("/auth", methods = ["POST"])
+@app.route("/umapi/auth", methods = ["POST"])
 def auth() -> str:
     username = request.headers.get('user-login')
     password = request.headers.get('user-password')
@@ -26,15 +39,14 @@ def auth() -> str:
     if db.users.find_one({"username": username, "password": password}) is None:
         return {"result": 10, "message": "Wrong login or password"}
 
-    token = str(uuid.uuid4()); redis_key = f"user/{username}"
-    redis_client.set(redis_key, token, ex = 1800, nx = True)
-    token = redis_client.get(redis_key).decode()
+    token = str(uuid.uuid4())
+    redis_client.set(f"user/{username}", token, ex = 1800)
     db.users.update_one({"username": username}, {"$set": {"token": token}}, upsert = True)
-    token_ttl = redis_client.ttl(redis_key)
+    token_ttl = redis_client.ttl(f"user/{username}")
     return {"result": 1, "token": token, "ttl": token_ttl}
 
 
-@app.route("/register", methods = ["POST"])
+@app.route("/umapi/register", methods = ["POST"])
 def register():
     username = request.headers.get('user-login')
     password = request.headers.get('user-password')
@@ -53,7 +65,7 @@ def register():
     return {"result": 1}
 
 
-@app.route("/register/<login>", methods = ["POST"])
+@app.route("/umapi/register/<login>", methods = ["POST"])
 def add_to_register_queue(login: str):
     requesting = get_user(request.headers.get("token"))
     role = request.headers.get("role")
@@ -68,16 +80,41 @@ def add_to_register_queue(login: str):
     return {"result": 1, "message": f"User <{login}> was created and waiting registration"}
 
 
-@app.route("/create_schema", methods = ["POST"])
-def create_schema():
-    pass
+@app.route("/usmapi/token_renew", methods = ["POST"])
+def token_renew():
+    token = request.headers.get('token')
+    user = db.users.find_one({"token": token})
+    
+    if user is None:
+        return {"result": 14, "message": "Wrong token"}
+    
+    redis_client.set(f"user/{user['username']}", token, ex = 1800)
+    ttl = redis_client.ttl(f"user/{user['username']}")
+    return {"result": 1, "token": token, "ttl": ttl}
 
 
+# ===================== #
+# === COMMON ROUTES === #
+# ===================== #
 
-# ============= #
-# COMMON ROUTES #
-# ============= #
-
-@app.route("/rlapi/get_info", methods = ["POST"])
+@app.route("/mapi/get_info", methods = ["POST"])
 def get_info():
     return {"server_name": app.config["LSERVER_NAME"], "result": 1}
+
+
+# ====================== #
+# === CONTENT ROUTES === #
+# ====================== #
+
+@app.route("/capi/create_schema", methods = ["POST"])
+def create_schema():
+    return {"result": -1}
+
+
+@app.route("/capi/create_system", methods = ["POST"])
+def create_system():
+    if check_token(request.headers.get("token")):
+        return {"result": 14}
+    
+    data = request.data
+    print(type(data["image"]))

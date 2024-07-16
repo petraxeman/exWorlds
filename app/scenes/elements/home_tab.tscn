@@ -1,0 +1,517 @@
+[gd_scene load_steps=3 format=3 uid="uid://bw5bvmvwyustt"]
+
+[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/Age_of_Ashes_1_-_Hellknight_Hill (1)-2.png" id="1_8mrvb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pss08"]
+
+[node name="home" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="scroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 947.0
+offset_bottom = 599.0
+
+[node name="margin" type="MarginContainer" parent="scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="vbox" type="VBoxContainer" parent="scroll/margin"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="hbox_sheduled_games" type="HBoxContainer" parent="scroll/margin/vbox"]
+layout_mode = 2
+
+[node name="sheduled_games" type="Label" parent="scroll/margin/vbox/hbox_sheduled_games"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 25
+text = "Scheduled games"
+
+[node name="show_more" type="Button" parent="scroll/margin/vbox/hbox_sheduled_games"]
+layout_mode = 2
+text = "Show more..."
+
+[node name="sep2" type="HSeparator" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="sheduled_games_list" type="HFlowContainer" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 15
+
+[node name="your_game" type="VBoxContainer" parent="scroll/margin/vbox/sheduled_games_list"]
+layout_mode = 2
+
+[node name="refrect" type="ReferenceRect" parent="scroll/margin/vbox/sheduled_games_list/your_game"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="scroll/margin/vbox/sheduled_games_list/your_game/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8mrvb")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="scroll/margin/vbox/sheduled_games_list/your_game/refrect/texture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -77.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="scroll/margin/vbox/sheduled_games_list/your_game/refrect/texture/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="game_name" type="Label" parent="scroll/margin/vbox/sheduled_games_list/your_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Age of ashes"
+horizontal_alignment = 1
+
+[node name="system_name" type="Label" parent="scroll/margin/vbox/sheduled_games_list/your_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Pathfinder 2e"
+horizontal_alignment = 1
+
+[node name="start_date" type="Label" parent="scroll/margin/vbox/sheduled_games_list/your_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "01.01.2024 12:00"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="scroll/margin/vbox/sheduled_games_list/your_game"]
+layout_mode = 2
+
+[node name="edit" type="Button" parent="scroll/margin/vbox/sheduled_games_list/your_game/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🖊️"
+
+[node name="play" type="Button" parent="scroll/margin/vbox/sheduled_games_list/your_game/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▶️"
+
+[node name="watch" type="Button" parent="scroll/margin/vbox/sheduled_games_list/your_game/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "👁️"
+
+[node name="sheduled_game" type="VBoxContainer" parent="scroll/margin/vbox/sheduled_games_list"]
+layout_mode = 2
+
+[node name="refrect" type="ReferenceRect" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8mrvb")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game/refrect/texture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -77.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game/refrect/texture/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="game_name" type="Label" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Age of ashes"
+horizontal_alignment = 1
+
+[node name="system_name" type="Label" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Pathfinder 2e"
+horizontal_alignment = 1
+
+[node name="start_date" type="Label" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "01.01.2024 12:00"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game"]
+layout_mode = 2
+
+[node name="wait" type="Button" parent="scroll/margin/vbox/sheduled_games_list/sheduled_game/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Just wait"
+
+[node name="started_game" type="VBoxContainer" parent="scroll/margin/vbox/sheduled_games_list"]
+layout_mode = 2
+
+[node name="refrect" type="ReferenceRect" parent="scroll/margin/vbox/sheduled_games_list/started_game"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="scroll/margin/vbox/sheduled_games_list/started_game/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8mrvb")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="scroll/margin/vbox/sheduled_games_list/started_game/refrect/texture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -77.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="scroll/margin/vbox/sheduled_games_list/started_game/refrect/texture/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="game_name" type="Label" parent="scroll/margin/vbox/sheduled_games_list/started_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Age of ashes"
+horizontal_alignment = 1
+
+[node name="system_name" type="Label" parent="scroll/margin/vbox/sheduled_games_list/started_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Pathfinder 2e"
+horizontal_alignment = 1
+
+[node name="start_date" type="Label" parent="scroll/margin/vbox/sheduled_games_list/started_game/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "01.01.2024 12:00"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="scroll/margin/vbox/sheduled_games_list/started_game"]
+layout_mode = 2
+
+[node name="enter" type="Button" parent="scroll/margin/vbox/sheduled_games_list/started_game/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Enter🚪"
+
+[node name="empty_sep" type="HSeparator" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 25
+theme_override_styles/separator = SubResource("StyleBoxEmpty_pss08")
+
+[node name="hbox_adventures" type="HBoxContainer" parent="scroll/margin/vbox"]
+layout_mode = 2
+
+[node name="adventures" type="Label" parent="scroll/margin/vbox/hbox_adventures"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 25
+text = "Adventures"
+
+[node name="show_more" type="Button" parent="scroll/margin/vbox/hbox_adventures"]
+layout_mode = 2
+text = "Show more..."
+
+[node name="sep" type="HSeparator" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="adventures_list" type="HFlowContainer" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 15
+
+[node name="your_adventure" type="VBoxContainer" parent="scroll/margin/vbox/adventures_list"]
+layout_mode = 2
+
+[node name="refrect" type="ReferenceRect" parent="scroll/margin/vbox/adventures_list/your_adventure"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="scroll/margin/vbox/adventures_list/your_adventure/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8mrvb")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="scroll/margin/vbox/adventures_list/your_adventure/refrect/texture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="scroll/margin/vbox/adventures_list/your_adventure/refrect/texture/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="adventure_name" type="Label" parent="scroll/margin/vbox/adventures_list/your_adventure/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Age of ashes (1/6)"
+horizontal_alignment = 1
+
+[node name="system_name" type="Label" parent="scroll/margin/vbox/adventures_list/your_adventure/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Pathfinder 2e"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="scroll/margin/vbox/adventures_list/your_adventure"]
+layout_mode = 2
+
+[node name="edit" type="Button" parent="scroll/margin/vbox/adventures_list/your_adventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🖊️"
+
+[node name="play" type="Button" parent="scroll/margin/vbox/adventures_list/your_adventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▶️"
+
+[node name="watch" type="Button" parent="scroll/margin/vbox/adventures_list/your_adventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "👁️"
+
+[node name="another_aventure" type="VBoxContainer" parent="scroll/margin/vbox/adventures_list"]
+layout_mode = 2
+
+[node name="refrect" type="ReferenceRect" parent="scroll/margin/vbox/adventures_list/another_aventure"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="scroll/margin/vbox/adventures_list/another_aventure/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8mrvb")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="scroll/margin/vbox/adventures_list/another_aventure/refrect/texture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="scroll/margin/vbox/adventures_list/another_aventure/refrect/texture/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="game_name" type="Label" parent="scroll/margin/vbox/adventures_list/another_aventure/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Age of ashes (2/6)"
+horizontal_alignment = 1
+
+[node name="system_name" type="Label" parent="scroll/margin/vbox/adventures_list/another_aventure/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Pathfinder 2e"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="scroll/margin/vbox/adventures_list/another_aventure"]
+layout_mode = 2
+
+[node name="play" type="Button" parent="scroll/margin/vbox/adventures_list/another_aventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▶️"
+
+[node name="watch" type="Button" parent="scroll/margin/vbox/adventures_list/another_aventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "👁️"
+
+[node name="empty_sep2" type="HSeparator" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 25
+theme_override_styles/separator = SubResource("StyleBoxEmpty_pss08")
+
+[node name="hbox_game_systems" type="HBoxContainer" parent="scroll/margin/vbox"]
+layout_mode = 2
+
+[node name="game_systems" type="Label" parent="scroll/margin/vbox/hbox_game_systems"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 25
+text = "Game systems
+"
+
+[node name="show_more" type="Button" parent="scroll/margin/vbox/hbox_game_systems"]
+layout_mode = 2
+text = "Show more..."
+
+[node name="sep3" type="HSeparator" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="game_systems_list" type="HFlowContainer" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 15
+
+[node name="your_adventure" type="VBoxContainer" parent="scroll/margin/vbox/game_systems_list"]
+layout_mode = 2
+
+[node name="refrect" type="ReferenceRect" parent="scroll/margin/vbox/game_systems_list/your_adventure"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="scroll/margin/vbox/game_systems_list/your_adventure/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8mrvb")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="scroll/margin/vbox/game_systems_list/your_adventure/refrect/texture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="scroll/margin/vbox/game_systems_list/your_adventure/refrect/texture/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="system_name" type="Label" parent="scroll/margin/vbox/game_systems_list/your_adventure/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Pathfinder 2e"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="scroll/margin/vbox/game_systems_list/your_adventure"]
+layout_mode = 2
+
+[node name="edit" type="Button" parent="scroll/margin/vbox/game_systems_list/your_adventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🖊️"
+
+[node name="watch" type="Button" parent="scroll/margin/vbox/game_systems_list/your_adventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "👁️"
+
+[node name="another_aventure" type="VBoxContainer" parent="scroll/margin/vbox/game_systems_list"]
+layout_mode = 2
+
+[node name="refrect" type="ReferenceRect" parent="scroll/margin/vbox/game_systems_list/another_aventure"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="scroll/margin/vbox/game_systems_list/another_aventure/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8mrvb")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="scroll/margin/vbox/game_systems_list/another_aventure/refrect/texture"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="scroll/margin/vbox/game_systems_list/another_aventure/refrect/texture/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="system_name" type="Label" parent="scroll/margin/vbox/game_systems_list/another_aventure/refrect/texture/panel/texts"]
+layout_mode = 2
+text = "Call of cthulhu 7e"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="scroll/margin/vbox/game_systems_list/another_aventure"]
+layout_mode = 2
+
+[node name="watch" type="Button" parent="scroll/margin/vbox/game_systems_list/another_aventure/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "👁️"
+
+[node name="empty_sep3" type="HSeparator" parent="scroll/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 25
+theme_override_styles/separator = SubResource("StyleBoxEmpty_pss08")

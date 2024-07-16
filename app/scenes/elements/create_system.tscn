@@ -1,0 +1,95 @@
+[gd_scene load_steps=3 format=3 uid="uid://dv622v0j76q1a"]
+
+[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/Age_of_Ashes_1_-_Hellknight_Hill (1)-2.png" id="1_8r5og"]
+[ext_resource type="Script" path="res://scripts/scenes/elements/create_system.gd" id="1_kul5c"]
+
+[node name="create_system" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_kul5c")
+
+[node name="vbox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -147.5
+offset_top = -38.5
+offset_right = 147.5
+offset_bottom = 38.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Create game system"
+horizontal_alignment = 1
+
+[node name="refrect" type="ReferenceRect" parent="vbox"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="texture" type="TextureRect" parent="vbox/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8r5og")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="file_chose" type="HBoxContainer" parent="vbox"]
+layout_mode = 2
+
+[node name="select_file" type="Button" parent="vbox/file_chose"]
+layout_mode = 2
+text = "Select file"
+
+[node name="label" type="Label" parent="vbox/file_chose"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "C://windows/system32/drivers/etc"
+horizontal_alignment = 3
+vertical_alignment = 1
+text_overrun_behavior = 3
+text_direction = 2
+
+[node name="game_system_name" type="LineEdit" parent="vbox"]
+layout_mode = 2
+placeholder_text = "Game system name (20 chars)"
+max_length = 20
+
+[node name="game_system_code_name" type="LineEdit" parent="vbox"]
+layout_mode = 2
+placeholder_text = "Game system code name (10 chars)"
+
+[node name="create_system" type="Button" parent="vbox"]
+layout_mode = 2
+text = "🚀 CREATE 🚀"
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+initial_position = 1
+size = Vector2i(407, 159)
+ok_button_text = "Открыть"
+dialog_hide_on_ok = true
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.svg")
+use_native_dialog = true
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[connection signal="pressed" from="vbox/file_chose/select_file" to="." method="_on_select_file_pressed"]
+[connection signal="pressed" from="vbox/create_system" to="." method="_on_create_system_pressed"]
+[connection signal="dir_selected" from="FileDialog" to="." method="_on_file_dialog_dir_selected"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]

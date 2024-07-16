@@ -129,31 +129,20 @@ text = "Ok"
 layout_mode = 2
 text = "Cancel"
 
-[node name="auth_rect" type="ReferenceRect" parent="."]
+[node name="auth_window" type="Control" parent="."]
 visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -110.0
-offset_right = 160.0
-offset_bottom = 110.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="auth_window" type="Control" parent="auth_rect"]
-clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 426.0
+offset_top = 225.0
+offset_right = -426.0
+offset_bottom = -248.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="background" type="ColorRect" parent="auth_rect/auth_window"]
+[node name="background" type="ColorRect" parent="auth_window"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -162,7 +151,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.48834, 0.528405, 0.554634, 1)
 
-[node name="vbox" type="VBoxContainer" parent="auth_rect/auth_window"]
+[node name="vbox" type="VBoxContainer" parent="auth_window"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -171,98 +160,41 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="label" type="Label" parent="auth_rect/auth_window/vbox"]
+[node name="label" type="Label" parent="auth_window/vbox"]
 layout_mode = 2
 text = "This server require auth:"
 horizontal_alignment = 1
 
-[node name="margin" type="MarginContainer" parent="auth_rect/auth_window/vbox"]
+[node name="margin" type="MarginContainer" parent="auth_window/vbox"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_right = 20
 
-[node name="vbox" type="VBoxContainer" parent="auth_rect/auth_window/vbox/margin"]
+[node name="vbox" type="VBoxContainer" parent="auth_window/vbox/margin"]
 layout_mode = 2
 
-[node name="login" type="LineEdit" parent="auth_rect/auth_window/vbox/margin/vbox"]
+[node name="login" type="LineEdit" parent="auth_window/vbox/margin/vbox"]
 layout_mode = 2
 placeholder_text = "Your login"
 
-[node name="password" type="LineEdit" parent="auth_rect/auth_window/vbox/margin/vbox"]
+[node name="password" type="LineEdit" parent="auth_window/vbox/margin/vbox"]
 layout_mode = 2
 placeholder_text = "Your password"
 secret = true
 secret_character = "⭐"
 
-[node name="login" type="Button" parent="auth_rect/auth_window/vbox"]
+[node name="login" type="Button" parent="auth_window/vbox"]
 layout_mode = 2
 size_flags_horizontal = 4
-text = "Enter"
+text = "Login"
 
-[node name="cancel" type="Button" parent="auth_rect/auth_window/vbox"]
+[node name="cancel" type="Button" parent="auth_window/vbox"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Cancel"
 
-[node name="waiting" type="ReferenceRect" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -110.0
-offset_top = -60.0
-offset_right = 110.0
-offset_bottom = 60.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="ColorRect" type="ColorRect" parent="waiting"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.490196, 0.529412, 0.552941, 1)
-
-[node name="vbox" type="VBoxContainer" parent="waiting"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="hello" type="Label" parent="waiting/vbox"]
-layout_mode = 2
-text = "Hello Bachus
-"
-horizontal_alignment = 1
-
-[node name="server" type="Label" parent="waiting/vbox"]
-layout_mode = 2
-text = "Server: Babajaba"
-horizontal_alignment = 1
-
-[node name="state" type="Label" parent="waiting/vbox"]
-layout_mode = 2
-text = "Try to login 🔥"
-horizontal_alignment = 1
-
-[node name="progress" type="ProgressBar" parent="waiting/vbox"]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-max_value = 4.0
-step = 1.0
-show_percentage = false
-
-[node name="HTTPRequest" type="HTTPRequest" parent="."]
-
 [connection signal="pressed" from="margin/vbox/add_new/Button" to="." method="_add_server_pressed"]
 [connection signal="pressed" from="del_confirm_window/vbox/buttons/ok" to="." method="_del_confirm_pressed"]
 [connection signal="pressed" from="del_confirm_window/vbox/buttons/cancel" to="." method="_del_cancel_pressed"]
-[connection signal="pressed" from="auth_rect/auth_window/vbox/login" to="." method="_login_pressed"]
-[connection signal="pressed" from="auth_rect/auth_window/vbox/cancel" to="." method="_cancel_enter_pressed"]
+[connection signal="pressed" from="auth_window/vbox/login" to="." method="_login_pressed"]
+[connection signal="pressed" from="auth_window/vbox/cancel" to="." method="_cancel_enter_pressed"]
