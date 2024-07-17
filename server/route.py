@@ -1,6 +1,7 @@
 from server.app import app, redis_client, db
 from flask import request
-import uuid, base64
+from werkzeug.utils import secure_filename
+import uuid, os, hashlib
 
 
     
@@ -21,12 +22,16 @@ def check_token(token: str) -> bool:
         return False
     return True
 
-# RETURS CODES:
+# RETURNS CODES:
 # 10 - Wrong login or password
 # 11 - Registration Forbidden
 # 12 - This login already use
 # 13 - Who you are?
 # 14 - Wrong token
+# 15 - Wrong extension
+# 16 - No selected file
+# 17 - No file part
+# 18 - File dont exist
 # ============================================== #
 # === USER REGISTRATION AND AUTHENTIFICATION === #
 # ============================================== #
@@ -101,6 +106,51 @@ def token_renew():
 def get_info():
     return {"server_name": app.config["LSERVER_NAME"], "result": 1}
 
+
+@app.route("/mapi/upload_image", methods = ["POST"])
+def upload_image():
+    token = request.headers.get("token")
+    if 'file' not in request.files:
+        return {"result": 17, "message": "No file part"}
+    file = request.files['file']
+
+    if file.filename == '':
+        return {"result": 16, "message": "No selected file"}
+    
+    if file.filename.split(".")[-1] != "png":
+        return {"result": 15, "message": "Wrong extension"}
+    
+    image_hash = hashlib.md5(file.read()).hexdigest()
+    image_name = str(uuid.uuid4()) + ".webp"
+    db.images.insert_one({"image_hash": image_hash, "image_name": image_name, "image": file.read()})
+    return {"result": 1, "message": "Upload Success", "file_name": image_name, "hash": image_hash}
+
+
+@app.route("/mapi/fetch_image", methods = ["POST"])
+def fetch_image():
+    token = request.headers.get("token")
+    image_hash = request.headers.get("image-hash")
+    image_name = request.headers.get("image-name")
+
+    image = db.images.find_one({"image_name": image_name})
+    if image is None:
+        return {"result": 18, "message": "File dont exist"}
+    
+    if image_hash != image["image_hash"]:
+        return {"result": 19, "message": "Hashes are different"}
+    else:
+        return {"result": 1, "message": "Hashes are similar"}
+
+
+@app.route("/mapi/download_image", methods = ["POST"])
+def download_image(image_name: str):
+    token = request.headers.get("token")
+    image_name = request.headers.get("image-name")
+
+    image = db.images.find_one({"image_name": image_name})
+    if image is None:
+        return {"result": 18, "message": "File dont exist"}
+    return {"result": 1, "message": "Operation success", "image": image["image"]}
 
 # ====================== #
 # === CONTENT ROUTES === #

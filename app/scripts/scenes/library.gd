@@ -23,7 +23,6 @@ func _on_tab_bar_tab_changed(tab):
 func _on_tab_bar_tab_close_pressed(tab):
 	$tab_bar.remove_tab(tab)
 	$tab_container.get_children()[tab].queue_free()
-	TabContainer
 
 
 func _on_home_pressed():

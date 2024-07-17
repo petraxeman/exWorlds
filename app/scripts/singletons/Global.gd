@@ -3,23 +3,26 @@ extends Node
 var servers = []
 var active_server: int = -1
 var timer: Timer = Timer.new()
+var cache: SQLite
+
 
 
 func _ready():
 	load_config()
+	cache = SQLite.new()
+	cache.path = "user://cache.db"
+	cache.open_db()
+	_init_db()
+	
 	timer.one_shot = false
 	timer.wait_time = 1
 	timer.timeout.connect(_on_timer_timeout)
-
+	
 
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		save_config()
 		get_tree().quit()
-
-
-#func auth(username: String, password: String) -> bool:
-#	return false
 
 
 func token_renew() -> bool:
@@ -81,6 +84,24 @@ func _init_config_file():
 	}
 	config_file.store_string(JSON.stringify(data))
 	config_file.close()
+
+
+func _init_db():
+	var images_cache_schema = {
+		"id": {"data_type": "int", "primary_key": true, "not_null": true},
+		"hash": {"data_type": "text", "not_null": true},
+		"file_name": {"data_type": "text", "not_null": true},
+		"image": {"data_type": "blob", "not_null": true}
+	}
+	var req_cache_schema = {
+		"id": {"data_type": "int", "primary_key": true, "not_null": true},
+		"hash": {"data_type": "text", "not_null": true},
+		"data": {"data_type": "text", "not_null": true}
+	}
+	cache.drop_table("images")
+	cache.drop_table("requests")
+	cache.create_table("images", images_cache_schema)
+	cache.create_table("requests", req_cache_schema)
 
 
 func _on_timer_timeout():
