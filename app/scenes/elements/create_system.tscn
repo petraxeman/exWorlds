@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dv622v0j76q1a"]
 
-[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/Age_of_Ashes_1_-_Hellknight_Hill (1)-2.png" id="1_8r5og"]
 [ext_resource type="Script" path="res://scripts/scenes/elements/create_system.gd" id="1_kul5c"]
+[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="2_tr4vf"]
 
 [node name="create_system" type="Control"]
 layout_mode = 3
@@ -43,7 +43,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_8r5og")
+texture = ExtResource("2_tr4vf")
 expand_mode = 3
 stretch_mode = 5
 

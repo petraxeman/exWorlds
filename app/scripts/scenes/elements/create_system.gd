@@ -12,9 +12,9 @@ func _on_select_file_pressed():
 
 func _on_create_system_pressed():
 	if not image:
-		image = Image.load_from_file("res://assets/Age_of_Ashes_1_-_Hellknight_Hill (1)-2.png")
-	await ResLoader.put_image(image)
-	return
+		image = Image.load_from_file("res://assets/placeholder.png")
+	var image_name = await ResLoader.put_image(image)
+	ResLoader.create_system($vbox/game_system_name.text, $vbox/game_system_code_name.text, image_name)
 	var tab_container: TabContainer = self.get_parent()
 	var tab_bar: TabBar = self.get_parent().get_parent().get_node("tab_bar")
 	var index = tab_container.get_children().find(self)
