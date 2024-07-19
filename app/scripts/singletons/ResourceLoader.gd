@@ -18,32 +18,31 @@ func _ready():
 	add_child(http)
 
 
-func get_image(file_name: String):
-	var cache: Array = Global.cache.select_rows("images", "file_name=\"" + file_name + "\"", ["hash", "file_name", "image"])
-	var image_info: Dictionary = {"empty": true}
-	if cache != [] and false:
+func get_image(file_name: String) -> Dictionary:
+	var cache: Array = Global.cache.select_rows("images", "file_name=\"" + file_name + "\"", ["author", "file_name", "image"])
+	if cache != []:
 		var cached: Dictionary = cache[0]
+		var image: Image = Image.new()
+		var _error = image.load_webp_from_buffer(cached["image"])
+		return {"author": cached["author"], "image": image}
+	else:
 		var headers = ["token: 12312313", "Image-Name:" + file_name]
+		var image_info: Dictionary
+		#
 		http.request("http://" + base_address + info_image_afex, headers, HTTPClient.METHOD_POST)
-		var result = await http.request_completed
-		image_info = JSON.parse_string(result[3].get_string_from_utf8())
-		if result[1] == 200 and image_info["result"] == 1 and image_info["image_hash"] == cached["hash"]:
-			var image: Image = Image.new()
-			var _error = image.load_webp_from_buffer(cached["image"])
-			return image
-	
-	var headers = ["token: 12312313", "Image-Name:" + file_name]
-	if image_info["empty"]:
-		http.request("http://" + base_address + info_image_afex, headers, HTTPClient.METHOD_POST)
-		var result = await http.request_completed
-		image_info = JSON.parse_string(result[3].get_string_from_utf8())
-	http.request("http://" + base_address + download_image_afex, headers, HTTPClient.METHOD_POST)
-	var result = await http.request_completed
-	if result[1] == 200:
+		var image_info_result = await http.request_completed
+		image_info = JSON.parse_string(image_info_result[3].get_string_from_utf8())
+		#
+		http.request("http://" + base_address + download_image_afex, headers, HTTPClient.METHOD_POST)
+		var image_result = await http.request_completed
+		#
+		if image_info_result[1] != 200 or image_result[1] != 200:
+			return {"author": "undefined", "image": Image.new()}
+		#
 		var new_image = Image.new()
-		new_image.load_webp_from_buffer(result[3])
-		return new_image
-	return Image.new()
+		new_image.load_webp_from_buffer(image_result[3])
+		return {"author": image_info["author"], "image": new_image}
+	return {"author": "undefined", "image": Image.new()}
 
 
 func put_image(image: Image):
@@ -62,7 +61,7 @@ func put_image(image: Image):
 	result[3] = result[3].get_string_from_utf8()
 	if result[1] == 200 and JSON.parse_string(result[3]).get("result", 100) == 1:
 		var data = JSON.parse_string(result[3])
-		Global.cache.insert_row("images", {"hash": data["hash"], "file_name": data["file_name"], "image": image.save_webp_to_buffer(true)})
+		Global.cache.insert_row("images", {"author": data["author"], "file_name": data["file_name"], "image": image.save_webp_to_buffer(true)})
 		return data["file_name"]
 
 

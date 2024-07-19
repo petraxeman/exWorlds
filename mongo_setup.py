@@ -24,7 +24,7 @@ notes = Collection(db, "notes", create=True)
 images = Collection(db, "images", create=True)
 
 try:
-    client.exworlds.command("createUser", mongo_exowrlds_login, pwd=mongo_exowrlds_passwd, roles = [{"role": "readWrite", "db": "main"}])
+    client.exworlds.command("createUser", mongo_exowrlds_login, pwd=mongo_exowrlds_passwd, roles = [{"role": "readWrite", "db": "exworlds"}])
 except errors.OperationFailure:
     pass
 except Exception as err:
