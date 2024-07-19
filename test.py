@@ -1,11 +1,10 @@
-import random as rnd
+import re
 
 
+t = re.compile("[a-z\-]+")
 
-alph = list("qazwsxedcrfvtgbyhnujmikolp1234567890-")
-secret = ""
-
-for i in range(175):
-    secret += rnd.choice(alph)
-
-print(secret)
+print(t.fullmatch("asd"))
+print(t.fullmatch("asd--"))
+print(t.fullmatch("asd---------------asd"))
+print(t.fullmatch("asdD \nasd"))
+print(t.fullmatch("asd1"))
