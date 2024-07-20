@@ -1,7 +1,7 @@
 from server.app import app, redis_client, db
 from flask import request, send_file, Response
 from werkzeug.utils import secure_filename
-import uuid, io, jwt, datetime, re
+import uuid, io, jwt, datetime, re, json
 from functools import wraps
 
 
@@ -38,8 +38,8 @@ def token_required(fn):
 
 @app.route("/account/auth", methods = ["POST"])
 def auth() -> str:
-    username = request.headers.get('User-Login')
-    password = request.headers.get('User-Password')
+    username = request.json.get('username')
+    password = request.json.get('password')
 
     if db.users.find_one({"username": username, "password": password}) is None:
         return {"msg": "Wrong login or password"}, 401
@@ -49,10 +49,10 @@ def auth() -> str:
     return {"token": token}, 200
 
 
-@app.route("/account/register", methods = ["POST"])
+@app.route("/account/registration", methods = ["POST"])
 def register():
-    username = request.headers.get('User-Login')
-    password = request.headers.get('User-Password')
+    username = request.json.get('username')
+    password = request.json.get('password')
     
     user_object = {"username": username, "password": password, "waiting": False, "role": "user"}
     registration_access = app.config["REGISTRATION"]
@@ -76,7 +76,7 @@ def register():
 @app.route("/account/addUserToQueue", methods = ["POST"])
 @token_required
 def add_to_register_queue():
-    username = request.headers.get("Username")
+    username = request.data.get("username")
 
     if current_user["role"] != "admin":
         return {"msg": "Registration forbidden"}; 401
@@ -94,9 +94,8 @@ def add_to_register_queue():
 # ===================== #
 
 @app.route("/server/info", methods = ["POST"])
-@token_required
 def get_server_info():
-    return {"server_name": app.config["LSERVER_NAME"], "result": 1}
+    return {"server_name": app.config["LSERVER_NAME"]}, 200
 
 
 
@@ -153,14 +152,20 @@ def download_image():
 # === CONTENT ROUTES === #
 # ====================== #
 
-@app.route("/structs/create_system", methods = ["POST"])
+@app.route("/structs/create/system", methods = ["POST"])
 def create_system():
     data = request.json
     if not db.images.find_one({"name": data["image_name"]}, limit = 1):
         return {"msg": "Image does not exist"}, 401
-    if not re.fullmatch("[a-z\-]+", data["codename"]):
+    if not re.fullmatch("[0-9a-z\-]+", data["codename"]):
         return {"msg": "Wrong codename"}, 401
-    if db.structs.find_one({"codename": data["codename"]}):
+    if db.structs.find_one({"author": current_user["username"], "codename": data["codename"], "type": "game_system"}):
         return {"msg": "Codename already taken"}
-    db.structs.insert_one({"author": current_user["username"], "name": data["name"], "codename": "placeholder", "image": data["image_name"]})
+    db.structs.insert_one({
+        "type": "game_system",
+        "author": current_user["username"],
+        "name": data["name"],
+        "codename": data["codename"],
+        "image": data["image_name"]
+        })
     return {"msg": "System creation success"}, 200

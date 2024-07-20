@@ -68,7 +68,7 @@ layout_mode = 2
 placeholder_text = "Game system name (20 chars)"
 max_length = 20
 
-[node name="game_system_code_name" type="LineEdit" parent="vbox"]
+[node name="game_system_codename" type="LineEdit" parent="vbox"]
 layout_mode = 2
 placeholder_text = "Game system code name (10 chars)"
 

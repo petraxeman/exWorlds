@@ -259,6 +259,8 @@ max_value = 4.0
 step = 1.0
 show_percentage = false
 
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
 [connection signal="pressed" from="margin/vbox/add_new/Button" to="." method="_add_server_pressed"]
 [connection signal="pressed" from="del_confirm_window/vbox/buttons/ok" to="." method="_del_confirm_pressed"]
 [connection signal="pressed" from="del_confirm_window/vbox/buttons/cancel" to="." method="_del_cancel_pressed"]

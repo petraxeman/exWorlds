@@ -1,10 +1,21 @@
 extends Control
 
 var image: Image
+var parent: Node
+
+
+# ================================== #
+# === SYSTEM CALLS AND FUNCTIONS === #
+# ================================== #
 
 func _ready():
-	pass
+	parent = get_node("/root/library")
 
+
+
+# ====================================== #
+# === ADDITIONAL CALLS AND FUNCTIONS === #
+# ====================================== #
 
 func _on_select_file_pressed():
 	$FileDialog.show()
@@ -14,13 +25,10 @@ func _on_create_system_pressed():
 	if not image:
 		image = Image.load_from_file("res://assets/placeholder.png")
 	var image_name = await ResLoader.put_image(image)
-	#ResLoader.create_system($vbox/game_system_name.text, $vbox/game_system_code_name.text, image_name)
-	ResLoader.get_image("123.webp")
-	var tab_container: TabContainer = self.get_parent()
-	var tab_bar: TabBar = self.get_parent().get_parent().get_node("tab_bar")
-	var index = tab_container.get_children().find(self)
-	tab_bar.remove_tab(index)
-	self.queue_free()
+	if image_name == "Somthing wrong": return
+	var creation_result = await ResLoader.create_system($vbox/game_system_name.text, $vbox/game_system_codename.text, image_name)
+	if not creation_result: return
+	parent.remove_tab_by_ref(self)
 
 
 func _on_file_dialog_file_selected(path):

@@ -1,23 +1,21 @@
 extends Node
 
-var servers = []
-var active_server: int = -1
-var timer: Timer = Timer.new()
+var servers: Array            = []
+var active_server_index: int  = -1
+var active_server: Dictionary
 var cache: SQLite
 
 
 
+# ================================== #
+# === SYSTEM CALLS AND FUNCTIONS === #
+# ================================== #
+
 func _ready():
+	IP.resolve_hostname("localhost", IP.TYPE_IPV4)
 	load_config()
-	cache = SQLite.new()
-	cache.path = "user://cache.db"
-	cache.open_db()
 	_init_db()
-	
-	timer.one_shot = false
-	timer.wait_time = 1
-	timer.timeout.connect(_on_timer_timeout)
-	
+
 
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -25,29 +23,39 @@ func _notification(what):
 		get_tree().quit()
 
 
-func token_renew() -> bool:
-	var http = HTTPRequest.new()
-	var headers = ["token:" + servers[active_server]["token"]]
-	http.request("http://" + servers[active_server]["address"] + "/umapi/renew", headers, HTTPClient.METHOD_POST)
-	var result = await http.request_completed
+
+# ================================ #
+# === USER CALLS AND FUNCTIONS === #
+# ================================ #
+
+func auth(username: String, password: String) -> bool:
+	var headers: Array = ["Content-Type: application/json"]
+	var data: String = JSON.stringify({"username": username, "password": password})
+	ResLoader.http.request(UrlEnum.build("http", active_server["address"], "auth"), headers, HTTPClient.METHOD_POST, data)
+	var result: Array = await ResLoader.http.request_completed
 	if result[1] != 200:
 		return false
-	var data = JSON.parse_string(result[3].get_string_from_utf8())
-	if data.get("result", 100) != 1:
-		return false
-	servers[active_server]["token"] = data["tokne"]
-	servers[active_server]["token_ttl"] = data["token_ttl"]
+	result[3] = JSON.parse_string(result[3].get_string_from_utf8())
+	servers[active_server_index]["token"] = result[3]["token"]
+	active_server = servers[active_server_index]
 	return true
 
 
-func check_token_ttl():
-	if active_server == -1:
-		return
-	var time_left: float = servers[active_server]["token_ttl"] - Time.get_unix_time_from_system() < 30
-	if time_left < 0:
-		get_tree().quit()
-	elif time_left < 30:
-		token_renew()
+func register(username: String, password: String) -> bool:
+	var data: String = JSON.stringify({"username": username, "password": password})
+	var headers: Array = ["Content-Type: application/json"]
+	ResLoader.http.request(UrlEnum.build("http", active_server["address"], "registration"), headers, HTTPClient.METHOD_POST, data)
+	var result = await ResLoader.http.request_completed
+	if not result[1] == 200:
+		return false
+	return true
+
+
+func get_auth_data() -> Dictionary:
+	return {
+		"addr": active_server["address"], 
+		"headers": ["Content-Type: application/json", "Auth-Token: " + active_server["token"]]
+		}
 
 
 func load_config():
@@ -70,12 +78,23 @@ func save_config():
 
 
 func add_server(server_name: String, server_address: String):
-	servers.append({"name": server_name, "address": server_address, "can_del": true, "token": "", "token_ttl": 0})
+	servers.append({"name": server_name, "address": server_address, "can_del": true, "token": ""})
 
 
 func remove_server(index: int):
 	servers.remove_at(index)
 
+
+func set_active_server(index: int) -> bool:
+	if index > servers.size():
+		return false
+	active_server_index = index
+	active_server = servers[index]
+	return true
+
+# ====================================== #
+# === ADDITIONAL CALLS AND FUNCTIONS === #
+# ====================================== #
 
 func _init_config_file():
 	var config_file: FileAccess = FileAccess.open("user://server_config.json", FileAccess.WRITE)
@@ -87,6 +106,10 @@ func _init_config_file():
 
 
 func _init_db():
+	cache = SQLite.new()
+	cache.path = "user://cache.db"
+	cache.open_db()
+	
 	var images_cache_schema = {
 		"id": {"data_type": "int", "primary_key": true, "not_null": true},
 		"author": {"data_type": "text", "not_null": true},
@@ -95,7 +118,6 @@ func _init_db():
 	}
 	var req_cache_structs = {
 		"id": {"data_type": "int", "primary_key": true, "not_null": true},
-		"author": {"data_type": "text", "not_null": true},
 		"hash": {"data_type": "text", "not_null": true},
 		"data": {"data_type": "text", "not_null": true}
 	}
@@ -103,7 +125,3 @@ func _init_db():
 	cache.drop_table("requests")
 	cache.create_table("images", images_cache_schema)
 	cache.create_table("requests", req_cache_structs)
-
-
-func _on_timer_timeout():
-	check_token_ttl()
