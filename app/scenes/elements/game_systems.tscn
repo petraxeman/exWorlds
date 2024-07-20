@@ -1,11 +1,17 @@
 [gd_scene load_steps=3 format=3 uid="uid://b50yjytm3ctvq"]
 
 [ext_resource type="Script" path="res://scripts/scenes/elements/game_systems.gd" id="1_w8k5w"]
-[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="2_1vgfe"]
+[ext_resource type="PackedScene" uid="uid://b18i7gt50l6hx" path="res://scenes/elements/game_system_card.tscn" id="2_mv4np"]
 
 [node name="game_systems" type="Control"]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_w8k5w")
 
 [node name="vbox" type="VBoxContainer" parent="."]
@@ -25,6 +31,11 @@ theme_override_constants/margin_bottom = 5
 
 [node name="hbox" type="HBoxContainer" parent="vbox/margin"]
 layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="refresh" type="Button" parent="vbox/margin/hbox"]
+layout_mode = 2
+text = "🔄"
 
 [node name="create_new" type="Button" parent="vbox/margin/hbox"]
 layout_mode = 2
@@ -51,8 +62,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 25
-text = "Your game systems
-"
+text = "Game systems"
 
 [node name="sep3" type="HSeparator" parent="vbox/margin2/scroll/vbox"]
 layout_mode = 2
@@ -63,105 +73,9 @@ layout_mode = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 15
 
-[node name="your_adventure" type="VBoxContainer" parent="vbox/margin2/scroll/vbox/game_systems_list"]
+[node name="game_system_card" parent="vbox/margin2/scroll/vbox/game_systems_list" instance=ExtResource("2_mv4np")]
+visible = false
 layout_mode = 2
 
-[node name="refrect" type="ReferenceRect" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure"]
-clip_contents = true
-custom_minimum_size = Vector2(160, 200)
-layout_mode = 2
-
-[node name="texture" type="TextureRect" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure/refrect"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -3.8806
-offset_bottom = 3.8806
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("2_1vgfe")
-expand_mode = 5
-stretch_mode = 5
-
-[node name="panel" type="PanelContainer" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure/refrect/texture"]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -23.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="texts" type="VBoxContainer" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure/refrect/texture/panel"]
-layout_mode = 2
-alignment = 2
-
-[node name="system_name" type="Label" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure/refrect/texture/panel/texts"]
-layout_mode = 2
-text = "Pathfinder 2e"
-horizontal_alignment = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure"]
-layout_mode = 2
-
-[node name="edit" type="Button" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "🖊️"
-
-[node name="watch" type="Button" parent="vbox/margin2/scroll/vbox/game_systems_list/your_adventure/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "👁️"
-
-[node name="another_aventure" type="VBoxContainer" parent="vbox/margin2/scroll/vbox/game_systems_list"]
-layout_mode = 2
-
-[node name="refrect" type="ReferenceRect" parent="vbox/margin2/scroll/vbox/game_systems_list/another_aventure"]
-clip_contents = true
-custom_minimum_size = Vector2(160, 200)
-layout_mode = 2
-
-[node name="texture" type="TextureRect" parent="vbox/margin2/scroll/vbox/game_systems_list/another_aventure/refrect"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -3.8806
-offset_bottom = 3.8806
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("2_1vgfe")
-expand_mode = 5
-stretch_mode = 5
-
-[node name="panel" type="PanelContainer" parent="vbox/margin2/scroll/vbox/game_systems_list/another_aventure/refrect/texture"]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -23.0
-grow_horizontal = 2
-grow_vertical = 0
-
-[node name="texts" type="VBoxContainer" parent="vbox/margin2/scroll/vbox/game_systems_list/another_aventure/refrect/texture/panel"]
-layout_mode = 2
-alignment = 2
-
-[node name="system_name" type="Label" parent="vbox/margin2/scroll/vbox/game_systems_list/another_aventure/refrect/texture/panel/texts"]
-layout_mode = 2
-text = "Call of cthulhu 7e"
-horizontal_alignment = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="vbox/margin2/scroll/vbox/game_systems_list/another_aventure"]
-layout_mode = 2
-
-[node name="watch" type="Button" parent="vbox/margin2/scroll/vbox/game_systems_list/another_aventure/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "👁️"
-
+[connection signal="pressed" from="vbox/margin/hbox/refresh" to="." method="_on_refresh_pressed"]
 [connection signal="pressed" from="vbox/margin/hbox/create_new" to="." method="_on_create_new_pressed"]

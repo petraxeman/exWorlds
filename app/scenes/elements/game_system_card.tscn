@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://b18i7gt50l6hx"]
+
+[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="1_0x43t"]
+
+[node name="game_system_card" type="VBoxContainer"]
+
+[node name="refrect" type="ReferenceRect" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -3.8806
+offset_bottom = 3.8806
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_0x43t")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="panel" type="PanelContainer" parent="refrect"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -45.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="texts" type="VBoxContainer" parent="refrect/panel"]
+layout_mode = 2
+alignment = 2
+
+[node name="system_name" type="Label" parent="refrect/panel/texts"]
+layout_mode = 2
+text = "Pathfinder 2e"
+horizontal_alignment = 1
+
+[node name="author" type="Label" parent="refrect/panel/texts"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "petraxeman"
+horizontal_alignment = 1
+
+[node name="hbox" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="edit" type="Button" parent="hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🖊️"
+
+[node name="watch" type="Button" parent="hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "👁️"

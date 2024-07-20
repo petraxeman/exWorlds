@@ -9,9 +9,6 @@ const info_image_afex = "/images/info"
 var http: HTTPRequest = HTTPRequest.new()
 var base_address: String = "127.0.0.1:5000"
 
-signal image_uploaded
-signal image_downloaded
-
 
 
 func _ready():
@@ -31,27 +28,27 @@ func get_info() -> Dictionary:
 
 ## Auth required
 func get_image(file_name: String) -> Dictionary:
-	var cache: Array = Global.cache.select_rows("images", "file_name=\"" + file_name + "\"", ["author", "file_name", "image"])
+	var cache: Array = Global.cache.select_rows("images", "file_name=\"" + file_name + "\"", ["file_name", "image"])
 	if cache != []:
 		var cached: Dictionary = cache[0]
 		var image: Image = Image.new()
 		var _error = image.load_webp_from_buffer(cached["image"])
 		return {"author": cached["author"], "image": image}
-	else:
-		var auth_data = Global.get_auth_data()
-		var headers = auth_data["headers"]
-		var image_info: Dictionary
-		http.request(UrlEnum.build("http", auth_data["addr"], "image_info"), headers, HTTPClient.METHOD_POST)
-		var image_info_result = await http.request_completed
-		image_info = JSON.parse_string(image_info_result[3].get_string_from_utf8())
-		http.request(UrlEnum.build("http", auth_data["addr"], "image_download"), headers, HTTPClient.METHOD_POST)
-		var image_result = await http.request_completed
-		if image_info_result[1] != 200 or image_result[1] != 200:
-			return {"author": "undefined", "image": Image.new()}
-		var new_image = Image.new()
-		new_image.load_webp_from_buffer(image_result[3])
-		return {"author": image_info["author"], "image": new_image}
-	return {"author": "undefined", "image": Image.new()}
+	var auth_data = Global.get_auth_data()
+	var headers = auth_data["headers"]
+	headers.append("Image-Name:"+file_name)
+	var image_info: Dictionary
+	http.request(UrlEnum.build("http", auth_data["addr"], "info_image"), headers, HTTPClient.METHOD_POST)
+	var image_info_result = await http.request_completed
+	image_info = JSON.parse_string(image_info_result[3].get_string_from_utf8())
+	http.request(UrlEnum.build("http", auth_data["addr"], "download_image"), headers, HTTPClient.METHOD_POST)
+	var image_result = await http.request_completed
+	if image_info_result[1] != 200 or image_result[1] != 200:
+		return {"author": "undefined", "image": Image.new()}
+	var new_image: Image = Image.new()
+	new_image.load_webp_from_buffer(image_result[3])
+	Global.cache.insert_row("images", {"file_name": file_name, "image": new_image.save_webp_to_buffer(true)})
+	return {"author": image_info["author"], "image": new_image}
 
 
 ## Auth required
@@ -83,5 +80,54 @@ func create_system(system_name: String, system_codename: String, system_poster: 
 	http.request(UrlEnum.build("http", auth_data["addr"], "create_game_system"), auth_data["headers"], HTTPClient.METHOD_POST, data)
 	var result = await http.request_completed
 	if result[1] == 200:
+		result[3] = JSON.parse_string(result[3].get_string_from_utf8())
+		Global.cache.insert_row("requests",{
+			"hash": result[3]["hash"],
+			"request": "system/"+system_codename,
+			"data": JSON.stringify(data)
+			})
 		return true
 	return false
+
+
+## Auth required
+func get_system(codename: String) -> Dictionary:
+	var cache = Global.cache.select_rows("requests", "request=\"system/" + codename + "\"", ["hash", "data"])
+	var auth_data = Global.get_auth_data()
+	if cache != []:
+		var hash_response: Dictionary = await UrlEnum.post(
+			http,
+			UrlEnum.build("http", auth_data["addr"], "get_game_system_hash"),
+			auth_data["headers"],
+			{"codename": codename}
+			)
+		if hash_response.get("r", "Error") == "Ok" and hash_response["hash"] == cache[0]["hash"]:
+			var cached_data: Dictionary = JSON.parse_string(JSON.parse_string(cache[0]["data"]))
+			return cached_data
+	var new_data: Dictionary = await UrlEnum.post(
+		http,
+		UrlEnum.build("http", auth_data["addr"], "get_game_system"),
+		auth_data["headers"],
+		{"codename": codename}
+	)
+	Global.cache.update_rows("requests", "request=\"system/"+codename+"\"", {"hash": new_data["hash"], "data": JSON.stringify(new_data)})
+	return new_data
+
+
+## Auth required
+func get_systems(page: int) -> Array:
+	var auth_data = Global.get_auth_data()
+	var systems = await UrlEnum.post(
+		http,
+		UrlEnum.build("http", auth_data["addr"], "get_game_systems"),
+		auth_data["headers"],
+		{"page": page}
+		)
+	if systems.get("r", "Error") != "Ok":
+		return []
+	var loaded_system: Array = []
+	for codename in systems["systems"]:
+		var system = await get_system(codename)
+		system["image"] = await get_image(system["image_name"])
+		loaded_system.append(system)
+	return loaded_system

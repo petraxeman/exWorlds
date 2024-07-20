@@ -1,7 +1,7 @@
 from server.app import app, redis_client, db
 from flask import request, send_file, Response
 from werkzeug.utils import secure_filename
-import uuid, io, jwt, datetime, re, json
+import uuid, io, jwt, datetime, re, json, hashlib
 from functools import wraps
 
 
@@ -21,7 +21,7 @@ def token_required(fn):
             data = jwt.decode(token, app.config["JWT_SECRET"], algorithms=["HS256"])
             if datetime.datetime.strptime(data["expire_date"], "%d-%m-%Y") < datetime.datetime.utcnow():
                 return {"msg": "Token expired"}, 401
-            current_user = db.users.find_one({"username": data["username"]}, limit = 1)
+            current_user = db.users.find_one({"username": data["username"]})
             if not current_user:
                 return {"msg": "Undefined token"}, 401
             return fn(*args, **kwargs)
@@ -129,11 +129,10 @@ def upload_image():
 def image_info():
     image_name = request.headers.get("Image-Name")
 
-    image = db.images.find_one({"image_name": image_name}, limit = 1)
-    if image is None:
+    image = db.images.find_one({"name": image_name})
+    if not image:
         return {"msg": "File dont exist"}, 401
-    else:
-        return {"author": image["author"], "image_name": image["image_name"]}, 200
+    return {"author": image["author"], "image_name": image["name"]}, 200
 
 
 # ADD TOKEN AUTHORIZATION AND SYSTEM AUTHOR SUPPORT
@@ -142,9 +141,9 @@ def image_info():
 def download_image():
     image_name = request.headers.get("Image-Name")
 
-    image = db.images.find_one({"image_name": image_name})
+    image = db.images.find_one({"name": image_name})
     if image is None:
-        return {"result": 18, "message": "File does not exist"}, 401
+        return {"msg": "File does not exist"}, 401
     return send_file(io.BytesIO(image["image"]), mimetype="image/webp", download_name = "image.webp"), 200
 
 
@@ -152,20 +151,60 @@ def download_image():
 # === CONTENT ROUTES === #
 # ====================== #
 
-@app.route("/structs/create/system", methods = ["POST"])
+@app.route("/structs/system/create", methods = ["POST"])
+@token_required
 def create_system():
     data = request.json
-    if not db.images.find_one({"name": data["image_name"]}, limit = 1):
+    if not db.images.find_one({"name": data["image_name"]}):
         return {"msg": "Image does not exist"}, 401
     if not re.fullmatch("[0-9a-z\-]+", data["codename"]):
         return {"msg": "Wrong codename"}, 401
     if db.structs.find_one({"author": current_user["username"], "codename": data["codename"], "type": "game_system"}):
         return {"msg": "Codename already taken"}
-    db.structs.insert_one({
-        "type": "game_system",
-        "author": current_user["username"],
+    new_system = {
         "name": data["name"],
         "codename": data["codename"],
-        "image": data["image_name"]
-        })
-    return {"msg": "System creation success"}, 200
+        "image_name": data["image_name"]
+        }
+    hash = hashlib.md5(str(new_system).encode()).hexdigest()
+    new_system["type"] = "game_system"
+    new_system["author"] = current_user["username"]
+    new_system["hash"] = hash
+    db.structs.insert_one(new_system)
+    return {"hash": hash}, 200
+
+
+@app.route("/structs/systems/get", methods = ["POST"])
+@token_required
+def get_systems():
+    data = request.json
+    page = data.get("page", 0)
+    systems = db.structs.find({"type": "game_system"}).skip(10 * page).limit(10)
+    codenames = [el["codename"] for el in systems]
+    return {"systems": codenames}, 200
+
+
+@app.route("/structs/system/get", methods = ["POST"])
+@token_required
+def get_system():
+    codename = request.json.get("codename")
+    if not codename:
+        return {"msg": "Undefined system"}, 401
+    system = db.structs.find_one({"type": "game_system", "codename": codename})
+    if not system:
+        return {"msg": "Undefined system"}, 401
+    del system["type"]
+    del system["_id"]
+    return system, 200
+
+
+@app.route("/structs/system/getHash", methods = ["POST"])
+@token_required
+def get_system_hash():
+    codename = request.json.get("codename")
+    if not codename:
+        return {"msg": "Undefined system"}, 401
+    system = db.structs.find_one({"type": "game_system", "codename": codename})
+    if not system:
+        return {"msg": "Undefined system"}, 401
+    return {"hash": system["hash"]}, 200

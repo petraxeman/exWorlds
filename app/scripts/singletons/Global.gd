@@ -112,13 +112,13 @@ func _init_db():
 	
 	var images_cache_schema = {
 		"id": {"data_type": "int", "primary_key": true, "not_null": true},
-		"author": {"data_type": "text", "not_null": true},
 		"file_name": {"data_type": "text", "not_null": true},
 		"image": {"data_type": "blob", "not_null": true}
 	}
 	var req_cache_structs = {
 		"id": {"data_type": "int", "primary_key": true, "not_null": true},
 		"hash": {"data_type": "text", "not_null": true},
+		"request": {"data_type": "text", "not_null": true},
 		"data": {"data_type": "text", "not_null": true}
 	}
 	cache.drop_table("images")
