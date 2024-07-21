@@ -19,6 +19,7 @@ func _ready():
 # ================================ #
 
 func render_systems() -> void:
+	$vbox/margin/hbox/refresh.disabled = true
 	for child in $vbox/margin2/scroll/vbox/game_systems_list.get_children():
 		child.queue_free()
 	var systems: Array = await ResLoader.get_systems(page - 1)
@@ -27,7 +28,10 @@ func render_systems() -> void:
 		system_card.get_node("refrect/texture").texture = ImageTexture.create_from_image(system["image"]["image"])
 		system_card.get_node("refrect/panel/texts/system_name").text = system["name"]
 		system_card.get_node("refrect/panel/texts/author").text = system["author"]
+		if not system["can_change"]:
+			system_card.get_node("hbox/edit").hide()
 		$vbox/margin2/scroll/vbox/game_systems_list.add_child(system_card)
+	$vbox/margin/hbox/refresh.disabled = false
 
 
 

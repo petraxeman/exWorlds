@@ -33,7 +33,7 @@ func get_image(file_name: String) -> Dictionary:
 		var cached: Dictionary = cache[0]
 		var image: Image = Image.new()
 		var _error = image.load_webp_from_buffer(cached["image"])
-		return {"author": cached["author"], "image": image}
+		return {"image": image}
 	var auth_data = Global.get_auth_data()
 	var headers = auth_data["headers"]
 	headers.append("Image-Name:"+file_name)
@@ -80,19 +80,14 @@ func create_system(system_name: String, system_codename: String, system_poster: 
 	http.request(UrlEnum.build("http", auth_data["addr"], "create_game_system"), auth_data["headers"], HTTPClient.METHOD_POST, data)
 	var result = await http.request_completed
 	if result[1] == 200:
-		result[3] = JSON.parse_string(result[3].get_string_from_utf8())
-		Global.cache.insert_row("requests",{
-			"hash": result[3]["hash"],
-			"request": "system/"+system_codename,
-			"data": JSON.stringify(data)
-			})
 		return true
 	return false
 
 
 ## Auth required
 func get_system(codename: String) -> Dictionary:
-	var cache = Global.cache.select_rows("requests", "request=\"system/" + codename + "\"", ["hash", "data"])
+	var update_row = false
+	var cache = Global.cache.select_rows("requests", 'request="system/%s"' % codename, ["hash", "data"])
 	var auth_data = Global.get_auth_data()
 	if cache != []:
 		var hash_response: Dictionary = await UrlEnum.post(
@@ -102,15 +97,20 @@ func get_system(codename: String) -> Dictionary:
 			{"codename": codename}
 			)
 		if hash_response.get("r", "Error") == "Ok" and hash_response["hash"] == cache[0]["hash"]:
-			var cached_data: Dictionary = JSON.parse_string(JSON.parse_string(cache[0]["data"]))
+			var cached_data: Dictionary = JSON.parse_string(cache[0]["data"])
 			return cached_data
+		else:
+			update_row = true
 	var new_data: Dictionary = await UrlEnum.post(
 		http,
 		UrlEnum.build("http", auth_data["addr"], "get_game_system"),
 		auth_data["headers"],
 		{"codename": codename}
 	)
-	Global.cache.update_rows("requests", "request=\"system/"+codename+"\"", {"hash": new_data["hash"], "data": JSON.stringify(new_data)})
+	if update_row:
+		Global.cache.update_rows("requests", 'request="system/%s"' % codename, {"hash": new_data["hash"], "data": JSON.stringify(new_data)})
+	else:
+		Global.cache.insert_row("requests", {"request": "system/%s" % codename, "hash": new_data["hash"], "data": JSON.stringify(new_data)})
 	return new_data
 
 

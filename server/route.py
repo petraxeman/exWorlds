@@ -195,6 +195,7 @@ def get_system():
         return {"msg": "Undefined system"}, 401
     del system["type"]
     del system["_id"]
+    system["can_change"] = True if current_user["username"] == system["author"] else False
     return system, 200
 
 
