@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://b50yjytm3ctvq"]
+[gd_scene load_steps=2 format=3 uid="uid://b50yjytm3ctvq"]
 
 [ext_resource type="Script" path="res://scripts/scenes/elements/game_systems.gd" id="1_w8k5w"]
-[ext_resource type="PackedScene" uid="uid://b18i7gt50l6hx" path="res://scenes/elements/game_system_card.tscn" id="2_mv4np"]
 
 [node name="game_systems" type="Control"]
 layout_mode = 3
@@ -73,9 +72,14 @@ layout_mode = 2
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 15
 
-[node name="game_system_card" parent="vbox/margin2/scroll/vbox/game_systems_list" instance=ExtResource("2_mv4np")]
-visible = false
+[node name="margin3" type="MarginContainer" parent="vbox"]
 layout_mode = 2
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="pages" type="HBoxContainer" parent="vbox/margin3"]
+layout_mode = 2
+alignment = 1
 
 [connection signal="pressed" from="vbox/margin/hbox/refresh" to="." method="_on_refresh_pressed"]
 [connection signal="pressed" from="vbox/margin/hbox/create_new" to="." method="_on_create_new_pressed"]

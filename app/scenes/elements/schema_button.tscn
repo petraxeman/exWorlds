@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://ceeoaxm7we356"]
+
+[ext_resource type="Script" path="res://scripts/scenes/elements/schema_button.gd" id="1_2gumy"]
+[ext_resource type="Texture2D" uid="uid://ch6nlcv81blys" path="res://assets/icons/bookmarklet.svg" id="1_twtc2"]
+
+[node name="schema" type="MarginContainer"]
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 7
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 7
+theme_override_constants/margin_bottom = 7
+script = ExtResource("1_2gumy")
+
+[node name="panel" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="margin" type="MarginContainer" parent="panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 7
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 7
+theme_override_constants/margin_bottom = 7
+
+[node name="hbox" type="HBoxContainer" parent="panel/margin"]
+layout_mode = 2
+alignment = 1
+
+[node name="icon" type="TextureRect" parent="panel/margin/hbox"]
+layout_mode = 2
+texture = ExtResource("1_twtc2")
+expand_mode = 3
+
+[node name="name" type="Label" parent="panel/margin/hbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Rules
+"

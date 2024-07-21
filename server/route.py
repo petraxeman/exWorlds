@@ -184,6 +184,13 @@ def get_systems():
     return {"systems": codenames}, 200
 
 
+@app.route("/structs/systems/getCount", methods = ["POST"])
+#@token_required
+def get_systems_count():
+    count = db.structs.count_documents({"type": "game_system"})
+    return {"count": count}
+
+
 @app.route("/structs/system/get", methods = ["POST"])
 @token_required
 def get_system():
@@ -209,3 +216,9 @@ def get_system_hash():
     if not system:
         return {"msg": "Undefined system"}, 401
     return {"hash": system["hash"]}, 200
+
+
+@app.route("/structs/schema/create", methods = {"POST"})
+@token_required
+def create_schema():
+    pass

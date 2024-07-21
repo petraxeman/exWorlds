@@ -14,7 +14,8 @@ const endpoints: Dictionary = {
 	"create_game_system": "/structs/system/create",
 	"get_game_system": "/structs/system/get",
 	"get_game_system_hash": "/structs/system/getHash",
-	"get_game_systems": "/structs/systems/get"
+	"get_game_systems": "/structs/systems/get",
+	"get_game_systems_count": "/structs/systems/getCount"
 }
 
 

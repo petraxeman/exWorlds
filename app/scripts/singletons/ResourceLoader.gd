@@ -131,3 +131,17 @@ func get_systems(page: int) -> Array:
 		system["image"] = await get_image(system["image_name"])
 		loaded_system.append(system)
 	return loaded_system
+
+
+## Auth required
+func get_systems_count() -> int:
+	var auth_data = Global.get_auth_data()
+	var result = await UrlEnum.post(
+		http,
+		UrlEnum.build("http", auth_data["addr"], "get_game_systems_count"),
+		auth_data["headers"],
+		{}
+		)
+	if result["r"] == "Ok":
+		return result["count"]
+	return 0
