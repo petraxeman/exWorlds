@@ -29,9 +29,9 @@ func get_info() -> Dictionary:
 func get_image(filename: String) -> Dictionary:
 	var cached_image = CacheUtils.get_image(filename)
 	if cached_image["exists"]:
-		return cached_image["image"]
+		return {"image": cached_image["image"]}
 	var image_bytes: Dictionary = await UrlUtils.post("download_image", [], {"filename": filename}, "raw")
-	if image_bytes["Ok"]:
+	if not image_bytes["Ok"]:
 		return {"image": Image.new()}
 	var image: Image = Image.new()
 	image.load_webp_from_buffer(image_bytes["data"])
@@ -40,7 +40,7 @@ func get_image(filename: String) -> Dictionary:
 
 
 ## Auth required
-func put_image(image: Image) -> bool:
+func put_image(image: Image) -> String:
 	var body: PackedByteArray = PackedByteArray()
 	body.append_array("\r\n--ImageBoundary\r\n".to_utf8_buffer())
 	body.append_array("Content-Disposition: form-data; name=\"image\"; filename=\"picture.webp\"\r\n".to_utf8_buffer())
@@ -50,53 +50,34 @@ func put_image(image: Image) -> bool:
 	var response: Dictionary = await UrlUtils.post_raw("upload_image", ["Content-Type: multipart/form-data; boundary=ImageBoundary"], body)
 	if response["Ok"]:
 		CacheUtils.put_image(response["filename"], image)
-		return true
-	return false
+		return response["filename"]
+	return ""
 
 
 ## Auth required
 func create_system(system_name: String, system_codename: String, system_poster: String):
 	var response: Dictionary = await UrlUtils.post("create_game_system", [], {"name": system_name, "codename": system_codename, "image_name": system_poster})
-	if response["Ok"] == 200:
+	if response["Ok"]:
 		return true
 	return false
 
 
 ## Auth required
 func get_system(codename: String) -> Dictionary:
-	var cached_system: Dictionary = CacheUtils.get_content('system/{0}'.format(codename))
+	var cached_system: Dictionary = CacheUtils.get_content('system/{0}'.format([codename]))
+	var need_update: bool = false
 	if cached_system["exists"]:
-		var response: Dictionary = await UrlUtils.post("get_game_system_hash")
+		var response: Dictionary = await UrlUtils.post("get_game_system_hash", [], {"codename": codename})
 		if response["Ok"]:
 			if response["hash"] == cached_system["hash"]:
 				return cached_system["data"]
-	
-	var update_row = false
-	var cache = Global.cache.select_rows("requests", 'request="system/%s"' % codename, ["hash", "data"])
-	var auth_data = Global.get_auth_data()
-	if cache != []:
-		var hash_response: Dictionary = await UrlEnum.post(
-			http,
-			UrlEnum.build("http", auth_data["addr"], "get_game_system_hash"),
-			auth_data["headers"],
-			{"codename": codename}
-			)
-		if hash_response.get("r", "Error") == "Ok" and hash_response["hash"] == cache[0]["hash"]:
-			var cached_data: Dictionary = JSON.parse_string(cache[0]["data"])
-			return cached_data
-		else:
-			update_row = true
-	var new_data: Dictionary = await UrlEnum.post(
-		http,
-		UrlEnum.build("http", auth_data["addr"], "get_game_system"),
-		auth_data["headers"],
-		{"codename": codename}
-	)
-	if update_row:
-		Global.cache.update_rows("requests", 'request="system/%s"' % codename, {"hash": new_data["hash"], "data": JSON.stringify(new_data)})
-	else:
-		Global.cache.insert_row("requests", {"request": "system/%s" % codename, "hash": new_data["hash"], "data": JSON.stringify(new_data)})
-	return new_data
+			else:
+				need_update = true
+	var response: Dictionary = await UrlUtils.post("get_game_system", [], {"codename": codename})
+	if not response["Ok"]:
+		return {}
+	CacheUtils.put_content("system/{0}".format([codename]), response["hash"], response, need_update)
+	return response
 
 
 ## Auth required
@@ -107,22 +88,20 @@ func get_systems(page: int) -> Array:
 	var systems: Array = []
 	for codename in response["systems"]:
 		var system = await get_system(codename)
+		
 		system["image"] = await get_image(system["image_name"])
+		system["image"]["filename"] = system["image_name"]
+		system.erase("image_name")
+		
 		systems.append(system)
 	return systems
 
 
 ## Auth required
 func get_systems_count() -> int:
-	var auth_data = Global.get_auth_data()
-	var result = await UrlEnum.post(
-		http,
-		UrlEnum.build("http", auth_data["addr"], "get_game_systems_count"),
-		auth_data["headers"],
-		{}
-		)
-	if result["r"] == "Ok":
-		return result["count"]
+	var response = await UrlUtils.post("get_game_systems_count")
+	if response["Ok"]:
+		return response["count"]
 	return 0
 
 

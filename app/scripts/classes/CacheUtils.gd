@@ -34,7 +34,7 @@ static func init_cache_db(server_addr: String):
 
 
 static func get_image(filename: String) -> Dictionary:
-	var cached: Array = Global.cache.select_rows("images", 'filename="{0}"'.format([filename]), ["file_name", "image"])
+	var cached: Array = Global.cache.select_rows("images", 'filename="{0}"'.format([filename]), ["filename", "image"])
 	if cached != []:
 		var loaded_image = Image.new()
 		var _error = loaded_image.load_webp_from_buffer(cached[0]["image"])
@@ -54,5 +54,7 @@ static func get_content(request: String) -> Dictionary:
 	return {"exists": false}
 
 
-static func put_content(request: String, hash: String, data: Dictionary, action: String) -> void:
-	pass
+static func put_content(request: String, hash: String, data: Dictionary, update: bool = false) -> void:
+	if update:
+		Global.cache.update_rows("contents", 'request="{0}"'.format(request), {"hash": hash, "data": JSON.stringify(data)})
+	Global.cache.insert_row("contents", {"request": request, "hash": hash, "data": JSON.stringify(data)})

@@ -45,7 +45,7 @@ static func post(endpoint: String, additional_headers: Array = [], body: Diction
 			data["Ok"] = true
 			return data
 		elif expecting == "raw":
-			return {"Ok": true, "data": result[1]}
+			return {"Ok": true, "data": result[3]}
 	return {"Ok": false}
 
 

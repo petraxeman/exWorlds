@@ -25,7 +25,7 @@ func _on_create_system_pressed():
 	if not image:
 		image = Image.load_from_file("res://assets/placeholder.png")
 	var image_name = await ResLoader.put_image(image)
-	if image_name == "Somthing wrong": return
+	if not image_name: return
 	var creation_result = await ResLoader.create_system($vbox/game_system_name.text, $vbox/game_system_codename.text, image_name)
 	if not creation_result: return
 	parent.remove_tab_by_ref(self)
