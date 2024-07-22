@@ -1,0 +1,109 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1iq2v1vjqxke"]
+
+[ext_resource type="Script" path="res://scripts/scenes/elements/game_system_view.gd" id="1_43t0a"]
+[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="1_tm567"]
+[ext_resource type="PackedScene" uid="uid://ceeoaxm7we356" path="res://scenes/elements/schema_button.tscn" id="2_dripj"]
+
+[node name="game_system_view" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_43t0a")
+
+[node name="vbox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="margin" type="MarginContainer" parent="vbox"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+
+[node name="hbox" type="HBoxContainer" parent="vbox/margin"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="refrect" type="ReferenceRect" parent="vbox/margin/hbox"]
+clip_contents = true
+custom_minimum_size = Vector2(160, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="texture" type="TextureRect" parent="vbox/margin/hbox/refrect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_tm567")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="names" type="VBoxContainer" parent="vbox/margin/hbox"]
+layout_mode = 2
+alignment = 1
+
+[node name="names" type="HBoxContainer" parent="vbox/margin/hbox/names"]
+layout_mode = 2
+
+[node name="system_name" type="Label" parent="vbox/margin/hbox/names/names"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 25
+text = "DnD 5e"
+
+[node name="code_name" type="Label" parent="vbox/margin/hbox/names/names"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 10
+text = "(dnd-5e)"
+
+[node name="author" type="Label" parent="vbox/margin/hbox/names"]
+layout_mode = 2
+text = "petraxeman"
+
+[node name="content_count" type="Label" parent="vbox/margin/hbox/names"]
+visible = false
+layout_mode = 2
+text = "Notes: 251"
+
+[node name="variants" type="VBoxContainer" parent="vbox/margin/hbox"]
+layout_mode = 2
+size_flags_horizontal = 10
+alignment = 2
+
+[node name="refresh" type="Button" parent="vbox/margin/hbox/variants"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "🔄"
+
+[node name="create_new_category" type="Button" parent="vbox/margin/hbox/variants"]
+layout_mode = 2
+text = "Create new category"
+
+[node name="scroll" type="ScrollContainer" parent="vbox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="grid" type="GridContainer" parent="vbox/scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 7
+columns = 2
+
+[node name="schema" parent="vbox/scroll/grid" instance=ExtResource("2_dripj")]
+layout_mode = 2
+
+[connection signal="pressed" from="vbox/margin/hbox/variants/refresh" to="." method="_on_refresh_pressed"]

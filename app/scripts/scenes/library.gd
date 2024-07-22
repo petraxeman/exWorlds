@@ -3,7 +3,8 @@ extends Control
 const tabs_dict: Dictionary = {
 	"home": ["Home page", preload("res://scenes/elements/home_tab.tscn")],
 	"game_systems": ["Game systems", preload("res://scenes/elements/game_systems.tscn")],
-	"create_new_system": ["Create new system", preload("res://scenes/elements/create_system.tscn")]
+	"create_new_system": ["Create new system", preload("res://scenes/elements/create_system.tscn")],
+	"game_system_view": ["System view", preload("res://scenes/elements/game_system_view.tscn")]
 }
 
 
@@ -12,22 +13,20 @@ const tabs_dict: Dictionary = {
 # === SYSTEM CALLS AND FUNCTIONS === #
 # ================================== #
 
-func _ready():
-	pass
-
 
 
 # ================================ #
 # === USER CALLS AND FUNCTIONS === #
 # ================================ #
 
-func create_tab(tab_name: String) -> void:
+func create_tab(tab_name: String) -> Node:
 	if not (tab_name in tabs_dict.keys()):
-		return
+		return Node.new()
 	var new_tab: Array = tabs_dict[tab_name]
 	var new_tab_scene = new_tab[1].instantiate()
 	$tab_container.add_child(new_tab_scene)
 	$tab_bar.add_tab(new_tab[0])
+	return new_tab_scene
 
 
 func remove_tab(tab: int) -> void:

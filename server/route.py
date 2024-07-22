@@ -218,7 +218,16 @@ def get_system_hash():
     return {"hash": system["hash"]}, 200
 
 
-@app.route("/structs/schema/create", methods = {"POST"})
+@app.route("/structs/schema/get", methods = ["POST"])
 @token_required
-def create_schema():
+def get_schema():
     pass
+
+
+@app.route("/structs/schemas/get", methods = ["POST"])
+#@token_required
+def get_schemas():
+    system_codename = request.json.get("system_codename")
+    schemas = db.structs.find({"type": "schema", "game_system": system_codename})
+    schemas = [{"codename": schema["codename"], "icon": schema["icon"], "name": schema["name"], } for schema in schemas]
+    return {"schemas": schemas}, 200

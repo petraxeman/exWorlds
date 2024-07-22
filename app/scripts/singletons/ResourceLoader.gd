@@ -145,3 +145,16 @@ func get_systems_count() -> int:
 	if result["r"] == "Ok":
 		return result["count"]
 	return 0
+
+
+func get_categories(system_codename: String) -> Array:
+	var auth_data: Dictionary = Global.get_auth_data()
+	var response: Dictionary = await UrlEnum.post(
+		http,
+		UrlEnum.build("http", auth_data["addr"], "get_categories"),
+		auth_data["headers"],
+		{"system_codename": system_codename}
+	)
+	if response["r"] == "Ok":
+		return response["schemas"]
+	return []

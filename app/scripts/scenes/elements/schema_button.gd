@@ -13,6 +13,10 @@ func _input(event):
 		emit_signal("button_pressed")
 
 
+func set_icon(icon_name: String):
+	$panel/margin/hbox/icon.texture = IconEnum.get_image_texture(icon_name)
+
+
 func set_texture(texture: ImageTexture):
 	$panel/margin/hbox/icon.texture = texture
 
