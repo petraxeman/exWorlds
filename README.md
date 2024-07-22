@@ -11,11 +11,10 @@ Virtual table for tabletop rpgs
 - [ ] Creating notes by categories
 - [ ] Creating games
 - [ ] Starting games
-- [ ] Full warkable game server
-- [ ] Saving statea of game servers
+- [ ] Full and working game server
+- [ ] Saving state of a game servers
 
-#### Description for elementa of roadmap
-- Auth and registration
+#### Auth and registration
 Registration and authorization:
    - Users can register and log in using their login and password through API endpoints.
    - Upon successful login, users receive an authentication token.
@@ -27,3 +26,19 @@ Registration methods:
    - "on_request": Users can submit a registration request that must be approved by an administrator.
 
 MVP will only support the first two registration methods.
+
+#### Creating game systems
+
+
+
+#### Creating categories for game systems
+
+#### Creating notes by categories
+
+#### Creating games
+
+#### Starting games
+
+#### Full and working game server
+
+#### Saving state of a game servers
