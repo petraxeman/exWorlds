@@ -4,6 +4,7 @@ var servers: Array            = []
 var active_server_index: int  = -1
 var active_server: Dictionary
 var cache: SQLite
+var proto: String = "http"
 
 
 
@@ -12,9 +13,10 @@ var cache: SQLite
 # ================================== #
 
 func _ready():
-	IP.resolve_hostname("localhost", IP.TYPE_IPV4)
 	load_config()
-	_init_db()
+	var dir: DirAccess = DirAccess.open("user://")
+	if not dir.dir_exists("cache"):
+		dir.make_dir("cache")
 
 
 func _notification(what):
@@ -31,7 +33,7 @@ func _notification(what):
 func auth(username: String, password: String) -> bool:
 	var headers: Array = ["Content-Type: application/json"]
 	var data: String = JSON.stringify({"username": username, "password": password})
-	ResLoader.http.request(UrlEnum.build("http", active_server["address"], "auth"), headers, HTTPClient.METHOD_POST, data)
+	ResLoader.http.request(UrlUtils.build("http", active_server["address"], "auth"), headers, HTTPClient.METHOD_POST, data)
 	var result: Array = await ResLoader.http.request_completed
 	if result[1] != 200:
 		return false
@@ -44,18 +46,11 @@ func auth(username: String, password: String) -> bool:
 func register(username: String, password: String) -> bool:
 	var data: String = JSON.stringify({"username": username, "password": password})
 	var headers: Array = ["Content-Type: application/json"]
-	ResLoader.http.request(UrlEnum.build("http", active_server["address"], "registration"), headers, HTTPClient.METHOD_POST, data)
+	ResLoader.http.request(UrlUtils.build("http", active_server["address"], "registration"), headers, HTTPClient.METHOD_POST, data)
 	var result = await ResLoader.http.request_completed
 	if not result[1] == 200:
 		return false
 	return true
-
-
-func get_auth_data() -> Dictionary:
-	return {
-		"addr": active_server["address"], 
-		"headers": ["Content-Type: application/json", "Auth-Token: " + active_server["token"]]
-		}
 
 
 func load_config():
@@ -92,6 +87,8 @@ func set_active_server(index: int) -> bool:
 	active_server = servers[index]
 	return true
 
+
+
 # ====================================== #
 # === ADDITIONAL CALLS AND FUNCTIONS === #
 # ====================================== #
@@ -103,25 +100,3 @@ func _init_config_file():
 	}
 	config_file.store_string(JSON.stringify(data))
 	config_file.close()
-
-
-func _init_db():
-	cache = SQLite.new()
-	cache.path = "user://cache.db"
-	cache.open_db()
-	
-	var images_cache_schema = {
-		"id": {"data_type": "int", "primary_key": true, "not_null": true},
-		"file_name": {"data_type": "text", "not_null": true},
-		"image": {"data_type": "blob", "not_null": true}
-	}
-	var req_cache_structs = {
-		"id": {"data_type": "int", "primary_key": true, "not_null": true},
-		"hash": {"data_type": "text", "not_null": true},
-		"request": {"data_type": "text", "not_null": true},
-		"data": {"data_type": "text", "not_null": true}
-	}
-	cache.drop_table("images")
-	cache.drop_table("requests")
-	cache.create_table("images", images_cache_schema)
-	cache.create_table("requests", req_cache_structs)

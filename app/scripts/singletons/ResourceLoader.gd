@@ -17,9 +17,8 @@ func _ready():
 
 ## Auth not required
 func get_info() -> Dictionary:
-	var auth_data: Dictionary = Global.get_auth_data()
 	var headers: Array = ["Content-Type: application/json"]
-	http.request(UrlEnum.build("http", auth_data["addr"], "server_info"), headers, HTTPClient.METHOD_POST)
+	http.request(UrlUtils.build("http", Global.active_server["address"], "server_info"), headers, HTTPClient.METHOD_POST)
 	var result = await http.request_completed
 	if result[1] == 200:
 		return JSON.parse_string(result[3].get_string_from_utf8())
@@ -27,65 +26,51 @@ func get_info() -> Dictionary:
 
 
 ## Auth required
-func get_image(file_name: String) -> Dictionary:
-	var cache: Array = Global.cache.select_rows("images", "file_name=\"" + file_name + "\"", ["file_name", "image"])
-	if cache != []:
-		var cached: Dictionary = cache[0]
-		var image: Image = Image.new()
-		var _error = image.load_webp_from_buffer(cached["image"])
-		return {"image": image}
-	var auth_data = Global.get_auth_data()
-	var headers = auth_data["headers"]
-	headers.append("Image-Name:"+file_name)
-	var image_info: Dictionary
-	http.request(UrlEnum.build("http", auth_data["addr"], "info_image"), headers, HTTPClient.METHOD_POST)
-	var image_info_result = await http.request_completed
-	image_info = JSON.parse_string(image_info_result[3].get_string_from_utf8())
-	http.request(UrlEnum.build("http", auth_data["addr"], "download_image"), headers, HTTPClient.METHOD_POST)
-	var image_result = await http.request_completed
-	if image_info_result[1] != 200 or image_result[1] != 200:
-		return {"author": "undefined", "image": Image.new()}
-	var new_image: Image = Image.new()
-	new_image.load_webp_from_buffer(image_result[3])
-	Global.cache.insert_row("images", {"file_name": file_name, "image": new_image.save_webp_to_buffer(true)})
-	return {"author": image_info["author"], "image": new_image}
+func get_image(filename: String) -> Dictionary:
+	var cached_image = CacheUtils.get_image(filename)
+	if cached_image["exists"]:
+		return cached_image["image"]
+	var image_bytes: Dictionary = await UrlUtils.post("download_image", [], {"filename": filename}, "raw")
+	if image_bytes["Ok"]:
+		return {"image": Image.new()}
+	var image: Image = Image.new()
+	image.load_webp_from_buffer(image_bytes["data"])
+	CacheUtils.put_image(filename, image)
+	return {"image": image}
 
 
 ## Auth required
-func put_image(image: Image) -> String:
-	var auth_data: Dictionary = Global.get_auth_data()
-	var headers: Array = auth_data["headers"]
-	headers.append("Content-Type: multipart/form-data; boundary=ImageBoundary")
-	var url: String = UrlEnum.build("http", auth_data["addr"], "put_image")
+func put_image(image: Image) -> bool:
 	var body: PackedByteArray = PackedByteArray()
 	body.append_array("\r\n--ImageBoundary\r\n".to_utf8_buffer())
 	body.append_array("Content-Disposition: form-data; name=\"image\"; filename=\"picture.webp\"\r\n".to_utf8_buffer())
 	body.append_array("Content-Type: image/webp\r\n\r\n".to_utf8_buffer())
 	body.append_array(image.save_webp_to_buffer(true))
 	body.append_array("\r\n--ImageBoundary--\r\n".to_utf8_buffer())
-	http.request_raw(url, headers, HTTPClient.METHOD_POST, body)
-	var result = await http.request_completed
-	result[3] = result[3].get_string_from_utf8()
-	if result[1] == 200:
-		var data = JSON.parse_string(result[3])
-		Global.cache.insert_row("images", {"author": data["author"], "file_name": data["name"], "image": image.save_webp_to_buffer(true)})
-		return data["name"]
-	return "Somthing wrong"
+	var response: Dictionary = await UrlUtils.post_raw("upload_image", ["Content-Type: multipart/form-data; boundary=ImageBoundary"], body)
+	if response["Ok"]:
+		CacheUtils.put_image(response["filename"], image)
+		return true
+	return false
 
 
 ## Auth required
 func create_system(system_name: String, system_codename: String, system_poster: String):
-	var data: String = JSON.stringify({"name": system_name, "codename": system_codename, "image_name": system_poster})
-	var auth_data: Dictionary = Global.get_auth_data()
-	http.request(UrlEnum.build("http", auth_data["addr"], "create_game_system"), auth_data["headers"], HTTPClient.METHOD_POST, data)
-	var result = await http.request_completed
-	if result[1] == 200:
+	var response: Dictionary = await UrlUtils.post("create_game_system", [], {"name": system_name, "codename": system_codename, "image_name": system_poster})
+	if response["Ok"] == 200:
 		return true
 	return false
 
 
 ## Auth required
 func get_system(codename: String) -> Dictionary:
+	var cached_system: Dictionary = CacheUtils.get_content('system/{0}'.format(codename))
+	if cached_system["exists"]:
+		var response: Dictionary = await UrlUtils.post("get_game_system_hash")
+		if response["Ok"]:
+			if response["hash"] == cached_system["hash"]:
+				return cached_system["data"]
+	
 	var update_row = false
 	var cache = Global.cache.select_rows("requests", 'request="system/%s"' % codename, ["hash", "data"])
 	var auth_data = Global.get_auth_data()
@@ -116,21 +101,15 @@ func get_system(codename: String) -> Dictionary:
 
 ## Auth required
 func get_systems(page: int) -> Array:
-	var auth_data = Global.get_auth_data()
-	var systems = await UrlEnum.post(
-		http,
-		UrlEnum.build("http", auth_data["addr"], "get_game_systems"),
-		auth_data["headers"],
-		{"page": page}
-		)
-	if systems.get("r", "Error") != "Ok":
+	var response = await UrlUtils.post("get_game_systems", [], {"page": page})
+	if not response["Ok"]:
 		return []
-	var loaded_system: Array = []
-	for codename in systems["systems"]:
+	var systems: Array = []
+	for codename in response["systems"]:
 		var system = await get_system(codename)
 		system["image"] = await get_image(system["image_name"])
-		loaded_system.append(system)
-	return loaded_system
+		systems.append(system)
+	return systems
 
 
 ## Auth required
@@ -148,13 +127,7 @@ func get_systems_count() -> int:
 
 
 func get_categories(system_codename: String) -> Array:
-	var auth_data: Dictionary = Global.get_auth_data()
-	var response: Dictionary = await UrlEnum.post(
-		http,
-		UrlEnum.build("http", auth_data["addr"], "get_categories"),
-		auth_data["headers"],
-		{"system_codename": system_codename}
-	)
-	if response["r"] == "Ok":
+	var response: Dictionary = await UrlUtils.post("get_categories", [], {"system_codename": system_codename})
+	if response["Ok"]:
 		return response["schemas"]
 	return []

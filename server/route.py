@@ -120,16 +120,15 @@ def upload_image():
     image_bytes = request.files['image'].read()
     image_name = str(uuid.uuid4()) + ".webp"
     db.images.insert_one({"author": current_user["username"], "name": image_name, "image": image_bytes})
-    return {"name": image_name, "author": current_user["username"]}, 200
+    return {"filename": image_name, "author": current_user["username"]}, 200
 
 
 # ADD TOKEN AUTHORIZATION
 @app.route("/images/info", methods = ["POST"])
 @token_required
 def image_info():
-    image_name = request.headers.get("Image-Name")
-
-    image = db.images.find_one({"name": image_name})
+    filename = request.json.get("filename")
+    image = db.images.find_one({"name": filename})
     if not image:
         return {"msg": "File dont exist"}, 401
     return {"author": image["author"], "image_name": image["name"]}, 200
@@ -139,9 +138,8 @@ def image_info():
 @app.route("/images/download", methods = ["POST"])
 @token_required
 def download_image():
-    image_name = request.headers.get("Image-Name")
-
-    image = db.images.find_one({"name": image_name})
+    filename = request.json.get("filename")
+    image = db.images.find_one({"name": filename})
     if image is None:
         return {"msg": "File does not exist"}, 401
     return send_file(io.BytesIO(image["image"]), mimetype="image/webp", download_name = "image.webp"), 200

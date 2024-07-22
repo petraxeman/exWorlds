@@ -101,6 +101,7 @@ func _login_pressed():
 		$waiting/vbox/state.text = "Now you will be redirected"
 	$waiting.hide()
 	
+	Global.cache = CacheUtils.init_cache_db(Global.active_server["address"])
 	var library_scene: PackedScene = preload("res://scenes/library.tscn")
 	get_tree().root.add_child(library_scene.instantiate())
 	get_node("/root/server_selection").free()
