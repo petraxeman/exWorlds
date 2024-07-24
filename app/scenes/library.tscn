@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://cc7yn1v7t1bu0"]
+[gd_scene load_steps=3 format=3 uid="uid://cc7yn1v7t1bu0"]
 
 [ext_resource type="Script" path="res://scripts/scenes/library.gd" id="1_6wuwk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pfugg"]
+bg_color = Color(0.355314, 0.355314, 0.355314, 1)
 
 [node name="library" type="Control"]
 layout_mode = 3
@@ -102,6 +105,1107 @@ grow_horizontal = 0
 grow_vertical = 2
 tabs_visible = false
 metadata/_edit_use_anchors_ = true
+
+[node name="create_table" type="Control" parent="tab_container"]
+layout_mode = 2
+
+[node name="margin" type="MarginContainer" parent="tab_container/create_table"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin"]
+layout_mode = 2
+
+[node name="header" type="Label" parent="tab_container/create_table/margin/vbox"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 25
+text = "Creating new table"
+
+[node name="HSeparator" type="HSeparator" parent="tab_container/create_table/margin/vbox"]
+layout_mode = 2
+
+[node name="scroll" type="ScrollContainer" parent="tab_container/create_table/margin/vbox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="settings" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/settings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Settings"
+
+[node name="search" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/settings"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/settings/search"]
+layout_mode = 2
+text = "Search by:"
+
+[node name="LineEdit" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/settings/search"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Field writed in format: name; codename; some-field"
+
+[node name="HSeparator" type="HSeparator" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="properties" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/properties"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Properties"
+
+[node name="elements" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/properties"]
+layout_mode = 2
+
+[node name="property" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/properties/elements"]
+layout_mode = 2
+
+[node name="codename" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/properties/elements/property"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "full-name"
+placeholder_text = "Property codename"
+
+[node name="value" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/properties/elements/property"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "to_upper(#note.name) (#note.codename)"
+placeholder_text = "Property value"
+
+[node name="del" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/properties/elements/property"]
+layout_mode = 2
+text = "X"
+
+[node name="add" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/properties/elements"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 23
+text = "+"
+
+[node name="HSeparator2" type="HSeparator" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="short_view" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/short_view"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Short view"
+
+[node name="elements" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/short_view"]
+layout_mode = 2
+text = "codename; name"
+placeholder_text = "Write codenames of fileds what are you want to show in short view."
+
+[node name="HSeparator3" type="HSeparator" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="main_view" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Main view"
+
+[node name="string_field" type="PanelContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfugg")
+
+[node name="margin" type="MarginContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "String field"
+
+[node name="args_row_1" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="codename" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+text = "Codename:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "my-cool-field"
+max_length = 20
+caret_blink_interval = 0.1
+
+[node name="name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+text = "Name:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "My cool field"
+
+[node name="default" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+text = "Default:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Value"
+
+[node name="placeholder" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+text = "Placeholder:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "This text"
+
+[node name="args_row_2" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="row" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+text = "Row:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+
+[node name="hide" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+text = "Hide:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+
+[node name="hide_name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+text = "Hide name:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+
+[node name="hide_if_empty" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+text = "Hide if empty:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+
+[node name="args_row_3" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="size" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_3"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_3/size"]
+layout_mode = 2
+text = "Size:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_3/size"]
+layout_mode = 2
+max_value = 5.0
+
+[node name="variants" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_3/variants"]
+layout_mode = 2
+text = "Variants:"
+
+[node name="LineEdit" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/args_row_3/variants"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Write possible variants like: [first item; second item], or leave this field blank"
+
+[node name="actions" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox"]
+layout_mode = 2
+
+[node name="Clone" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Clone"
+
+[node name="delete" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/string_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Delete"
+
+[node name="paragraph_field" type="PanelContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfugg")
+
+[node name="margin" type="MarginContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Paragraph field"
+
+[node name="args_row_1" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="codename" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+text = "Codename:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "my-cool-field"
+max_length = 20
+caret_blink_interval = 0.1
+
+[node name="name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+text = "Name:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "My cool field"
+
+[node name="default" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+text = "Default:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Value"
+
+[node name="placeholder" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+text = "Placeholder:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "This text"
+
+[node name="args_row_2" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="row" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+text = "Row:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+min_value = 1.0
+value = 2.0
+
+[node name="hide" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+text = "Hide:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+
+[node name="hide_name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+text = "Hide name:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+
+[node name="hide_if_empty" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+text = "Hide if empty:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+
+[node name="actions" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox"]
+layout_mode = 2
+
+[node name="Clone" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Clone"
+
+[node name="delete" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/paragraph_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Delete"
+
+[node name="number_field" type="PanelContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfugg")
+
+[node name="margin" type="MarginContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Number field"
+
+[node name="args_row_1" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="codename" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+text = "Codename:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "my-cool-field"
+max_length = 20
+caret_blink_interval = 0.1
+
+[node name="name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+text = "Name:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "My cool field"
+
+[node name="default" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+text = "Default:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Value"
+
+[node name="placeholder" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+text = "Placeholder:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "This text"
+
+[node name="args_row_2" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="row" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+text = "Row:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+min_value = 1.0
+value = 3.0
+
+[node name="hide" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+text = "Hide:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+
+[node name="hide_name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+text = "Hide name:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+
+[node name="hide_if_empty" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+text = "Hide if empty:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+
+[node name="args_row_3" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="subtype" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_3"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_3/subtype"]
+layout_mode = 2
+text = "Subtype:"
+
+[node name="OptionButton" type="OptionButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/args_row_3/subtype"]
+layout_mode = 2
+item_count = 3
+selected = 0
+popup/item_0/text = "int"
+popup/item_0/id = 0
+popup/item_1/text = "float"
+popup/item_1/id = 1
+popup/item_2/text = "dice"
+popup/item_2/id = 2
+
+[node name="actions" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox"]
+layout_mode = 2
+
+[node name="Clone" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Clone"
+
+[node name="delete" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/number_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Delete"
+
+[node name="bool_field" type="PanelContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfugg")
+
+[node name="margin" type="MarginContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Bool field"
+
+[node name="args_row_1" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="codename" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+text = "Codename:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "my-cool-field"
+max_length = 20
+caret_blink_interval = 0.1
+
+[node name="name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+text = "Name:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "My cool field"
+
+[node name="default" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+text = "Default:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Value"
+
+[node name="placeholder" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+text = "Placeholder:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "This text"
+
+[node name="args_row_2" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="row" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+text = "Row:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+min_value = 1.0
+value = 4.0
+
+[node name="hide" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+text = "Hide:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+
+[node name="hide_name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+text = "Hide name:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+
+[node name="hide_if_empty" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+text = "Hide if empty:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+
+[node name="actions" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox"]
+layout_mode = 2
+
+[node name="Clone" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Clone"
+
+[node name="delete" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/bool_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Delete"
+
+[node name="list_field" type="PanelContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfugg")
+
+[node name="margin" type="MarginContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "List field"
+
+[node name="args_row_1" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="codename" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+text = "Codename:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "my-cool-field"
+max_length = 20
+caret_blink_interval = 0.1
+
+[node name="name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+text = "Name:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "My cool field"
+
+[node name="default" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+text = "Default:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Value"
+
+[node name="placeholder" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+text = "Placeholder:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "This text"
+
+[node name="args_row_2" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="row" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+text = "Row:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+min_value = 1.0
+value = 5.0
+
+[node name="hide" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+text = "Hide:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+
+[node name="hide_name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+text = "Hide name:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+
+[node name="hide_if_empty" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+text = "Hide if empty:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+
+[node name="args_row_3" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="as_link" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3/as_link"]
+layout_mode = 2
+text = "As link:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3/as_link"]
+layout_mode = 2
+
+[node name="possible_tables" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3/possible_tables"]
+layout_mode = 2
+text = "Possible tables:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3/possible_tables"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "@table; @table-2; @table-3"
+
+[node name="field_name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3/field_name"]
+layout_mode = 2
+text = "Field name:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/args_row_3/field_name"]
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+placeholder_text = "name"
+
+[node name="actions" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox"]
+layout_mode = 2
+
+[node name="Clone" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Clone"
+
+[node name="delete" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/list_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Delete"
+
+[node name="table_field" type="PanelContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfugg")
+
+[node name="margin" type="MarginContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="vbox" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Table field"
+
+[node name="args_row_1" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="codename" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+text = "Codename:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/codename"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "my-cool-field"
+max_length = 20
+caret_blink_interval = 0.1
+
+[node name="name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+text = "Name:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/name"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "My cool field"
+
+[node name="default" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+text = "Default:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/default"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Value"
+
+[node name="placeholder" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+text = "Placeholder:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_1/placeholder"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "This text"
+
+[node name="args_row_2" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="row" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+text = "Row:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/row"]
+layout_mode = 2
+min_value = 1.0
+value = 6.0
+
+[node name="hide" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+text = "Hide:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/hide"]
+layout_mode = 2
+
+[node name="hide_name" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+text = "Hide name:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/hide_name"]
+layout_mode = 2
+
+[node name="hide_if_empty" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+text = "Hide if empty:"
+
+[node name="check" type="CheckButton" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_2/hide_if_empty"]
+layout_mode = 2
+
+[node name="args_row_3" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="column count" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_3"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_3/column count"]
+layout_mode = 2
+text = "Column count:"
+
+[node name="spin" type="SpinBox" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_3/column count"]
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+
+[node name="possible_tables" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_3/possible_tables"]
+layout_mode = 2
+text = "Possible tables:"
+
+[node name="entry" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/args_row_3/possible_tables"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "@table; @table-2; @table-3"
+
+[node name="columns" type="VBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox"]
+layout_mode = 2
+
+[node name="column_1" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/columns"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/columns/column_1"]
+layout_mode = 2
+text = "Column 1"
+
+[node name="name" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/columns/column_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Column name"
+
+[node name="default" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/columns/column_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Column default"
+
+[node name="placeholder" type="LineEdit" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/columns/column_1"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Column placeholder"
+
+[node name="actions" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox"]
+layout_mode = 2
+
+[node name="Clone" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Clone"
+
+[node name="delete" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/main_view/table_field/margin/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Delete"
+
+[node name="add_new_field" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "ADD NEW FIELD"
+
+[node name="final_actions" type="HBoxContainer" parent="tab_container/create_table/margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="save_and_upload" type="Button" parent="tab_container/create_table/margin/vbox/scroll/vbox/final_actions"]
+layout_mode = 2
+text = "Save and upload"
 
 [node name="tab_bar" type="TabBar" parent="."]
 layout_mode = 1
