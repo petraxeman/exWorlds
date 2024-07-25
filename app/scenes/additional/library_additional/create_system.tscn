@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dv622v0j76q1a"]
 
-[ext_resource type="Script" path="res://scripts/scenes/elements/create_system.gd" id="1_kul5c"]
+[ext_resource type="Script" path="res://scenes/additional/library_additional/create_system.gd" id="1_kul5c"]
 [ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="2_tr4vf"]
 
 [node name="create_system" type="Control"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dkacahcwucuc6"]
 
-[ext_resource type="Script" path="res://scripts/scenes/server_selection.gd" id="1_ygnkg"]
+[ext_resource type="Script" path="res://scenes/server_selection.gd" id="1_ygnkg"]
 
 [node name="server_selection" type="Control"]
 layout_mode = 3

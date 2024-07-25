@@ -1,10 +1,10 @@
 extends Control
 
 const tabs_dict: Dictionary = {
-	"home": ["Home page", preload("res://scenes/elements/home_tab.tscn")],
-	"game_systems": ["Game systems", preload("res://scenes/elements/game_systems.tscn")],
-	"create_new_system": ["Create new system", preload("res://scenes/elements/create_system.tscn")],
-	"game_system_view": ["System view", preload("res://scenes/elements/game_system_view.tscn")]
+	"home": ["Home page", preload("res://scenes/additional/library_additional/home_tab.tscn")],
+	"game_systems": ["Game systems", preload("res://scenes/additional/library_additional/game_systems.tscn")],
+	"create_system": ["Create new system", preload("res://scenes/additional/library_additional/create_system.tscn")],
+	"game_system": ["System view", preload("res://scenes/additional/library_additional/game_system.tscn")]
 }
 
 
