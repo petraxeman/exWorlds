@@ -23,7 +23,7 @@ func render_categories():
 	rendering_categories = true
 	var categories = await ResLoader.get_categories(game_system_codename)
 	for category in categories:
-		var category_button = preload("res://scenes/elements/schema_button.tscn").instantiate()
+		var category_button = preload("res://scenes/additional/library_additional/game_system_additional/table_selector_button.tscn").instantiate()
 		category_button.set_icon(category["icon"])
 		category_button.set_label(category["name"])
 		$vbox/scroll/grid.add_child(category_button)

@@ -1,0 +1,124 @@
+[gd_scene load_steps=3 format=3 uid="uid://cc7yn1v7t1bu0"]
+
+[ext_resource type="Script" path="res://scenes/library.gd" id="1_kwn48"]
+[ext_resource type="PackedScene" uid="uid://dscinfguvb265" path="res://scenes/additional/library_additional/create_table.tscn" id="2_v5gxl"]
+
+[node name="library" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kwn48")
+
+[node name="background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.382504, 0.418663, 0.442298, 1)
+
+[node name="menu" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.173611
+anchor_bottom = 1.0
+grow_vertical = 2
+color = Color(0.490196, 0.529412, 0.552941, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="margin" type="MarginContainer" parent="menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="vbox" type="VBoxContainer" parent="menu/margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="server_name" type="Label" parent="menu/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Pupi du pu"
+horizontal_alignment = 1
+text_overrun_behavior = 1
+
+[node name="vbox_top" type="VBoxContainer" parent="menu/margin/vbox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="home" type="Button" parent="menu/margin/vbox/vbox_top"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Home 🏠"
+
+[node name="games" type="Button" parent="menu/margin/vbox/vbox_top"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Games 🎮"
+
+[node name="adventures" type="Button" parent="menu/margin/vbox/vbox_top"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Adventures 📙"
+
+[node name="game_systems" type="Button" parent="menu/margin/vbox/vbox_top"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Game systems 📜"
+
+[node name="vbox_down" type="VBoxContainer" parent="menu/margin/vbox"]
+layout_mode = 2
+
+[node name="server_manager" type="Button" parent="menu/margin/vbox/vbox_down"]
+layout_mode = 2
+text = "Server manager 🗺️"
+
+[node name="settings" type="Button" parent="menu/margin/vbox/vbox_down"]
+layout_mode = 2
+text = "Settings ⚙️"
+
+[node name="exit" type="Button" parent="menu/margin/vbox/vbox_down"]
+layout_mode = 2
+text = "Exit ❌"
+
+[node name="tab_container" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.173611
+anchor_top = 0.0679012
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+tabs_visible = false
+metadata/_edit_use_anchors_ = true
+
+[node name="create_table" parent="tab_container" instance=ExtResource("2_v5gxl")]
+layout_mode = 2
+
+[node name="tab_bar" type="TabBar" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.173611
+anchor_right = 1.0
+anchor_bottom = 0.0679012
+grow_horizontal = 0
+tab_close_display_policy = 1
+drag_to_rearrange_enabled = true
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="menu/margin/vbox/vbox_top/home" to="." method="_on_home_pressed"]
+[connection signal="pressed" from="menu/margin/vbox/vbox_top/game_systems" to="." method="_on_game_systems_pressed"]
+[connection signal="tab_changed" from="tab_bar" to="." method="_on_tab_bar_tab_changed"]
+[connection signal="tab_close_pressed" from="tab_bar" to="." method="_on_tab_bar_tab_close_pressed"]

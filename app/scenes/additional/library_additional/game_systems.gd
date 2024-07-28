@@ -29,7 +29,7 @@ func render_systems() -> void:
 		child.queue_free()
 	var systems: Array = await ResLoader.get_systems(page - 1)
 	for system in systems:
-		var system_card = preload("res://scenes/elements/game_system_card.tscn").instantiate()
+		var system_card = preload("res://scenes/additional/library_additional/game_systems_additional/game_system_card.tscn").instantiate()
 		system_card.get_node("refrect/texture").texture = ImageTexture.create_from_image(system["image"]["image"])
 		system_card.get_node("refrect/panel/texts/system_name").text = system["name"]
 		system_card.get_node("refrect/panel/texts/author").text = system["author"]

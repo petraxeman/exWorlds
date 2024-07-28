@@ -1,14 +1,14 @@
 extends Control
 
 var fields = {
-	0: ["String", preload("res://scenes/elements/tabs/create_table_fields/string_field.tscn")],
-	1: ["Paragraph", preload("res://scenes/elements/tabs/create_table_fields/paragraph_field.tscn")],
-	2: ["Number", preload("res://scenes/elements/tabs/create_table_fields/number_field.tscn")],
-	3: ["Bool", preload("res://scenes/elements/tabs/create_table_fields/bool_field.tscn")],
-	4: ["List", preload("res://scenes/elements/tabs/create_table_fields/list_field.tscn")],
-	5: ["Table", preload("res://scenes/elements/tabs/create_table_fields/table_field.tscn")],
-	6: ["Image", preload("res://scenes/elements/tabs/create_table_fields/image_field.tscn")],
-	7: ["Gelery", preload("res://scenes/elements/tabs/create_table_fields/gelery_field.tscn")]
+	0: ["String", preload("res://scenes/additional/library_additional/create_table_fields/string_field.tscn")],
+	1: ["Paragraph", preload("res://scenes/additional/library_additional/create_table_fields/paragraph_field.tscn")],
+	2: ["Number", preload("res://scenes/additional/library_additional/create_table_fields/number_field.tscn")],
+	3: ["Bool", preload("res://scenes/additional/library_additional/create_table_fields/bool_field.tscn")],
+	4: ["List", preload("res://scenes/additional/library_additional/create_table_fields/list_field.tscn")],
+	5: ["Table", preload("res://scenes/additional/library_additional/create_table_fields/table_field.tscn")],
+	6: ["Image", preload("res://scenes/additional/library_additional/create_table_fields/image_field.tscn")],
+	7: ["Gelery", preload("res://scenes/additional/library_additional/create_table_fields/gelery_field.tscn")]
 }
 
 

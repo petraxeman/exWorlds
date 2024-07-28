@@ -53,6 +53,18 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 23
 text = "Settings"
 
+[node name="table_name" type="HBoxContainer" parent="margin/vbox/scroll/vbox/settings"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="margin/vbox/scroll/vbox/settings/table_name"]
+layout_mode = 2
+text = "Table name:"
+
+[node name="LineEdit" type="LineEdit" parent="margin/vbox/scroll/vbox/settings/table_name"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Weapon, Armor, Potions etc."
+
 [node name="search" type="HBoxContainer" parent="margin/vbox/scroll/vbox/settings"]
 layout_mode = 2
 
@@ -117,8 +129,7 @@ text = "Short view"
 
 [node name="elements" type="LineEdit" parent="margin/vbox/scroll/vbox/short_view"]
 layout_mode = 2
-text = "codename; name"
-placeholder_text = "Write codenames of fileds what are you want to show in short view."
+placeholder_text = "Write codenames of fileds what are you want to show in short view. Example: [name; level; description]"
 
 [node name="HSeparator3" type="HSeparator" parent="margin/vbox/scroll/vbox"]
 layout_mode = 2
@@ -148,7 +159,6 @@ text = "Save and upload"
 title = "Select field"
 initial_position = 2
 size = Vector2i(147, 224)
-visible = true
 item_count = 8
 item_0/text = "String"
 item_0/id = 0
