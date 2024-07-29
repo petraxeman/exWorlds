@@ -223,7 +223,7 @@ def get_schema():
 
 
 @app.route("/structs/schemas/get", methods = ["POST"])
-#@token_required
+@token_required
 def get_schemas():
     system_codename = request.json.get("system_codename")
     schemas = db.structs.find({"type": "schema", "game_system": system_codename})

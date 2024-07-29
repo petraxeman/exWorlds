@@ -87,26 +87,14 @@ placeholder_text = "This text"
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="row" type="HBoxContainer" parent="margin/vbox/args_row_2"]
+[node name="hide_field" type="HBoxContainer" parent="margin/vbox/args_row_2"]
 layout_mode = 2
 
-[node name="label" type="Label" parent="margin/vbox/args_row_2/row"]
+[node name="label" type="Label" parent="margin/vbox/args_row_2/hide_field"]
 layout_mode = 2
-text = "Row:"
+text = "Hide field:"
 
-[node name="spin" type="SpinBox" parent="margin/vbox/args_row_2/row"]
-layout_mode = 2
-min_value = 1.0
-value = 1.0
-
-[node name="hide" type="HBoxContainer" parent="margin/vbox/args_row_2"]
-layout_mode = 2
-
-[node name="label" type="Label" parent="margin/vbox/args_row_2/hide"]
-layout_mode = 2
-text = "Hide:"
-
-[node name="check" type="CheckButton" parent="margin/vbox/args_row_2/hide"]
+[node name="check" type="CheckButton" parent="margin/vbox/args_row_2/hide_field"]
 layout_mode = 2
 
 [node name="hide_name" type="HBoxContainer" parent="margin/vbox/args_row_2"]
@@ -152,7 +140,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Variants:"
 
-[node name="LineEdit" type="LineEdit" parent="margin/vbox/args_row_3/variants"]
+[node name="entry" type="LineEdit" parent="margin/vbox/args_row_3/variants"]
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Write possible variants like: [first item; second item], or leave this field blank"

@@ -15,7 +15,7 @@ var fields = {
 func create_field(index: int) -> void:
 	var new_field: Node = fields[index][1].instantiate()
 	new_field.parent = self
-	$margin/vbox/scroll/vbox/main_view.add_child(new_field)
+	$margin/vbox/scroll/vbox/main_view/vbox.add_child(new_field)
 
 
 func _on_field_type_selected(index: int):
@@ -24,3 +24,11 @@ func _on_field_type_selected(index: int):
 
 func _on_add_new_field_pressed():
 	$field_type_selector.show()
+
+
+func _on_save_and_upload_pressed():
+	for child in $margin/vbox/scroll/vbox/main_view/vbox.get_children():
+		var data: Dictionary = child.get_data()
+		if data["Ok"]:
+			data.erase("Ok")
+			print(data)

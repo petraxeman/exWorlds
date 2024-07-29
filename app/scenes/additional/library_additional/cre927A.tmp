@@ -38,7 +38,6 @@ layout_mode = 2
 [node name="scroll" type="ScrollContainer" parent="margin/vbox"]
 layout_mode = 2
 size_flags_vertical = 3
-scroll_vertical = 75
 horizontal_scroll_mode = 0
 
 [node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll"]
@@ -170,10 +169,6 @@ theme_override_constants/separation = 25
 layout_mode = 2
 theme_override_font_sizes/font_size = 23
 text = "Main view"
-
-[node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll/vbox/main_view"]
-layout_mode = 2
-size_flags_vertical = 3
 
 [node name="add_new_field" type="Button" parent="margin/vbox/scroll/vbox"]
 layout_mode = 2
