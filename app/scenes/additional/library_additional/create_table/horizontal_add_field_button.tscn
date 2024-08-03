@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://b5tesgvbywudk"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/create_table/horizontal_add_field_button.gd" id="1_rk2wt"]
+[ext_resource type="StyleBox" uid="uid://dmfncsvviyvqu" path="res://assets/themes/styleboxes/add_field_button_style_box.tres" id="1_xqexr"]
+
+[node name="horizontal_add_field" type="MarginContainer"]
+offset_right = 12.0
+offset_bottom = 25.0
+script = ExtResource("1_rk2wt")
+
+[node name="line" type="HSeparator" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="add_button" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_styles/normal = ExtResource("1_xqexr")
+theme_override_styles/hover = ExtResource("1_xqexr")
+theme_override_styles/pressed = ExtResource("1_xqexr")
+theme_override_styles/disabled = ExtResource("1_xqexr")
+theme_override_styles/focus = ExtResource("1_xqexr")
+text = "+"
+
+[connection signal="pressed" from="add_button" to="." method="_on_add_button_pressed"]
