@@ -14,7 +14,7 @@ func _input(event):
 
 
 func set_icon(icon_name: String):
-	$panel/margin/hbox/icon.texture = IconEnum.get_image_texture(icon_name)
+	$panel/margin/hbox/icon.texture = Icons.get_icon(icon_name)
 
 
 func set_texture(texture: ImageTexture):

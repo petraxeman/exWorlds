@@ -18,7 +18,7 @@ func _ready():
 # ================================ #
 
 func render_servers():
-	var server_row: PackedScene = load("res://scenes/elements/server_selection/server_row.tscn")
+	var server_row: PackedScene = load("res://scenes/additional/server_selector_additional/server_row.tscn")
 	for child in $margin/vbox/scroll/margin/vbox.get_children():
 		child.queue_free()
 	for i in range(Global.servers.size()):
@@ -101,7 +101,7 @@ func _login_pressed():
 		$waiting/vbox/state.text = "Now you will be redirected"
 	$waiting.hide()
 	
-	Global.cache = CacheUtils.init_cache_db(Global.active_server["address"])
+	#Global.cache = CacheLib.init_cache_db(Global.active_server["address"])
 	var library_scene: PackedScene = preload("res://scenes/library.tscn")
 	get_tree().root.add_child(library_scene.instantiate())
 	get_node("/root/server_selection").free()

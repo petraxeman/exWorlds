@@ -87,9 +87,9 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "🔄"
 
-[node name="create_new_category" type="Button" parent="vbox/margin/hbox/variants"]
+[node name="create_new_table" type="Button" parent="vbox/margin/hbox/variants"]
 layout_mode = 2
-text = "Create new category"
+text = "Create new table"
 
 [node name="scroll" type="ScrollContainer" parent="vbox"]
 layout_mode = 2
@@ -107,3 +107,4 @@ columns = 2
 layout_mode = 2
 
 [connection signal="pressed" from="vbox/margin/hbox/variants/refresh" to="." method="_on_refresh_pressed"]
+[connection signal="pressed" from="vbox/margin/hbox/variants/create_new_table" to="." method="_on_create_new_table_pressed"]

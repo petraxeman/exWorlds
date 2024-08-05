@@ -1,23 +1,30 @@
 extends Node
-class_name UrlUtils
+class_name UrlLib
 
 const endpoints: Dictionary = {
-	# Common
+	# Auth
 	"auth": "/account/auth",
 	"registration": "/account/registration",
+	"add_user_to_queue": "/account/addUserToQueue",
+	# Server
 	"server_info": "/server/info",
 	# Images
-	"upload_image": "/images/upload",
-	"info_image": "/images/info",
-	"download_image": "/images/download",
+	"upload_image": "/image/upload",
+	"info_image": "/image/info",
+	"download_image": "/image/download",
+	# Macros
+	"macro_upload": "/macro/upload",
+	"macro_get": "/macro/get",
 	# Game Systems
-	"create_game_system": "/structs/system/create",
-	"get_game_system": "/structs/system/get",
-	"get_game_system_hash": "/structs/system/getHash",
-	"get_game_systems": "/structs/systems/get",
-	"get_game_systems_count": "/structs/systems/getCount",
+	"create_game_system": "/gameSystem/create",
+	"get_game_system": "/gameSystem/get",
+	"get_game_system_hash": "/gameSystem/getHash",
+	"get_game_systems": "/gameSystems/get",
+	"get_game_systems_count": "/gameSystems/getCount",
 	# Categories
-	"get_categories": "/structs/schemas/get"
+	"get_tables": "/gameSystem/getTables",
+	"get_table": "/gameSystem/getTable",
+	"create_table": "/gameSystem/createTable"
 }
 
 
@@ -26,13 +33,20 @@ static func build(proto: String, url: String, endpoint: String):
 	return proto + "://" + url + endpoints[endpoint]
 
 
-static func post(endpoint: String, additional_headers: Array = [], body: Dictionary = {}, expecting: String = "json"):
+static func post(endpoint: String,
+				additional_headers: Array = [],
+				body: Dictionary = {},
+				expecting: String = "json",
+				auth_required: bool = true):
 	var http: HTTPRequest = HTTPRequest.new()
 	Global.add_child(http)
-	var headers: Array = ["Auth-Token: {0}".format([Global.active_server["token"]]), "Content-Type: application/json"]
+	var headers: Array
+	if auth_required:
+		headers = ["Auth-Token: {0}".format([Global.active_server["token"]]), "Content-Type: application/json"]
+	headers += ["Content-Type: application/json"]
 	headers += additional_headers
 	http.request(
-		UrlUtils.build(Global.proto, Global.active_server["address"], endpoint),
+		UrlLib.build(Global.proto, Global.active_server["address"], endpoint),
 		headers,
 		HTTPClient.METHOD_POST,
 		JSON.stringify(body)
@@ -55,7 +69,7 @@ static func post_raw(endpoint: String, additional_headers: Array, body: PackedBy
 	var headers: Array = ["Auth-Token: {0}".format([Global.active_server["token"]]), "Content-Type: application/json"]
 	headers += additional_headers
 	http.request_raw(
-		UrlUtils.build(Global.proto, Global.active_server["address"], endpoint),
+		UrlLib.build(Global.proto, Global.active_server["address"], endpoint),
 		headers,
 		HTTPClient.METHOD_POST,
 		body

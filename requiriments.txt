@@ -1,4 +1,3 @@
 flask
-flask-redis
 flask-pymongo
-pyjwt
+flask-jwt-extended

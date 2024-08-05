@@ -72,7 +72,7 @@ func render_pages() -> void:
 # ====================================== #
 
 func _on_create_new_pressed():
-	parent.create_tab("create_new_system")
+	parent.create_tab("create_system")
 
 
 func _on_refresh_pressed():
@@ -123,5 +123,5 @@ func _on_watch_system_pressed(codename: String):
 	var system_info: Dictionary = await ResLoader.get_system(codename)
 	var image = await ResLoader.get_image(system_info["image_name"])
 	
-	var tab: Node = parent.create_tab("game_system_view")
+	var tab: Node = parent.create_tab("game_system")
 	tab.setup_view(system_info["name"], system_info["codename"], system_info["author"], 0, ImageTexture.create_from_image(image["image"]))

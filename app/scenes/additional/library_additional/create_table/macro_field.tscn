@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbn5f1bvsd8uj"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/create_table/macro_field.gd" id="1_785ei"]
+
+[node name="macro" type="HBoxContainer"]
+script = ExtResource("1_785ei")
+
+[node name="codename" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+placeholder_text = "Lua script codename"
+
+[node name="select" type="Button" parent="."]
+layout_mode = 2
+text = "Select lua file..."
+
+[node name="method_name" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Method name. Examle: \"calc_damage\""
+
+[node name="del" type="Button" parent="."]
+layout_mode = 2
+text = "X"
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+size = Vector2i(407, 159)
+ok_button_text = "Открыть"
+dialog_hide_on_ok = true
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.lua")
+use_native_dialog = true
+
+[connection signal="pressed" from="select" to="." method="_on_select_pressed"]
+[connection signal="pressed" from="del" to="." method="_on_del_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]

@@ -4,7 +4,8 @@ const tabs_dict: Dictionary = {
 	"home": ["Home page", preload("res://scenes/additional/library_additional/home_tab.tscn")],
 	"game_systems": ["Game systems", preload("res://scenes/additional/library_additional/game_systems.tscn")],
 	"create_system": ["Create new system", preload("res://scenes/additional/library_additional/create_system.tscn")],
-	"game_system": ["System view", preload("res://scenes/additional/library_additional/game_system.tscn")]
+	"game_system": ["System view", preload("res://scenes/additional/library_additional/game_system.tscn")],
+	"create_table": ["Create table", preload("res://scenes/additional/library_additional/create_table.tscn")]
 }
 
 

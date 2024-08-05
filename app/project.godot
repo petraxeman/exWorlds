@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Global="*res://scripts/singletons/Global.gd"
 ResLoader="*res://scripts/singletons/ResourceLoader.gd"
+Icons="*res://scripts/singletons/Icons.gd"
 
 [editor_plugins]
 

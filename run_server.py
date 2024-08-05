@@ -1,3 +1,3 @@
-from server.app import app
+import server
 
-app.run()
+server.app.run()

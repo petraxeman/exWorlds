@@ -1,14 +1,10 @@
-from server.app import app, redis_client, db
+from server import app, db
 from flask import request, send_file, Response
 from werkzeug.utils import secure_filename
 import uuid, io, jwt, datetime, re, json, hashlib
 from functools import wraps
 
 
-
-# ========================== #
-# === ADDITIONAL METHODS === #
-# ========================== #
 
 def token_required(fn):  
     @wraps(fn)  
@@ -104,7 +100,7 @@ def get_server_info():
 # ==================== #
 
 # ADD TOKEN AUTHORIZATION AND SYSTEM AUTHOR SUPPORT
-@app.route("/images/upload", methods = ["POST"])
+@app.route("/image/upload", methods = ["POST"])
 @token_required
 def upload_image():
     if 'image' not in request.files:
@@ -124,7 +120,7 @@ def upload_image():
 
 
 # ADD TOKEN AUTHORIZATION
-@app.route("/images/info", methods = ["POST"])
+@app.route("/image/info", methods = ["POST"])
 @token_required
 def image_info():
     filename = request.json.get("filename")
@@ -135,7 +131,7 @@ def image_info():
 
 
 # ADD TOKEN AUTHORIZATION AND SYSTEM AUTHOR SUPPORT
-@app.route("/images/download", methods = ["POST"])
+@app.route("/image/download", methods = ["POST"])
 @token_required
 def download_image():
     filename = request.json.get("filename")
@@ -145,17 +141,36 @@ def download_image():
     return send_file(io.BytesIO(image["image"]), mimetype="image/webp", download_name = "image.webp"), 200
 
 
-# ====================== #
-# === CONTENT ROUTES === #
-# ====================== #
 
-@app.route("/structs/system/create", methods = ["POST"])
+# ===================== #
+# === MACROS ROUTES === #
+# ===================== #
+
+@app.route("/macro/upload", methods = ["POST"])
+@token_required
+def upload_macros():
+    return {}, 200
+
+
+@app.route("/macro/get", methods = ["POST"])
+@token_required
+def get_macros():
+    pass
+
+
+
+# ===================== #
+# === SYSTEM ROUTES === #
+# ===================== #
+
+@app.route("/gameSystem/create", methods = ["POST"])
 @token_required
 def create_system():
     data = request.json
     if not db.images.find_one({"name": data["image_name"]}):
         return {"msg": "Image does not exist"}, 401
     if not re.fullmatch("[0-9a-z\-]+", data["codename"]):
+        print(data["codename"])
         return {"msg": "Wrong codename"}, 401
     if db.structs.find_one({"author": current_user["username"], "codename": data["codename"], "type": "game_system"}):
         return {"msg": "Codename already taken"}
@@ -172,24 +187,7 @@ def create_system():
     return {"hash": hash}, 200
 
 
-@app.route("/structs/systems/get", methods = ["POST"])
-@token_required
-def get_systems():
-    data = request.json
-    page = data.get("page", 0)
-    systems = db.structs.find({"type": "game_system"}).skip(10 * page).limit(10)
-    codenames = [el["codename"] for el in systems]
-    return {"systems": codenames}, 200
-
-
-@app.route("/structs/systems/getCount", methods = ["POST"])
-#@token_required
-def get_systems_count():
-    count = db.structs.count_documents({"type": "game_system"})
-    return {"count": count}
-
-
-@app.route("/structs/system/get", methods = ["POST"])
+@app.route("/gameSystem/get", methods = ["POST"])
 @token_required
 def get_system():
     codename = request.json.get("codename")
@@ -204,7 +202,7 @@ def get_system():
     return system, 200
 
 
-@app.route("/structs/system/getHash", methods = ["POST"])
+@app.route("/gameSystem/getHash", methods = ["POST"])
 @token_required
 def get_system_hash():
     codename = request.json.get("codename")
@@ -216,16 +214,45 @@ def get_system_hash():
     return {"hash": system["hash"]}, 200
 
 
-@app.route("/structs/schema/get", methods = ["POST"])
+@app.route("/gameSystems/get", methods = ["POST"])
 @token_required
-def get_schema():
+def get_systems():
+    data = request.json
+    page = data.get("page", 0)
+    systems = db.structs.find({"type": "game_system"}).skip(10 * page).limit(10)
+    codenames = [el["codename"] for el in systems]
+    return {"systems": codenames}, 200
+
+
+@app.route("/gameSystems/getCount", methods = ["POST"])
+@token_required
+def get_systems_count():
+    count = db.structs.count_documents({"type": "game_system"})
+    return {"count": count}
+
+
+
+# ==================== #
+# === TABLE ROUTES === #
+# ==================== #
+
+
+@app.route("/gameSystem/getTable", methods = ["POST"])
+@token_required
+def get_table():
     pass
 
 
-@app.route("/structs/schemas/get", methods = ["POST"])
+@app.route("/gameSystem/getTables", methods = ["POST"])
 @token_required
-def get_schemas():
+def get_tables():
     system_codename = request.json.get("system_codename")
     schemas = db.structs.find({"type": "schema", "game_system": system_codename})
     schemas = [{"codename": schema["codename"], "icon": schema["icon"], "name": schema["name"], } for schema in schemas]
     return {"schemas": schemas}, 200
+
+
+@app.route("/gameSystem/createTable", methods = ["POST"])
+@token_required
+def create_table():
+    return {}, 200

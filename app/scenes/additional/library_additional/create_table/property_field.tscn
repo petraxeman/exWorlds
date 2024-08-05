@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://dpeojidf8mtwo"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/create_table/property_field.gd" id="1_xi486"]
+
+[node name="property" type="HBoxContainer"]
+script = ExtResource("1_xi486")
+
+[node name="codename" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+placeholder_text = "Property codename"
+
+[node name="value" type="LineEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Property value"
+
+[node name="del" type="Button" parent="."]
+layout_mode = 2
+text = "X"
+
+[connection signal="pressed" from="del" to="." method="_on_del_pressed"]

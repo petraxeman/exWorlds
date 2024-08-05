@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://cc7yn1v7t1bu0"]
+[gd_scene load_steps=2 format=3 uid="uid://cc7yn1v7t1bu0"]
 
 [ext_resource type="Script" path="res://scenes/library.gd" id="1_kwn48"]
-[ext_resource type="PackedScene" uid="uid://dscinfguvb265" path="res://scenes/additional/library_additional/create_table.tscn" id="2_v5gxl"]
 
 [node name="library" type="Control"]
 layout_mode = 3
@@ -103,9 +102,6 @@ grow_horizontal = 0
 grow_vertical = 2
 tabs_visible = false
 metadata/_edit_use_anchors_ = true
-
-[node name="create_table" parent="tab_container" instance=ExtResource("2_v5gxl")]
-layout_mode = 2
 
 [node name="tab_bar" type="TabBar" parent="."]
 layout_mode = 1

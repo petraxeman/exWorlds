@@ -7,6 +7,8 @@ extends Control
 @onready var field_scene = preload("res://scenes/additional/library_additional/create_table/field.tscn")
 @onready var tab_scene = preload("res://scenes/additional/library_additional/create_table/tab_container.tscn")
 @onready var block_scene = preload("res://scenes/additional/library_additional/create_table/block.tscn")
+@onready var macro_field = preload("res://scenes/additional/library_additional/create_table/macro_field.tscn")
+@onready var property_field = preload("res://scenes/additional/library_additional/create_table/property_field.tscn")
 
 var types_map = {
 	1: {"data": {"type": "string", "codename": "undefined", "name": ""}},
@@ -14,28 +16,41 @@ var types_map = {
 	3: {"data": {"type": "number", "codename": "undefined", "name": ""}},
 	4: {"data": {"type": "bool", "codename": "undefined", "name": ""}},
 	5: {"data": {"type": "list", "codename": "undefined", "name": ""}},
-	6: {"data": {"type": "table", "codename": "undefined", "name": ""}},
-	7: {"data": {"type": "image", "codename": "undefined", "name": ""}},
-	8: {"data": {"type": "gelery", "codename": "undefined", "name": ""}},
+	6: {"data": {"type": "image", "codename": "undefined", "name": ""}},
+	7: {"data": {"type": "gelery", "codename": "undefined", "name": ""}},
+	8: {"data": {"type": "macro", "codename": "undefined", "name": ""}},	
 	10: {"data": {"type": "block", "name": "Common", "rows": []}},
 	11: {"data": {"type": "tab", "tabs": []}},
 }
 
 var type_to_field = {
-	"default_for_simple": {
-		"codename": {"type": "LineEdit", "name": "Codename", "placeholder": "field-codename"},
-		"name": {"type": "LineEdit", "name": "Name", "placeholder": "Name of field"},
-		"default": {"type": "LineEdit", "name": "Default", "placeholder": "Default value"},
-		"placeholder": {"type": "LineEdit", "name": "Placeholder", "placeholder": "This text"},
-		"hide_if_empty": {"type": "CheckButton", "name": "Hide if empty"},
-		"hide_name": {"type": "CheckButton", "name": "Hide name"},
-		"hide": {"type": "CheckButton", "name": "Hide field"}
+	"default": {
+		"codename": {"type": "LineEdit", "name": "Codename:", "placeholder": "field-codename"},
+		"name": {"type": "LineEdit", "name": "Name:", "placeholder": "Name of field"},
+		"default": {"type": "LineEdit", "name": "Default:", "placeholder": "Default value"},
+		"placeholder": {"type": "LineEdit", "name": "Placeholder:", "placeholder": "This text"},
+		"hide_if_empty": {"type": "CheckButton", "name": "Hide if empty:"},
+		"hide_name": {"type": "CheckButton", "name": "Hide name:"},
+		"hide": {"type": "CheckButton", "name": "Hide field:"}
 	},
 	"string": {
-		"size": {"type": "SpinBox", "name": "Size of text", "min": 0, "max": 5, "value": 0},
-		"as_type": {"type": "LineEdit", "name": "As type", "placeholder": "Value1; Value2; Value3"}
+		"size": {"type": "SpinBox", "name": "Size of text:", "min": 0, "max": 5, "value": 0},
+		"as_type": {"type": "LineEdit", "name": "As type:", "placeholder": "Value1; Value2; Value3"}
 	},
 	"paragraph": {},
+	"number": {
+		"subtype": {"type": "OptionButton", "name": "Subtype:", "text": "integer", "variants": ["integer", "float", "dice"]}
+	},
+	"bool": {},
+	"list": {
+		"group_by": {"type": "LineEdit", "name": "Group by:", "placeholder": "field name"},
+		"possible_types": {"type": "LineEdit", "name": "Possible tables:", "placeholder": "@table1; @table2; @table3"},
+	},
+	"image": {},
+	"gelery": {
+		"max_images": {"type": "SpinBox", "name": "Max images:", "min": 0, "max": 100, "value": 0},
+		"images_per_page": {"type": "SpinBox", "name": "Images per page:", "min": 0, "max": 100, "value": 0},
+	}
 }
 
 var settings_map = {}
@@ -141,9 +156,9 @@ func render_field_setup():
 	root_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	
 	var settings: Dictionary = {}
-	if field_setup_source["type"] in ["paragraph", "string"]:
-		settings.merge(type_to_field["default_for_simple"])
-		settings.merge(type_to_field[field_setup_source["type"]])
+	#if field_setup_source["type"] in ["paragraph", "string", "number", "list"]:
+	settings.merge(type_to_field["default"])
+	settings.merge(type_to_field[field_setup_source["type"]], true)
 	
 	for parametr_key: String in settings:
 		var parametr: Dictionary = settings[parametr_key]
@@ -171,7 +186,14 @@ func render_field_setup():
 			spinbox.value = field_setup_source.get(parametr_key, 0)
 			settings_map[parametr_key] = spinbox
 			row.add_child(spinbox)
-		
+		elif parametr["type"] == "OptionButton":
+			var optionbutton: OptionButton = OptionButton.new()
+			for variant in parametr["variants"]:
+				optionbutton.add_item(variant)
+			optionbutton.text = field_setup_source.get(parametr_key, "") if field_setup_source.get(parametr_key, false) else parametr.get("text", "")
+			optionbutton.get_popup().always_on_top = true
+			settings_map[parametr_key] = optionbutton
+			row.add_child(optionbutton)
 		root_vbox.add_child(row)
 	var submit_button: Button = Button.new()
 	submit_button.text = "Submit"
@@ -219,14 +241,13 @@ func _on_field_setup_submited():
 	var new_settings: Dictionary = {}
 	var settings: Dictionary = {}
 	
-	if field_setup_source["type"] in ["paragraph", "string"]:
-		settings.merge(type_to_field["default_for_simple"])
-		settings.merge(type_to_field[field_setup_source["type"]])
+	#if field_setup_source["type"] in ["paragraph", "string", "number", "list"]:
+	settings.merge(type_to_field["default"])
+	settings.merge(type_to_field[field_setup_source["type"]])
 	
 	for parametr_key: String in settings:
 		var parametr: Dictionary = settings[parametr_key]
-		
-		if parametr["type"] == "LineEdit":
+		if parametr["type"] in ["LineEdit", "OptionButton"]:
 			field_setup_source[parametr_key] = settings_map[parametr_key].text
 		elif parametr["type"] == "SpinBox":
 			field_setup_source[parametr_key] = settings_map[parametr_key].value
@@ -236,7 +257,6 @@ func _on_field_setup_submited():
 	render_table()
 	field_setup_source = {}
 	$field_setup.hide()
-	
 
 
 func _on_delete_field_pressed(container: Array, data: Dictionary):
@@ -249,4 +269,13 @@ func _add_field_at(container: Array, index: int, new_line: bool = false):
 	add_field_index = index
 	add_field_new_line = new_line
 	$field_type_selector.show()
-	
+
+
+func _on_add_macro_pressed():
+	var new_macro: HBoxContainer = macro_field.instantiate()
+	$margin/vbox/scroll/vbox/macros/elements/vbox.add_child(new_macro)
+
+
+func _on_add_property_pressed():
+	var new_property: HBoxContainer = property_field.instantiate()
+	$margin/vbox/scroll/vbox/properties/elements/vbox.add_child(new_property)

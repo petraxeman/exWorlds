@@ -1,8 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://dscinfguvb265"]
+[gd_scene load_steps=2 format=3 uid="uid://dscinfguvb265"]
 
 [ext_resource type="Script" path="res://scenes/additional/library_additional/create_table.gd" id="1_8afrb"]
-[ext_resource type="PackedScene" uid="uid://bbn5f1bvsd8uj" path="res://scenes/additional/library_additional/create_table/macro_field.tscn" id="2_6edm6"]
-[ext_resource type="PackedScene" uid="uid://dpeojidf8mtwo" path="res://scenes/additional/library_additional/create_table/property_field.tscn" id="2_h68gc"]
 
 [node name="create_table" type="Control"]
 layout_mode = 3
@@ -78,7 +76,7 @@ text = "Table codename:"
 [node name="LineEdit" type="LineEdit" parent="margin/vbox/scroll/vbox/settings/table_codename"]
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "weapon, aromr, potion etc."
+placeholder_text = "Weapon, Armor, Potions etc."
 
 [node name="table_icon" type="HBoxContainer" parent="margin/vbox/scroll/vbox/settings"]
 layout_mode = 2
@@ -110,6 +108,45 @@ placeholder_text = "Field writed in format: name; codename; some-field"
 [node name="HSeparator" type="HSeparator" parent="margin/vbox/scroll/vbox"]
 layout_mode = 2
 
+[node name="properties" type="VBoxContainer" parent="margin/vbox/scroll/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="margin/vbox/scroll/vbox/properties"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Properties"
+
+[node name="elements" type="VBoxContainer" parent="margin/vbox/scroll/vbox/properties"]
+layout_mode = 2
+
+[node name="property" type="HBoxContainer" parent="margin/vbox/scroll/vbox/properties/elements"]
+layout_mode = 2
+
+[node name="codename" type="LineEdit" parent="margin/vbox/scroll/vbox/properties/elements/property"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "full-name"
+placeholder_text = "Property codename"
+
+[node name="value" type="LineEdit" parent="margin/vbox/scroll/vbox/properties/elements/property"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "to_upper(#note.name) (#note.codename)"
+placeholder_text = "Property value"
+
+[node name="del" type="Button" parent="margin/vbox/scroll/vbox/properties/elements/property"]
+layout_mode = 2
+text = "X"
+
+[node name="add" type="Button" parent="margin/vbox/scroll/vbox/properties/elements"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 23
+text = "+"
+
+[node name="HSeparator2" type="HSeparator" parent="margin/vbox/scroll/vbox"]
+layout_mode = 2
+
 [node name="short_view" type="VBoxContainer" parent="margin/vbox/scroll/vbox"]
 layout_mode = 2
 
@@ -122,59 +159,7 @@ text = "Short view"
 layout_mode = 2
 placeholder_text = "Write codenames of fileds what are you want to show in short view. Example: [name; level; description]"
 
-[node name="HSeparator2" type="HSeparator" parent="margin/vbox/scroll/vbox"]
-layout_mode = 2
-
-[node name="properties" type="VBoxContainer" parent="margin/vbox/scroll/vbox"]
-layout_mode = 2
-
-[node name="label" type="Label" parent="margin/vbox/scroll/vbox/properties"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 23
-text = "Properties"
-
-[node name="elements" type="VBoxContainer" parent="margin/vbox/scroll/vbox/properties"]
-layout_mode = 2
-
-[node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll/vbox/properties/elements"]
-layout_mode = 2
-
-[node name="property" parent="margin/vbox/scroll/vbox/properties/elements/vbox" instance=ExtResource("2_h68gc")]
-layout_mode = 2
-
-[node name="add" type="Button" parent="margin/vbox/scroll/vbox/properties/elements"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 23
-text = "+"
-
 [node name="HSeparator3" type="HSeparator" parent="margin/vbox/scroll/vbox"]
-layout_mode = 2
-
-[node name="macros" type="VBoxContainer" parent="margin/vbox/scroll/vbox"]
-layout_mode = 2
-
-[node name="label" type="Label" parent="margin/vbox/scroll/vbox/macros"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 23
-text = "Macros"
-
-[node name="elements" type="VBoxContainer" parent="margin/vbox/scroll/vbox/macros"]
-layout_mode = 2
-
-[node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll/vbox/macros/elements"]
-layout_mode = 2
-
-[node name="macro_field" parent="margin/vbox/scroll/vbox/macros/elements/vbox" instance=ExtResource("2_6edm6")]
-layout_mode = 2
-
-[node name="add" type="Button" parent="margin/vbox/scroll/vbox/macros/elements"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 23
-text = "+"
-
-[node name="HSeparator4" type="HSeparator" parent="margin/vbox/scroll/vbox"]
 layout_mode = 2
 
 [node name="main_view" type="VBoxContainer" parent="margin/vbox/scroll/vbox"]
@@ -247,7 +232,5 @@ extend_to_title = true
 content_scale_mode = 1
 content_scale_aspect = 4
 
-[connection signal="pressed" from="margin/vbox/scroll/vbox/properties/elements/add" to="." method="_on_add_property_pressed"]
-[connection signal="pressed" from="margin/vbox/scroll/vbox/macros/elements/add" to="." method="_on_add_macro_pressed"]
 [connection signal="pressed" from="margin/vbox/scroll/vbox/final_actions/save_and_upload" to="." method="_on_save_and_upload_pressed"]
 [connection signal="index_pressed" from="field_type_selector" to="." method="_on_field_type_selected"]

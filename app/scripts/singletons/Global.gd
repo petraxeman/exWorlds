@@ -3,7 +3,7 @@ extends Node
 var servers: Array            = []
 var active_server_index: int  = -1
 var active_server: Dictionary
-var cache: SQLite
+var cache: CacheLib = CacheLib.new()
 var proto: String = "http"
 
 
@@ -31,24 +31,19 @@ func _notification(what):
 # ================================ #
 
 func auth(username: String, password: String) -> bool:
-	var headers: Array = ["Content-Type: application/json"]
-	var data: String = JSON.stringify({"username": username, "password": password})
-	ResLoader.http.request(UrlUtils.build("http", active_server["address"], "auth"), headers, HTTPClient.METHOD_POST, data)
-	var result: Array = await ResLoader.http.request_completed
-	if result[1] != 200:
+	var data: Dictionary = {"username": username, "password": password}
+	var result: Dictionary = await UrlLib.post("auth", [], data, "json", false)
+	if not result["Ok"]:
 		return false
-	result[3] = JSON.parse_string(result[3].get_string_from_utf8())
-	servers[active_server_index]["token"] = result[3]["token"]
+	servers[active_server_index]["token"] = result["token"]
 	active_server = servers[active_server_index]
 	return true
 
 
 func register(username: String, password: String) -> bool:
-	var data: String = JSON.stringify({"username": username, "password": password})
-	var headers: Array = ["Content-Type: application/json"]
-	ResLoader.http.request(UrlUtils.build("http", active_server["address"], "registration"), headers, HTTPClient.METHOD_POST, data)
-	var result = await ResLoader.http.request_completed
-	if not result[1] == 200:
+	var data: Dictionary = {"username": username, "password": password}
+	var result: Dictionary = await UrlLib.post("register", [], data, "json", false)
+	if not result["Ok"]:
 		return false
 	return true
 
