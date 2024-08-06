@@ -20,3 +20,7 @@ func _ready():
 
 func get_icon(icon_name: String) -> Image:
 	return icons[icon_name]
+
+
+func get_icons() -> Array:
+	return icons.keys()

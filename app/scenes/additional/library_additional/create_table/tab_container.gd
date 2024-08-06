@@ -8,6 +8,7 @@ signal delete_tab
 func _ready():
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
+
 func add_page(page_name: String) -> Node:
 	var vbox: VBoxContainer = VBoxContainer.new()
 	$tabbar.add_tab(page_name)

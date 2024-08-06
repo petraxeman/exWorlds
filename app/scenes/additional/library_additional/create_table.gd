@@ -25,6 +25,7 @@ var types_map = {
 
 var type_to_field = {
 	"default": {
+		"default_category": {"type": "Label", "name": "Default:"},
 		"codename": {"type": "LineEdit", "name": "Codename:", "placeholder": "field-codename"},
 		"name": {"type": "LineEdit", "name": "Name:", "placeholder": "Name of field"},
 		"default": {"type": "LineEdit", "name": "Default:", "placeholder": "Default value"},
@@ -33,23 +34,44 @@ var type_to_field = {
 		"hide_name": {"type": "CheckButton", "name": "Hide name:"},
 		"hide": {"type": "CheckButton", "name": "Hide field:"}
 	},
+	"default_for_images" : {
+		"dimages_category": {"type": "Label", "name": "Default:"},
+		"codename": {"type": "LineEdit", "name": "Codename:", "placeholder": "field-codename"},
+		"name": {"type": "LineEdit", "name": "Name:", "placeholder": "Name of field"},
+		"hide_if_empty": {"type": "CheckButton", "name": "Hide if empty:"},
+		"hide_name": {"type": "CheckButton", "name": "Hide name:"},
+		"hide": {"type": "CheckButton", "name": "Hide field:"}
+	},
+	"macros": {
+		"macros_category": {"type": "Label", "name": "Macros:"},
+		"macroses": {"type": "LineEdit", "name": "Macroses:", "placeholder": "macro-codename; macro2-codename"}
+		
+	},
 	"string": {
+		"string_category": {"type": "Label", "name": "String settings:"},
 		"size": {"type": "SpinBox", "name": "Size of text:", "min": 0, "max": 5, "value": 0},
 		"as_type": {"type": "LineEdit", "name": "As type:", "placeholder": "Value1; Value2; Value3"}
 	},
 	"paragraph": {},
 	"number": {
+		"number_category": {"type": "Label", "name": "Number settings:"},
 		"subtype": {"type": "OptionButton", "name": "Subtype:", "text": "integer", "variants": ["integer", "float", "dice"]}
 	},
 	"bool": {},
 	"list": {
+		"list_category": {"type": "Label", "name": "List settings:"},
 		"group_by": {"type": "LineEdit", "name": "Group by:", "placeholder": "field name"},
 		"possible_types": {"type": "LineEdit", "name": "Possible tables:", "placeholder": "@table1; @table2; @table3"},
 	},
 	"image": {},
 	"gelery": {
+		"gelery_category": {"type": "Label", "name": "Gelery settings:"},
 		"max_images": {"type": "SpinBox", "name": "Max images:", "min": 0, "max": 100, "value": 0},
 		"images_per_page": {"type": "SpinBox", "name": "Images per page:", "min": 0, "max": 100, "value": 0},
+	},
+	"macro": {},
+	"block": {
+		"name": {"type": "LineEdit", "name": "Block name:"}
 	}
 }
 
@@ -60,7 +82,7 @@ var add_field_index: int = -1
 var add_field_new_line: bool = false
 var field_setup_source: Dictionary = {}
 
-var table: Array = []
+var table: Array = [[{"type": "tab", "tabs": [{"name": "Ponos", "rows": []}]}]]
 
 
 
@@ -89,6 +111,7 @@ func render_table():
 
 
 func parse_data(container: Node, data: Array):
+	print("\n\n\n", data)
 	if container is HBoxContainer:
 		var add_field = vadd_field.instantiate()
 		add_field.pressed.connect(_add_field_at.bind(data, 0))
@@ -100,8 +123,12 @@ func parse_data(container: Node, data: Array):
 	
 	for index in range(data.size()):
 		if data[index]["type"] == "block":
+			
+			data[index]["rows"].erase([])
+			
 			var block_box: VBoxContainer = block_scene.instantiate()
 			block_box.set_block_name(data[index]["name"])
+			block_box.change_block.connect(_on_settings_field_pressed.bind(data[index]))
 			block_box.delete_block.connect(_on_delete_field_pressed.bind(data, data[index]))
 			
 			var add_field = hadd_field.instantiate()
@@ -117,10 +144,11 @@ func parse_data(container: Node, data: Array):
 				var add_field_after = hadd_field.instantiate()
 				add_field_after.pressed.connect(_add_field_at.bind(data[index]["rows"], row_block_index + 1, true))
 				block_box.add_child(add_field_after)
-			
+				
 			container.add_child(block_box)
 		elif data[index]["type"] == "tab":
 			var new_tabs: VBoxContainer = tab_scene.instantiate()
+			new_tabs.change_tab.connect(_on_settings_tab_pressed.bind(data[index]))
 			new_tabs.delete_tab.connect(_on_delete_field_pressed.bind(data, data[index]))
 			for tab in data[index]["tabs"]:
 				var page_vbox: VBoxContainer = new_tabs.add_page(tab["name"])
@@ -156,8 +184,12 @@ func render_field_setup():
 	root_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	
 	var settings: Dictionary = {}
-	#if field_setup_source["type"] in ["paragraph", "string", "number", "list"]:
-	settings.merge(type_to_field["default"])
+	if field_setup_source["type"] != "block":
+		if field_setup_source["type"] in ["image", "gelery", "macro"]:
+			settings.merge(type_to_field["default_for_images"])
+		else:
+			settings.merge(type_to_field["default"])
+		settings.merge(type_to_field["macros"])
 	settings.merge(type_to_field[field_setup_source["type"]], true)
 	
 	for parametr_key: String in settings:
@@ -202,13 +234,70 @@ func render_field_setup():
 	$field_setup.add_child(root_vbox)
 
 
+func render_tab_setup():
+	for child in $tab_setup/vbox/vbox.get_children():
+		child.queue_free()
+	
+	for tab in field_setup_source["tabs"]:
+		var row_box: HBoxContainer = HBoxContainer.new()
+		
+		var tab_name: LineEdit = LineEdit.new()
+		var tab_delete: Button = Button.new()
+		
+		tab_name.text = tab["name"]
+		tab_name.set_meta("prev_name", tab["name"])
+		tab_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		tab_delete.text = "X"
+		tab_delete.pressed.connect(row_box.queue_free)
+		
+		row_box.add_child(tab_name)
+		row_box.add_child(tab_delete)
+		$tab_setup/vbox/vbox.add_child(row_box)
+
+
 func create_field(index: int) -> void:
-	var new_field = types_map[index]["data"].duplicate()
+	var new_field = types_map[index]["data"].duplicate(true)
 	if add_field_new_line:
 		add_field_container.insert(add_field_index, [new_field])
 	else:
 		add_field_container.insert(add_field_index, new_field)
 	render_table()
+
+
+func compress_table() -> Array:
+	var compressed_table: Array = table.duplicate(true)
+	for row in compressed_table:
+		compress_row(row)
+	return compressed_table
+
+
+func compress_row(data: Array):
+	for index in range(data.size()):
+		
+		var fields: Dictionary = {}
+		if data[index]["type"] in ["image", "gelery", "macro"]:
+			fields.merge(type_to_field["default_for_images"])
+		else:
+			fields.merge(type_to_field["default"])
+		fields.merge(type_to_field[data[index]["type"]])
+		fields.merge(type_to_field["macros"])
+		
+		if data[index]["type"] == "block":
+			for row in data[index]["rows"]:
+				compress_row(row)
+		
+		for field in fields:
+			if fields[field]["type"] == "LineEdit" and field in data[index] and data[index][field] == "":
+				data[index].erase(field)
+			elif fields[field]["type"] == "CheckButton" and field in data[index] and data[index][field] == false:
+				data[index].erase(field)
+			elif fields[field]["type"] == "SpinBox" and field in data[index] and data[index][field] == 0:
+				data[index].erase(field)
+
+
+func validate_table() -> bool:
+	return true
 
 
 func _on_field_type_selected(index: int):
@@ -241,8 +330,12 @@ func _on_field_setup_submited():
 	var new_settings: Dictionary = {}
 	var settings: Dictionary = {}
 	
-	#if field_setup_source["type"] in ["paragraph", "string", "number", "list"]:
-	settings.merge(type_to_field["default"])
+	if not field_setup_source["type"] in ["block", "tabs"]:
+		if field_setup_source["type"] in ["images", "gelery"]:
+			settings.merge(type_to_field["default_for_image"])
+		else:
+			settings.merge(type_to_field["default"])
+		settings.merge(type_to_field["macros"])
 	settings.merge(type_to_field[field_setup_source["type"]])
 	
 	for parametr_key: String in settings:
@@ -279,3 +372,64 @@ func _on_add_macro_pressed():
 func _on_add_property_pressed():
 	var new_property: HBoxContainer = property_field.instantiate()
 	$margin/vbox/scroll/vbox/properties/elements/vbox.add_child(new_property)
+
+
+func _on_compress_and_print_pressed():
+	print(compress_table())
+
+
+
+#
+# TABS SETUP ZONE
+#
+
+func _on_settings_tab_pressed(tabcr: Dictionary):
+	field_setup_source = tabcr
+	render_tab_setup()
+	$tab_setup.show()
+
+
+func _on_tab_setup_submit_pressed():
+	var operations: Array = []
+	var exists_tabs: Array = []
+	
+	for tab in field_setup_source["tabs"]:
+		exists_tabs.append(tab["name"])
+	
+	for tab_field in $tab_setup/vbox/vbox.get_children():
+		var tab_name_field: LineEdit = tab_field.get_children()[0]
+		
+		if tab_name_field.get_meta("prev_name") != tab_name_field.text and tab_name_field.get_meta("prev_name") != "Undefined tab":
+			for tab in field_setup_source["tabs"]:
+				if tab["name"] == tab_name_field.get_meta("prev_name"):
+					tab["name"] = tab_name_field.text
+					exists_tabs.erase(tab_name_field.get_meta("prev_name"))
+					break
+		elif not tab_name_field.text in exists_tabs:
+			field_setup_source["tabs"].append({"name": tab_name_field.text, "rows": []})
+		elif tab_name_field.text in exists_tabs:
+			exists_tabs.erase(tab_name_field.text)
+	
+	var to_delete: Array = []
+	for tab in field_setup_source["tabs"]:
+		if tab["name"] in exists_tabs:
+			to_delete.append(tab)
+	
+	for tab_for_delition in to_delete:
+		field_setup_source["tabs"].erase(tab_for_delition)
+	$tab_setup.hide()
+	render_table()
+
+
+func _on_create_field_in_tabs_pressed():
+	var new_tab_field: HBoxContainer = HBoxContainer.new()
+	var tab_name: LineEdit = LineEdit.new()
+	var tab_delete: Button = Button.new()
+	tab_name.text = "Undefined tab"
+	tab_name.set_meta("prev_name", "Undefined tab")
+	tab_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tab_delete.text = "X"
+	tab_delete.pressed.connect(new_tab_field.queue_free)
+	new_tab_field.add_child(tab_name)
+	new_tab_field.add_child(tab_delete)
+	$tab_setup/vbox/vbox.add_child(new_tab_field)

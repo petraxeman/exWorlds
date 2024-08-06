@@ -40,7 +40,7 @@ layout_mode = 2
 [node name="scroll" type="ScrollContainer" parent="margin/vbox"]
 layout_mode = 2
 size_flags_vertical = 3
-scroll_vertical = 19
+scroll_vertical = 100
 horizontal_scroll_mode = 0
 
 [node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll"]
@@ -198,6 +198,10 @@ layout_mode = 2
 layout_mode = 2
 text = "Save and upload"
 
+[node name="Button" type="Button" parent="margin/vbox/scroll/vbox/final_actions"]
+layout_mode = 2
+text = "Compress and print"
+
 [node name="field_type_selector" type="PopupMenu" parent="."]
 title = "Select field"
 initial_position = 2
@@ -247,7 +251,37 @@ extend_to_title = true
 content_scale_mode = 1
 content_scale_aspect = 4
 
+[node name="tab_setup" type="PopupPanel" parent="."]
+title = "Tab setup"
+initial_position = 1
+unresizable = false
+borderless = false
+always_on_top = true
+extend_to_title = true
+content_scale_mode = 1
+content_scale_aspect = 4
+
+[node name="vbox" type="VBoxContainer" parent="tab_setup"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 130.0
+offset_bottom = 96.0
+
+[node name="vbox" type="VBoxContainer" parent="tab_setup/vbox"]
+layout_mode = 2
+
+[node name="create_tab" type="Button" parent="tab_setup/vbox"]
+layout_mode = 2
+text = "Create new tab"
+
+[node name="submit" type="Button" parent="tab_setup/vbox"]
+layout_mode = 2
+text = "Submit"
+
 [connection signal="pressed" from="margin/vbox/scroll/vbox/properties/elements/add" to="." method="_on_add_property_pressed"]
 [connection signal="pressed" from="margin/vbox/scroll/vbox/macros/elements/add" to="." method="_on_add_macro_pressed"]
 [connection signal="pressed" from="margin/vbox/scroll/vbox/final_actions/save_and_upload" to="." method="_on_save_and_upload_pressed"]
+[connection signal="pressed" from="margin/vbox/scroll/vbox/final_actions/Button" to="." method="_on_compress_and_print_pressed"]
 [connection signal="index_pressed" from="field_type_selector" to="." method="_on_field_type_selected"]
+[connection signal="pressed" from="tab_setup/vbox/create_tab" to="." method="_on_create_field_in_tabs_pressed"]
+[connection signal="pressed" from="tab_setup/vbox/submit" to="." method="_on_tab_setup_submit_pressed"]
