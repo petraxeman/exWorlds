@@ -116,10 +116,10 @@ func parse_data(container: Node, data: Array):
 		var add_field = vadd_field.instantiate()
 		add_field.pressed.connect(_add_field_at.bind(data, 0))
 		container.add_child(add_field)
-	else:
-		var add_field = hadd_field.instantiate()
-		add_field.pressed.connect(_add_field_at.bind(data, 0))
-		container.add_child(add_field)
+	#else:
+	#	var add_field = hadd_field.instantiate()
+	#	add_field.pressed.connect(_add_field_at.bind(data, 0))
+	#	container.add_child(add_field)
 	
 	for index in range(data.size()):
 		if data[index]["type"] == "block":
@@ -151,8 +151,20 @@ func parse_data(container: Node, data: Array):
 			new_tabs.change_tab.connect(_on_settings_tab_pressed.bind(data[index]))
 			new_tabs.delete_tab.connect(_on_delete_field_pressed.bind(data, data[index]))
 			for tab in data[index]["tabs"]:
+				tab["rows"].erase([])
 				var page_vbox: VBoxContainer = new_tabs.add_page(tab["name"])
-				parse_data(page_vbox, tab["rows"])
+				
+				var add_field_behind = hadd_field.instantiate()
+				add_field_behind.pressed.connect(_add_field_at.bind(tab["rows"], 0, true))
+				page_vbox.add_child(add_field_behind)
+				
+				for row in range(tab["rows"].size()):
+					var row_box: HBoxContainer = HBoxContainer.new()
+					parse_data(row_box, tab["rows"][row])
+					page_vbox.add_child(row_box)
+					var add_field_after = hadd_field.instantiate()
+					add_field_after.pressed.connect(_add_field_at.bind(tab["rows"], row + 1, true))
+					page_vbox.add_child(add_field_after)
 			container.add_child(new_tabs)
 		else:
 			var new_field: PanelContainer = field_scene.instantiate()
@@ -166,10 +178,10 @@ func parse_data(container: Node, data: Array):
 			var add_field = vadd_field.instantiate()
 			add_field.pressed.connect(_add_field_at.bind(data, index + 1))
 			container.add_child(add_field)
-		else:
-			var add_field = hadd_field.instantiate()
-			add_field.pressed.connect(_add_field_at.bind(data, index + 1))
-			container.add_child(add_field)
+		#else:
+		#	var add_field = hadd_field.instantiate()
+		#	add_field.pressed.connect(_add_field_at.bind(data, index + 1))
+		#	container.add_child(add_field)
 
 
 func render_field_setup():
@@ -276,16 +288,21 @@ func compress_row(data: Array):
 	for index in range(data.size()):
 		
 		var fields: Dictionary = {}
-		if data[index]["type"] in ["image", "gelery", "macro"]:
-			fields.merge(type_to_field["default_for_images"])
-		else:
-			fields.merge(type_to_field["default"])
-		fields.merge(type_to_field[data[index]["type"]])
-		fields.merge(type_to_field["macros"])
+		if not data[index]["type"] in ["block", "tab"]:
+			if data[index]["type"] in ["image", "gelery", "macro"]:
+				fields.merge(type_to_field["default_for_images"])
+			else:
+				fields.merge(type_to_field["default"])
+			fields.merge(type_to_field[data[index]["type"]])
+			fields.merge(type_to_field["macros"])
 		
 		if data[index]["type"] == "block":
 			for row in data[index]["rows"]:
 				compress_row(row)
+		elif data[index]["type"] == "tab":
+			for tab in data[index]["tabs"]:
+				for row in tab["rows"]:
+					compress_row(row)
 		
 		for field in fields:
 			if fields[field]["type"] == "LineEdit" and field in data[index] and data[index][field] == "":
