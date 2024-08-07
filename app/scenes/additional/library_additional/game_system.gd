@@ -40,4 +40,6 @@ func _on_refresh_pressed():
 
 
 func _on_create_new_table_pressed():
-	parent.create_tab("create_table")
+	var create_table_scene: Node = parent.create_tab("create_table")
+	create_table_scene.game_system = game_system_codename
+	create_table_scene.render_table()

@@ -32,7 +32,8 @@ func _init():
 
 
 func get_image(filename: String) -> Dictionary:
-	var response: Array = cache.select_rows("images", 'filename="{0}"'.format([filename]), ["filename", "image"])
+	var request_filename = "server:{0};filename:{1}".format([Global.active_server["address"], filename])
+	var response: Array = cache.select_rows("images", 'filename="{0}"'.format([request_filename]), ["filename", "image"])
 	if response != []:
 		var loaded_image = Image.new()
 		var _error = loaded_image.load_webp_from_buffer(response[0]["image"])
@@ -41,11 +42,13 @@ func get_image(filename: String) -> Dictionary:
 
 
 func put_image(filename: String, image: Image) -> void:
-	cache.insert_row("images", {"filename": filename, "image": image.save_webp_to_buffer(true)})
+	var request_filename = "server:{0};filename:{1}".format([Global.active_server["address"], filename])
+	cache.insert_row("images", {"filename": request_filename, "image": image.save_webp_to_buffer(true)})
 
 
 func get_content(address: String) -> Dictionary:
-	var response: Array = cache.select_rows("contents", 'address="{0}"'.format([address]), ["hash", "data"])
+	var request_address = "server:{0};content_marks:{1}".format([Global.active_server["address"], address])
+	var response: Array = cache.select_rows("contents", 'address="{0}"'.format([request_address]), ["hash", "data"])
 	if response != []:
 		var loaded_data: Dictionary = JSON.parse_string(response[0]["data"])
 		return {"Ok": true, "hash": response[0]["hash"], "data": loaded_data}
@@ -53,6 +56,7 @@ func get_content(address: String) -> Dictionary:
 
 
 func put_content(address: String, hash: String, data: Dictionary, update: bool = false) -> void:
+	var request_address = "server:{0};content_marks:{1}".format([Global.active_server["address"], address])
 	if update:
-		cache.update_rows("contents", 'address="{0}"'.format(address), {"hash": hash, "data": JSON.stringify(data)})
-	cache.insert_row("contents", {"address": address, "hash": hash, "data": JSON.stringify(data)})
+		cache.update_rows("contents", 'address="{0}"'.format([request_address]), {"hash": hash, "data": JSON.stringify(data)})
+	cache.insert_row("contents", {"address": request_address, "hash": hash, "data": JSON.stringify(data)})

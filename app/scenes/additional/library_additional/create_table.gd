@@ -1,5 +1,7 @@
 extends Control
 
+@onready var parent = get_node("/root/library")
+
 @onready var froot = $margin/vbox/scroll/vbox/main_view/vbox
 
 @onready var hadd_field = preload("res://scenes/additional/library_additional/create_table/horizontal_add_field_button.tscn")
@@ -16,11 +18,12 @@ var types_map = {
 	3: {"data": {"type": "number", "codename": "undefined", "name": ""}},
 	4: {"data": {"type": "bool", "codename": "undefined", "name": ""}},
 	5: {"data": {"type": "list", "codename": "undefined", "name": ""}},
-	6: {"data": {"type": "image", "codename": "undefined", "name": ""}},
-	7: {"data": {"type": "gelery", "codename": "undefined", "name": ""}},
-	8: {"data": {"type": "macro", "codename": "undefined", "name": ""}},	
-	10: {"data": {"type": "block", "name": "Common", "rows": []}},
-	11: {"data": {"type": "tab", "tabs": []}},
+	6: {"data": {"type": "table", "codename": "undefined", "name": ""}},
+	7: {"data": {"type": "image", "codename": "undefined", "name": ""}},
+	8: {"data": {"type": "gelery", "codename": "undefined", "name": ""}},
+	9: {"data": {"type": "macro", "codename": "undefined", "name": ""}},
+	11: {"data": {"type": "block", "name": "Common", "rows": []}},
+	12: {"data": {"type": "tab", "tabs": []}},
 }
 
 var type_to_field = {
@@ -32,7 +35,8 @@ var type_to_field = {
 		"placeholder": {"type": "LineEdit", "name": "Placeholder:", "placeholder": "This text"},
 		"hide_if_empty": {"type": "CheckButton", "name": "Hide if empty:"},
 		"hide_name": {"type": "CheckButton", "name": "Hide name:"},
-		"hide": {"type": "CheckButton", "name": "Hide field:"}
+		"hide": {"type": "CheckButton", "name": "Hide field:"},
+		"changable": {"type": "CheckButton", "name": "In-game changable"},
 	},
 	"default_for_image" : {
 		"dimages_category": {"type": "Label", "name": "Default:"},
@@ -40,7 +44,8 @@ var type_to_field = {
 		"name": {"type": "LineEdit", "name": "Name:", "placeholder": "Name of field"},
 		"hide_if_empty": {"type": "CheckButton", "name": "Hide if empty:"},
 		"hide_name": {"type": "CheckButton", "name": "Hide name:"},
-		"hide": {"type": "CheckButton", "name": "Hide field:"}
+		"hide": {"type": "CheckButton", "name": "Hide field:"},
+		"changable": {"type": "CheckButton", "name": "In-game changable"},
 	},
 	"macros": {
 		"macros_category": {"type": "Label", "name": "Macros:"},
@@ -63,6 +68,10 @@ var type_to_field = {
 		"group_by": {"type": "LineEdit", "name": "Group by:", "placeholder": "field name"},
 		"possible_types": {"type": "LineEdit", "name": "Possible tables:", "placeholder": "@table1; @table2; @table3"},
 	},
+	"table": {
+		"table_category": {"type": "Label", "name": "Table settings:"},
+		"possible_types": {"type": "LineEdit", "name": "Possible tables:", "placeholder": "@table1; @table2; @table3"}
+	},
 	"image": {},
 	"gelery": {
 		"gelery_category": {"type": "Label", "name": "Gelery settings:"},
@@ -82,6 +91,8 @@ var add_field_index: int = -1
 var add_field_new_line: bool = false
 var field_setup_source: Dictionary = {}
 
+
+var game_system: String
 var table: Array = []
 
 
@@ -89,7 +100,7 @@ var table: Array = []
 func _ready():
 	for icon_name in Icons.get_icons():
 		$margin/vbox/scroll/vbox/settings/table_icon/OptionButton.add_item(icon_name)
-	render_table()
+	#@render_table()
 
 
 func render_table():
@@ -337,7 +348,7 @@ func validate_table() -> Dictionary:
 	
 	for codename in codenames:
 		var result = regex.search(codename)
-		if result.get_string() == codename:
+		if (result != null) and result.get_string() == codename:
 			if codename in validated_codenames:
 				validation_result["Ok"] = false
 				validation_result["messages"].append("Codename: \"%s\" used more than one time" % codename)
@@ -449,7 +460,8 @@ func _on_save_and_upload_pressed():
 	
 	if validation_result["Ok"]:
 		var preapred_table: Dictionary = build_upload_request()
-		print(preapred_table)
+		ResLoader.create_table(preapred_table, game_system)
+		parent.remove_tab_by_ref(self)
 	else:
 		var warnings_text: String = "Wait, i find this errors:\n" 
 		for message_index in range(validation_result["messages"].size()):

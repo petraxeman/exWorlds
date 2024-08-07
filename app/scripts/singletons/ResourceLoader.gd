@@ -96,8 +96,22 @@ func get_systems_count() -> int:
 	return 0
 
 
+#
+# TABLE ACTIONS
+#
+
+# GET ALL TABLES IN SYSTEM 
 func get_tables(system_codename: String) -> Array:
 	var response: Dictionary = await UrlLib.post("get_tables", [], {"system_codename": system_codename})
 	if response["Ok"]:
 		return response["schemas"]
 	return []
+
+
+# CREATE NEW TABLE
+func create_table(data: Dictionary, system_name: String):
+	var response: Dictionary = await UrlLib.post("create_table", ["Game-System: %s"%system_name], data)
+	if response["Ok"]:
+		Global.cache.put_content("(type=table,system_name={0},table_name={1})".format([system_name, data["common"]["table_codename"]]), response["hash"], data)
+		return true
+	return false

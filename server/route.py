@@ -22,7 +22,6 @@ def token_required(fn):
                 return {"msg": "Undefined token"}, 401
             return fn(*args, **kwargs)
         except Exception as err:
-            print(err)
             return {"msg": "Wrong token"}, 401
     return decorator 
 
@@ -72,7 +71,7 @@ def register():
 @app.route("/account/addUserToQueue", methods = ["POST"])
 @token_required
 def add_to_register_queue():
-    username = request.data.get("username")
+    username = request.json.get("username")
 
     if current_user["role"] != "admin":
         return {"msg": "Registration forbidden"}; 401
@@ -170,10 +169,10 @@ def create_system():
     if not db.images.find_one({"name": data["image_name"]}):
         return {"msg": "Image does not exist"}, 401
     if not re.fullmatch("[0-9a-z\-_]+", data["codename"]):
-        print(data["codename"])
         return {"msg": "Wrong codename"}, 401
     if db.structs.find_one({"author": current_user["username"], "codename": data["codename"], "type": "game_system"}):
-        return {"msg": "Codename already taken"}
+        return {"msg": "Codename already taken"}, 401
+    
     new_system = {
         "name": data["name"],
         "codename": data["codename"],
@@ -252,15 +251,40 @@ def get_tables():
     return {"schemas": schemas}, 200
 
 
-
-def parse_table(table: list):
-    return {} # Должен вернуть список полей и результат проверки
-
-def parse_row(row: list):
-    pass
-
 @app.route("/gameSystem/createTable", methods = ["POST"])
 @token_required
 def create_table():
-    parse_table(request.json.get("table", []))
-    return {}, 200
+    for property in ["common", "macros", "table", "properties"]:
+        if property not in list(request.json.keys()):
+            return {"msg": "Bad request"}, 401
+    
+    if not request.json["common"].get("table_codename", False) or not request.json["common"].get("table_name", False):
+        return {"msg": "Not name or codename"}, 401
+    
+    table_hash = hashlib.md5(str(request.json).encode()).hexdigest()
+
+    if db.structs.find_one({"author": current_user["username"], "codename": request.json["common"]["table_codename"], "type": "schema"}):
+        db.structs.update_one({"author": current_user["username"], "codename": request.json["common"]["table_codename"], "type": "schema"}, {
+            "$set": {
+                "name": request.json["common"]["table_name"],
+                "hash": table_hash,
+                "table_data": request.json,
+                "icon": request.json["common"]["table_icon"]
+            }
+        })
+    else:
+        print(current_user["username"])
+        table = {
+            "author": current_user["username"],
+            "game_system": request.headers.get("Game-System"),
+            "icon": request.json["common"].get("table_icon", ""),
+            "name": request.json["common"]["table_name"],
+            "codename": request.json["common"]["table_codename"],
+            "hash": table_hash,
+            "type": "schema",
+            "table_data": request.json
+        }
+        db.structs.insert_one(table)
+    
+
+    return {"Ok": True, "hash": table_hash}, 200
