@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dscinfguvb265"]
+[gd_scene load_steps=3 format=3 uid="uid://dscinfguvb265"]
 
 [ext_resource type="Script" path="res://scenes/additional/library_additional/create_table.gd" id="1_8afrb"]
 [ext_resource type="PackedScene" uid="uid://bbn5f1bvsd8uj" path="res://scenes/additional/library_additional/create_table/macro_field.tscn" id="2_6edm6"]
-[ext_resource type="PackedScene" uid="uid://dpeojidf8mtwo" path="res://scenes/additional/library_additional/create_table/property_field.tscn" id="2_h68gc"]
 
 [node name="create_table" type="Control"]
 layout_mode = 3
@@ -40,7 +39,7 @@ layout_mode = 2
 [node name="scroll" type="ScrollContainer" parent="margin/vbox"]
 layout_mode = 2
 size_flags_vertical = 3
-scroll_vertical = 100
+scroll_vertical = 25
 horizontal_scroll_mode = 0
 
 [node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll"]
@@ -80,21 +79,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "weapon, aromr, potion etc."
 
-[node name="table_icon" type="HBoxContainer" parent="margin/vbox/scroll/vbox/settings"]
-layout_mode = 2
-
-[node name="label" type="Label" parent="margin/vbox/scroll/vbox/settings/table_icon"]
-layout_mode = 2
-text = "Table icon:"
-
-[node name="OptionButton" type="OptionButton" parent="margin/vbox/scroll/vbox/settings/table_icon"]
-layout_mode = 2
-item_count = 2
-popup/item_0/text = "Book"
-popup/item_0/id = 0
-popup/item_1/text = "Sword"
-popup/item_1/id = 1
-
 [node name="search" type="HBoxContainer" parent="margin/vbox/scroll/vbox/settings"]
 layout_mode = 2
 
@@ -106,6 +90,32 @@ text = "Search by:"
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Field writed in format: name; codename; some-field"
+
+[node name="table_icon" type="HBoxContainer" parent="margin/vbox/scroll/vbox/settings"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="margin/vbox/scroll/vbox/settings/table_icon"]
+layout_mode = 2
+text = "Table icon:"
+
+[node name="OptionButton" type="OptionButton" parent="margin/vbox/scroll/vbox/settings/table_icon"]
+layout_mode = 2
+
+[node name="table_view" type="HBoxContainer" parent="margin/vbox/scroll/vbox/settings"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="margin/vbox/scroll/vbox/settings/table_view"]
+layout_mode = 2
+text = "Table view:"
+
+[node name="OptionButton" type="OptionButton" parent="margin/vbox/scroll/vbox/settings/table_view"]
+layout_mode = 2
+item_count = 2
+selected = 0
+popup/item_0/text = "List"
+popup/item_0/id = 0
+popup/item_1/text = "Table"
+popup/item_1/id = 1
 
 [node name="HSeparator" type="HSeparator" parent="margin/vbox/scroll/vbox"]
 layout_mode = 2
@@ -137,9 +147,6 @@ text = "Properties"
 layout_mode = 2
 
 [node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll/vbox/properties/elements"]
-layout_mode = 2
-
-[node name="property" parent="margin/vbox/scroll/vbox/properties/elements/vbox" instance=ExtResource("2_h68gc")]
 layout_mode = 2
 
 [node name="add" type="Button" parent="margin/vbox/scroll/vbox/properties/elements"]
@@ -197,10 +204,6 @@ layout_mode = 2
 [node name="save_and_upload" type="Button" parent="margin/vbox/scroll/vbox/final_actions"]
 layout_mode = 2
 text = "Save and upload"
-
-[node name="Button" type="Button" parent="margin/vbox/scroll/vbox/final_actions"]
-layout_mode = 2
-text = "Compress and print"
 
 [node name="field_type_selector" type="PopupMenu" parent="."]
 title = "Select field"
@@ -278,10 +281,19 @@ text = "Create new tab"
 layout_mode = 2
 text = "Submit"
 
+[node name="warnings" type="AcceptDialog" parent="."]
+title = "Something went wrong"
+initial_position = 1
+size = Vector2i(300, 100)
+always_on_top = true
+extend_to_title = true
+content_scale_mode = 1
+content_scale_aspect = 4
+ok_button_text = "Ok..."
+
 [connection signal="pressed" from="margin/vbox/scroll/vbox/properties/elements/add" to="." method="_on_add_property_pressed"]
 [connection signal="pressed" from="margin/vbox/scroll/vbox/macros/elements/add" to="." method="_on_add_macro_pressed"]
 [connection signal="pressed" from="margin/vbox/scroll/vbox/final_actions/save_and_upload" to="." method="_on_save_and_upload_pressed"]
-[connection signal="pressed" from="margin/vbox/scroll/vbox/final_actions/Button" to="." method="_on_compress_and_print_pressed"]
 [connection signal="index_pressed" from="field_type_selector" to="." method="_on_field_type_selected"]
 [connection signal="pressed" from="tab_setup/vbox/create_tab" to="." method="_on_create_field_in_tabs_pressed"]
 [connection signal="pressed" from="tab_setup/vbox/submit" to="." method="_on_tab_setup_submit_pressed"]

@@ -34,7 +34,7 @@ var type_to_field = {
 		"hide_name": {"type": "CheckButton", "name": "Hide name:"},
 		"hide": {"type": "CheckButton", "name": "Hide field:"}
 	},
-	"default_for_images" : {
+	"default_for_image" : {
 		"dimages_category": {"type": "Label", "name": "Default:"},
 		"codename": {"type": "LineEdit", "name": "Codename:", "placeholder": "field-codename"},
 		"name": {"type": "LineEdit", "name": "Name:", "placeholder": "Name of field"},
@@ -82,11 +82,13 @@ var add_field_index: int = -1
 var add_field_new_line: bool = false
 var field_setup_source: Dictionary = {}
 
-var table: Array = [[{"type": "tab", "tabs": [{"name": "Ponos", "rows": []}]}]]
+var table: Array = []
 
 
 
 func _ready():
+	for icon_name in Icons.get_icons():
+		$margin/vbox/scroll/vbox/settings/table_icon/OptionButton.add_item(icon_name)
 	render_table()
 
 
@@ -111,7 +113,6 @@ func render_table():
 
 
 func parse_data(container: Node, data: Array):
-	print("\n\n\n", data)
 	if container is HBoxContainer:
 		var add_field = vadd_field.instantiate()
 		add_field.pressed.connect(_add_field_at.bind(data, 0))
@@ -198,7 +199,7 @@ func render_field_setup():
 	var settings: Dictionary = {}
 	if field_setup_source["type"] != "block":
 		if field_setup_source["type"] in ["image", "gelery", "macro"]:
-			settings.merge(type_to_field["default_for_images"])
+			settings.merge(type_to_field["default_for_image"])
 		else:
 			settings.merge(type_to_field["default"])
 		settings.merge(type_to_field["macros"])
@@ -313,8 +314,123 @@ func compress_row(data: Array):
 				data[index].erase(field)
 
 
-func validate_table() -> bool:
-	return true
+func validate_table() -> Dictionary:
+	var validation_result: Dictionary = {"Ok": true, "messages": []}
+	var table_name: String = $margin/vbox/scroll/vbox/settings/table_name/LineEdit.text
+	var table_codename: String = $margin/vbox/scroll/vbox/settings/table_codename/LineEdit.text
+	var regex: RegEx = RegEx.new()
+	regex.compile("[0-9a-z\\-_]+")
+	
+	if table_name == "":
+		validation_result["Ok"] = false
+		validation_result["messages"].append("Table name can't be empty")
+	if table_codename == "":
+		validation_result["Ok"] = false
+		validation_result["messages"].append("Table codename can't be empty")
+	elif table_codename != regex.search(table_codename).get_string():
+		validation_result["Ok"] = false
+		validation_result["messages"].append("Table codename does not match the pattern")
+	
+	var codenames: Array = collect_codenames(compress_table())
+	var validated_codenames: Array = []
+	
+	
+	for codename in codenames:
+		var result = regex.search(codename)
+		if result.get_string() == codename:
+			if codename in validated_codenames:
+				validation_result["Ok"] = false
+				validation_result["messages"].append("Codename: \"%s\" used more than one time" % codename)
+			else:
+				validated_codenames.append(codename)
+		else:
+			validation_result["Ok"] = false
+			validation_result["messages"].append("Codename: \"%s\" does not match the pattern" % codename)
+	
+	var macros: Dictionary = get_macros()
+	var luaapi: LuaAPI = LuaAPI.new()
+	for macro in macros["macros"]:
+		var macro_dict: Dictionary = macros["macros"][macro]
+		luaapi.do_string(macros["scripts"][macro_dict["script"]])
+		if not luaapi.function_exists(macro_dict["method"]):
+			validation_result["Ok"] = false
+			validation_result["messages"].append("Method \"%s\" in \"%s\" macro does not exists" % [macro_dict["method"], macro])
+	
+	return validation_result
+
+
+func collect_codenames(rows: Array) -> Array:
+	var codenames: Array = []
+	
+	for row in rows:
+		for field in row:
+			if field["type"] == "tab":
+				for tab in field["tabs"]:
+					codenames += collect_codenames(tab["rows"])
+			elif field["type"] == "block":
+				codenames += collect_codenames(field["rows"])
+			else:
+				codenames.append(field["codename"])
+	
+	for property in get_properties():
+		codenames.append(property["codename"])
+	
+	for macro_field in $margin/vbox/scroll/vbox/macros/elements/vbox.get_children():
+		var macro_data: Dictionary = macro_field.get_data()
+		codenames.append(macro_data["codename"])
+	
+	return codenames
+
+
+func get_properties() -> Array:
+	var properties: Array = []
+	for child in $margin/vbox/scroll/vbox/properties/elements/vbox.get_children():
+		var property_data: Array = child.get_data()
+		if property_data[0] == "" or property_data[1] == "":
+			continue
+		properties.append({"codename": property_data[0], "value": property_data[1]})
+	return properties
+
+
+func get_macros() -> Dictionary:
+	var macros_scripts_map: Dictionary = {}
+	var macros_map: Dictionary = {"scripts": {}, "macros": {}}
+	
+	for child in $margin/vbox/scroll/vbox/macros/elements/vbox.get_children():
+		var macros_data: Dictionary = child.get_data()
+		if macros_data["script"] == "" or macros_data["codename"] == "" or macros_data["method"] == "":
+			continue
+			
+		if not macros_data["path"] in macros_scripts_map.keys():
+			var new_name: String = uuid4.v4()
+			macros_scripts_map[macros_data["path"]] = {
+				"new_codename": new_name
+				}
+			macros_map["scripts"][new_name] = macros_data["script"]
+		macros_map["macros"][macros_data["codename"]] = {
+			"method": macros_data["method"], 
+			"script": macros_scripts_map[macros_data["path"]]["new_codename"]
+			}
+		
+	return macros_map
+
+
+func build_upload_request() -> Dictionary:
+	var request = {
+		"common": {
+			"table_name": $margin/vbox/scroll/vbox/settings/table_name/LineEdit.text,
+			"table_codename": $margin/vbox/scroll/vbox/settings/table_codename/LineEdit.text,
+			"search_fields": $margin/vbox/scroll/vbox/settings/search/LineEdit.text,
+			"table_icon": $margin/vbox/scroll/vbox/settings/table_icon/OptionButton.text,
+			"table_view": $margin/vbox/scroll/vbox/settings/table_view/OptionButton.text,
+			"short_view": $margin/vbox/scroll/vbox/short_view/elements.text
+		}
+	}
+	request["properties"] = get_properties()
+	request["macros"] = get_macros()
+	request["table"] = compress_table()
+	
+	return request
 
 
 func _on_field_type_selected(index: int):
@@ -329,11 +445,17 @@ func _on_add_new_field_pressed():
 
 
 func _on_save_and_upload_pressed():
-	for child in $margin/vbox/scroll/vbox/main_view/vbox.get_children():
-		var data: Dictionary = child.get_data()
-		if data["Ok"]:
-			data.erase("Ok")
-			print(data)
+	var validation_result: Dictionary = validate_table()
+	
+	if validation_result["Ok"]:
+		var preapred_table: Dictionary = build_upload_request()
+		print(preapred_table)
+	else:
+		var warnings_text: String = "Wait, i find this errors:\n" 
+		for message_index in range(validation_result["messages"].size()):
+			warnings_text += "%s. %s\n" % [str(message_index + 1), validation_result["messages"][message_index]]
+		$warnings.dialog_text = warnings_text
+		$warnings.show()
 
 
 func _on_settings_field_pressed(source):
@@ -344,11 +466,10 @@ func _on_settings_field_pressed(source):
 
 
 func _on_field_setup_submited():
-	var new_settings: Dictionary = {}
 	var settings: Dictionary = {}
 	
 	if not field_setup_source["type"] in ["block", "tabs"]:
-		if field_setup_source["type"] in ["images", "gelery"]:
+		if field_setup_source["type"] == "image" or field_setup_source["type"] == "gelery":
 			settings.merge(type_to_field["default_for_image"])
 		else:
 			settings.merge(type_to_field["default"])
@@ -391,10 +512,6 @@ func _on_add_property_pressed():
 	$margin/vbox/scroll/vbox/properties/elements/vbox.add_child(new_property)
 
 
-func _on_compress_and_print_pressed():
-	print(compress_table())
-
-
 
 #
 # TABS SETUP ZONE
@@ -407,7 +524,6 @@ func _on_settings_tab_pressed(tabcr: Dictionary):
 
 
 func _on_tab_setup_submit_pressed():
-	var operations: Array = []
 	var exists_tabs: Array = []
 	
 	for tab in field_setup_source["tabs"]:

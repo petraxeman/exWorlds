@@ -1,12 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cq5b3pp8ahpug"]
 
-[sub_resource type="GDScript" id="GDScript_ac4kx"]
-script/source = "extends Node2D
-
-
-func _ready():
-	print(\"123\".md5_text())
-"
+[ext_resource type="Script" path="res://test.gd" id="1_f7qmc"]
 
 [node name="Node2D" type="Node2D"]
-script = SubResource("GDScript_ac4kx")
+script = ExtResource("1_f7qmc")

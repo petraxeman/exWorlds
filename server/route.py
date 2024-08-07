@@ -169,7 +169,7 @@ def create_system():
     data = request.json
     if not db.images.find_one({"name": data["image_name"]}):
         return {"msg": "Image does not exist"}, 401
-    if not re.fullmatch("[0-9a-z\-]+", data["codename"]):
+    if not re.fullmatch("[0-9a-z\-_]+", data["codename"]):
         print(data["codename"])
         return {"msg": "Wrong codename"}, 401
     if db.structs.find_one({"author": current_user["username"], "codename": data["codename"], "type": "game_system"}):
@@ -252,7 +252,15 @@ def get_tables():
     return {"schemas": schemas}, 200
 
 
+
+def parse_table(table: list):
+    return {} # Должен вернуть список полей и результат проверки
+
+def parse_row(row: list):
+    pass
+
 @app.route("/gameSystem/createTable", methods = ["POST"])
 @token_required
 def create_table():
+    parse_table(request.json.get("table", []))
     return {}, 200

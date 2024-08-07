@@ -1,21 +1,22 @@
 extends HBoxContainer
 
-var script_filename: String
 var path_to_script: String
+var script_text: String
 
 
 
-func get_data() -> Array:
-	return [script_filename, path_to_script]
+func get_data() -> Dictionary:
+	return {"codename": $codename.text, "method": $method_name.text, "script": script_text, "path": path_to_script}
 
 
 func _on_file_dialog_file_selected(path):
 	var filename: String = path.split("\\")[-1]
 	$select.text = "   " + filename + "   "
 	
-	script_filename = filename
 	path_to_script = path
-
+	
+	var script_file: FileAccess = FileAccess.open(path_to_script, FileAccess.READ)
+	script_text = script_file.get_as_text()
 
 func _on_select_pressed():
 	$FileDialog.show()
