@@ -444,6 +444,34 @@ func build_upload_request() -> Dictionary:
 	return request
 
 
+func apply_macros(data: Dictionary):
+	for macro_codename in data["macros"].keys():
+		var macro: Dictionary = data["macros"][macro_codename]
+		var new_macro_field: HBoxContainer = macro_field.instantiate()
+		new_macro_field.set_data(macro_codename, data["scripts"][macro["script"]], macro["method"], macro["script"])
+		$margin/vbox/scroll/vbox/macros/elements/vbox.add_child(new_macro_field)
+		
+
+func apply_common(data: Dictionary):
+	$margin/vbox/scroll/vbox/settings/table_name/LineEdit.text = data.get("table_name", "")
+	$margin/vbox/scroll/vbox/settings/table_codename/LineEdit.text = data.get("table_codename", "")
+	$margin/vbox/scroll/vbox/settings/search/LineEdit.text = data.get("search_fields", "")
+	$margin/vbox/scroll/vbox/settings/table_icon/OptionButton.text = data.get("table_icon", "")
+	$margin/vbox/scroll/vbox/settings/table_view/OptionButton.text = data.get("table_view", "")
+	$margin/vbox/scroll/vbox/short_view/elements.text = data.get("short_view", "")
+
+
+func apply_properties(data: Array):
+	for prop in data:
+		var new_property: HBoxContainer = property_field.instantiate()
+		new_property.set_data(prop["codename"], prop["value"])
+		$margin/vbox/scroll/vbox/properties/elements/vbox.add_child(new_property)
+
+
+func disable_codename_field():
+	$margin/vbox/scroll/vbox/settings/table_codename/LineEdit.editable = false
+
+
 func _on_field_type_selected(index: int):
 	if index == 13:
 		$field_type_selector.hide()

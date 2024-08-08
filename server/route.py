@@ -230,6 +230,18 @@ def get_systems_count():
     return {"count": count}
 
 
+@app.route("/gameSystems/delete", methods = ["POST"])
+@token_required
+def delete_system():
+    if not request.json.get("codename", False):
+        return {"msg": "Undefined codename"}, 401
+    game_system = db.structs.find_one({"author": current_user["username"], "codename": request.json["codename"], "type": "game_system"})
+    db.images.delete_one({"name": game_system["image_name"]})
+    db.structs.delete_one(game_system)
+    db.structs.delete_many({"type": "schema", "author": current_user["username"], "game_system": game_system["codename"]})
+    return {"Ok": True}, 200
+
+
 
 # ==================== #
 # === TABLE ROUTES === #
@@ -239,7 +251,21 @@ def get_systems_count():
 @app.route("/gameSystem/getTable", methods = ["POST"])
 @token_required
 def get_table():
-    pass
+    if not request.json.get("game_system", False) or not request.json.get("table_name", False):
+        return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
+    schema = db.structs.find_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
+    print(schema)
+    return {"table": schema["table_data"], "hash": schema["hash"]}, 200
+
+
+@app.route("/gameSystem/getTableHash", methods = ["POST"])
+@token_required
+def get_table_hash():
+    if not request.json.get("game_system", False) or not request.json.get("table_name", False):
+        return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
+    schema = db.structs.find_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
+    print(schema)
+    return {"hash": schema["hash"]}, 200
 
 
 @app.route("/gameSystem/getTables", methods = ["POST"])
@@ -285,6 +311,13 @@ def create_table():
             "table_data": request.json
         }
         db.structs.insert_one(table)
-    
-
     return {"Ok": True, "hash": table_hash}, 200
+
+
+@app.route("/gameSystem/deleteTable", methods = ["POST"])
+@token_required
+def delete_table():
+    if not request.json.get("game_system", False) or not request.json.get("table_name", False):
+        return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
+    db.structs.delete_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
+    return {}, 200

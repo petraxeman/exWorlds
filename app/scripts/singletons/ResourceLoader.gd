@@ -45,6 +45,11 @@ func put_image(image: Image) -> String:
 	return ""
 
 
+
+#
+# SYSTEM ACTIONS
+#
+
 ## Auth required
 func create_system(system_name: String, system_codename: String, system_poster: String):
 	var response: Dictionary = await UrlLib.post("create_game_system", [], {"name": system_name, "codename": system_codename, "image_name": system_poster})
@@ -96,9 +101,36 @@ func get_systems_count() -> int:
 	return 0
 
 
+func delete_system(codename: String) -> bool:
+	var result: Dictionary = await UrlLib.post("delete_game_system", [], {"codename": codename})
+	if result["Ok"]:
+		return true
+	return false
+
+
+
 #
 # TABLE ACTIONS
 #
+
+func get_table(game_system: String, table_name: String) -> Dictionary:
+	var cache_address: String = "(type=table,system_name={0},table_name={1})".format([game_system, table_name])
+	var cached_table = Global.cache.get_content(cache_address)
+	var need_update: bool = false
+	if cached_table["Ok"]:
+		var response: Dictionary = await UrlLib.post("get_table_hash", [], {"table_name": table_name, "game_system": game_system})
+		if response["hash"] == cached_table["hash"]:
+			var loaded_data: Dictionary = cached_table["data"].duplicate(true)
+			loaded_data["Ok"] = true
+			return loaded_data
+		else:
+			need_update = true
+	var response: Dictionary = await UrlLib.post("get_table", [], {"table_name": table_name, "game_system": game_system})
+	if response["Ok"]:
+		Global.cache.put_content(cache_address, response["hash"], response["table"], need_update)
+		return response["table"]
+	return {"Ok": false}
+
 
 # GET ALL TABLES IN SYSTEM 
 func get_tables(system_codename: String) -> Array:
@@ -113,5 +145,12 @@ func create_table(data: Dictionary, system_name: String):
 	var response: Dictionary = await UrlLib.post("create_table", ["Game-System: %s"%system_name], data)
 	if response["Ok"]:
 		Global.cache.put_content("(type=table,system_name={0},table_name={1})".format([system_name, data["common"]["table_codename"]]), response["hash"], data)
+		return true
+	return false
+
+
+func delete_table(game_system: String, table_name: String) -> bool:
+	var response: Dictionary = await UrlLib.post("delete_table", [], {"table_name": table_name, "game_system": game_system})
+	if response["Ok"]:
 		return true
 	return false

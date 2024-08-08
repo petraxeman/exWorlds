@@ -5,6 +5,14 @@ var script_text: String
 
 
 
+func set_data(codename: String, code: String, method: String, filename: String):
+	path_to_script = filename
+	$select.text = "   " + filename + "   "
+	$codename.text = codename
+	$method_name.text = method
+	script_text = code
+
+
 func get_data() -> Dictionary:
 	return {"codename": $codename.text, "method": $method_name.text, "script": script_text, "path": path_to_script}
 
@@ -17,6 +25,7 @@ func _on_file_dialog_file_selected(path):
 	
 	var script_file: FileAccess = FileAccess.open(path_to_script, FileAccess.READ)
 	script_text = script_file.get_as_text()
+
 
 func _on_select_pressed():
 	$FileDialog.show()

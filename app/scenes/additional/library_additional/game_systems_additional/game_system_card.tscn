@@ -57,6 +57,7 @@ size_flags_horizontal = 3
 text = "🖊️"
 
 [node name="copy" type="Button" parent="hbox"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "📄"

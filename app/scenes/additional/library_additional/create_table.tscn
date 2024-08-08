@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://dscinfguvb265"]
+[gd_scene load_steps=2 format=3 uid="uid://dscinfguvb265"]
 
 [ext_resource type="Script" path="res://scenes/additional/library_additional/create_table.gd" id="1_8afrb"]
-[ext_resource type="PackedScene" uid="uid://bbn5f1bvsd8uj" path="res://scenes/additional/library_additional/create_table/macro_field.tscn" id="2_6edm6"]
 
 [node name="create_table" type="Control"]
 layout_mode = 3
@@ -170,9 +169,6 @@ text = "Macros"
 layout_mode = 2
 
 [node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll/vbox/macros/elements"]
-layout_mode = 2
-
-[node name="macro_field" parent="margin/vbox/scroll/vbox/macros/elements/vbox" instance=ExtResource("2_6edm6")]
 layout_mode = 2
 
 [node name="add" type="Button" parent="margin/vbox/scroll/vbox/macros/elements"]

@@ -82,6 +82,11 @@ layout_mode = 2
 size_flags_horizontal = 10
 alignment = 2
 
+[node name="delete" type="Button" parent="vbox/margin/hbox/variants"]
+layout_mode = 2
+size_flags_vertical = 2
+text = "DELETE"
+
 [node name="refresh" type="Button" parent="vbox/margin/hbox/variants"]
 layout_mode = 2
 size_flags_horizontal = 8
@@ -106,5 +111,53 @@ columns = 2
 [node name="schema" parent="vbox/scroll/grid" instance=ExtResource("3_vn1yx")]
 layout_mode = 2
 
+[node name="delete_popup" type="Popup" parent="."]
+title = "Delete"
+initial_position = 1
+size = Vector2i(187, 207)
+borderless = false
+always_on_top = true
+extend_to_title = true
+content_scale_mode = 1
+content_scale_aspect = 4
+
+[node name="margin" type="MarginContainer" parent="delete_popup"]
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="vbox" type="VBoxContainer" parent="delete_popup/margin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="label" type="Label" parent="delete_popup/margin/vbox"]
+layout_mode = 2
+text = "You want to delete
+\"dnd-5e\" system
+Write dnd-5e in field"
+horizontal_alignment = 1
+
+[node name="lineedit" type="LineEdit" parent="delete_popup/margin/vbox"]
+layout_mode = 2
+placeholder_text = "dnd-5e"
+
+[node name="hbox" type="HBoxContainer" parent="delete_popup/margin/vbox"]
+layout_mode = 2
+
+[node name="ok" type="Button" parent="delete_popup/margin/vbox/hbox"]
+layout_mode = 2
+text = "Ok"
+
+[node name="cancel" type="Button" parent="delete_popup/margin/vbox/hbox"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Cancel"
+
+[connection signal="pressed" from="vbox/margin/hbox/variants/delete" to="." method="_on_start_delete_pressed"]
 [connection signal="pressed" from="vbox/margin/hbox/variants/refresh" to="." method="_on_refresh_pressed"]
 [connection signal="pressed" from="vbox/margin/hbox/variants/create_new_table" to="." method="_on_create_new_table_pressed"]
+[connection signal="pressed" from="delete_popup/margin/vbox/hbox/ok" to="." method="_on_ok_system_delition_pressed"]
+[connection signal="pressed" from="delete_popup/margin/vbox/hbox/cancel" to="." method="_on_cancel_system_delition_pressed"]

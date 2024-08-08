@@ -21,10 +21,13 @@ const endpoints: Dictionary = {
 	"get_game_system_hash": "/gameSystem/getHash",
 	"get_game_systems": "/gameSystems/get",
 	"get_game_systems_count": "/gameSystems/getCount",
+	"delete_game_system": "/gameSystems/delete",
 	# Categories
 	"get_tables": "/gameSystem/getTables",
 	"get_table": "/gameSystem/getTable",
-	"create_table": "/gameSystem/createTable"
+	"get_table_hash": "/gameSystem/getTableHash",
+	"create_table": "/gameSystem/createTable",
+	"delete_table": "/gameSystem/deleteTable"
 }
 
 
