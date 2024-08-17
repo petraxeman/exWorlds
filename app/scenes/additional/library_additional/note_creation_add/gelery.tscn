@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://bbvwktekt2fvn"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_creation_add/gelery.gd" id="1_g0u86"]
+
+[node name="gelery" type="PanelContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_g0u86")
+
+[node name="margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="scroll" type="ScrollContainer" parent="margin"]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="vbox" type="VBoxContainer" parent="margin/scroll"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+ok_button_text = "Открыть"
+file_mode = 0
+access = 2
+use_native_dialog = true
+
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]

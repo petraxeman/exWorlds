@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://cswc4p4f53e8a"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_creation_add/list_row_item.gd" id="1_kgeb2"]
+
+[node name="row" type="HBoxContainer"]
+script = ExtResource("1_kgeb2")
+
+[node name="label" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+text = "Row 1:"
+
+[node name="text_edit" type="TextEdit" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+scroll_fit_content_height = true
+
+[node name="del" type="Button" parent="."]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Delete"
+
+[connection signal="pressed" from="del" to="." method="_on_del_pressed"]

@@ -27,7 +27,11 @@ const endpoints: Dictionary = {
 	"get_table": "/gameSystem/getTable",
 	"get_table_hash": "/gameSystem/getTableHash",
 	"create_table": "/gameSystem/createTable",
-	"delete_table": "/gameSystem/deleteTable"
+	"delete_table": "/gameSystem/deleteTable",
+	# Notes
+	"create_note": "/gameSystem/table/createNote",
+	"get_note": "/gameSystem/table/getNote",
+	"get_note_hash": "/gameSystem/table/getNoteHash"
 }
 
 
@@ -63,6 +67,7 @@ static func post(endpoint: String,
 			return data
 		elif expecting == "raw":
 			return {"Ok": true, "data": result[3]}
+	print(JSON.parse_string(result[3].get_string_from_utf8()))
 	return {"Ok": false}
 
 

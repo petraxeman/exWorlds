@@ -42,7 +42,7 @@ func auth(username: String, password: String) -> bool:
 
 func register(username: String, password: String) -> bool:
 	var data: Dictionary = {"username": username, "password": password}
-	var result: Dictionary = await UrlLib.post("register", [], data, "json", false)
+	var result: Dictionary = await UrlLib.post("registration", [], data, "json", false)
 	if not result["Ok"]:
 		return false
 	return true
@@ -81,6 +81,19 @@ func set_active_server(index: int) -> bool:
 	active_server_index = index
 	active_server = servers[index]
 	return true
+
+
+func base64URL_decode(input: String) -> PackedByteArray:
+	match (input.length() % 4):
+		2: input += "=="
+		3: input += "="
+	return Marshalls.base64_to_raw(input.replacen("_","/").replacen("-","+"))
+
+
+func get_current_user():
+	var splited_token = active_server["token"].split(".")
+	var decoded_payload = base64URL_decode(splited_token[1]).get_string_from_utf8()
+	return JSON.parse_string(decoded_payload)
 
 
 

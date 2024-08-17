@@ -33,7 +33,7 @@ func render_systems() -> void:
 		system_card.get_node("refrect/texture").texture = ImageTexture.create_from_image(system["image"]["image"])
 		system_card.get_node("refrect/panel/texts/system_name").text = system["name"]
 		system_card.get_node("refrect/panel/texts/author").text = system["author"]
-		system_card.get_node("hbox/watch").pressed.connect(_on_watch_system_pressed.bind(system["codename"], system["can_change"]))
+		system_card.get_node("hbox/watch").pressed.connect(_on_watch_system_pressed.bind(system["codename"]))
 		$vbox/margin2/scroll/vbox/game_systems_list.add_child(system_card)
 	$vbox/margin/hbox/refresh.disabled = false
 	rendering_page = false
@@ -117,10 +117,9 @@ func _on_page_changed(page_number: int):
 	render_systems()
 
 
-func _on_watch_system_pressed(codename: String, can_change: bool):
+func _on_watch_system_pressed(codename: String):
 	var system_info: Dictionary = await ResLoader.get_system(codename)
 	var image = await ResLoader.get_image(system_info["image_name"])
 
 	var tab: Node = parent.create_tab("game_system")
-	tab.is_author = can_change
 	tab.setup_view(system_info["name"], system_info["codename"], system_info["author"], 0, ImageTexture.create_from_image(image["image"]))

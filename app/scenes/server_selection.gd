@@ -84,9 +84,9 @@ func _login_pressed():
 	if info.get("error", false): __exit_from_enter_view(); return
 	__set_server_info(info)
 	var result: bool = await Global.auth(username, password)
-	if not result:
-		$waiting/vbox/state.text = "Failed. Try reg."
-		result = await Global.register(username, password)
+	#if not result:
+	#	$waiting/vbox/state.text = "Failed. Try reg."
+	#	result = await Global.register(username, password)
 	$waiting/vbox/progress.value = 2
 	if not result:
 		$waiting/vbox/state.text = "Failed. Wrong login or pass"
@@ -104,7 +104,10 @@ func _login_pressed():
 	#Global.cache = CacheLib.init_cache_db(Global.active_server["address"])
 	var library_scene: PackedScene = preload("res://scenes/library.tscn")
 	get_tree().root.add_child(library_scene.instantiate())
+	var s = preload("res://test.tscn").instantiate()
+	get_node("/root").add_child(s)
 	get_node("/root/server_selection").free()
+	
 
 
 func __init_server_enter_view(username: String) -> void:

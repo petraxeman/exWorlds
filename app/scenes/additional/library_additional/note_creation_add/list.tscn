@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://yvkdjdwqq4ld"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_creation_add/list.gd" id="1_54nmf"]
+
+[node name="list" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_54nmf")
+
+[node name="rows" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="add" type="Button" parent="."]
+layout_mode = 2
+text = "+"
+
+[connection signal="pressed" from="add" to="." method="_on_add_pressed"]

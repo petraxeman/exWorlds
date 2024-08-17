@@ -67,7 +67,7 @@ static func v4_rng(rng: RandomNumberGenerator):
 var _uuid: Array
 
 func _init(rng := RandomNumberGenerator.new()) -> void:
-	_uuid = uuidbinrng(rng)
+	_uuid = uuid4.uuidbinrng(rng)
 
 func as_array() -> Array:
 	return _uuid.duplicate()

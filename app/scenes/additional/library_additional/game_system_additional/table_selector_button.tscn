@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://ceeoaxm7we356"]
+[gd_scene load_steps=6 format=3 uid="uid://ceeoaxm7we356"]
 
 [ext_resource type="Script" path="res://scenes/additional/library_additional/game_system_additional/table_selector_button.gd" id="1_2gumy"]
 [ext_resource type="Texture2D" uid="uid://ch6nlcv81blys" path="res://assets/icons/bookmarklet.svg" id="1_twtc2"]
 [ext_resource type="Texture2D" uid="uid://cyb8738pysflg" path="res://assets/icons/big-gear.svg" id="3_asqr0"]
+[ext_resource type="Texture2D" uid="uid://dnbfggi20dvcy" path="res://assets/icons/pencil.svg" id="3_rqjna"]
 [ext_resource type="Texture2D" uid="uid://7xwqudu7eh6d" path="res://assets/icons/trash-can.svg" id="4_4hbtt"]
 
 [node name="schema" type="MarginContainer"]
@@ -39,6 +40,13 @@ theme_override_font_sizes/font_size = 30
 text = "Rules
 "
 
+[node name="create_new" type="Button" parent="panel/margin/hbox"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+icon = ExtResource("3_rqjna")
+icon_alignment = 1
+expand_icon = true
+
 [node name="settings" type="Button" parent="panel/margin/hbox"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
@@ -55,6 +63,8 @@ expand_icon = true
 initial_position = 1
 size = Vector2i(210, 106)
 
+[connection signal="gui_input" from="panel" to="." method="_on_panel_gui_input"]
+[connection signal="pressed" from="panel/margin/hbox/create_new" to="." method="_on_create_new_pressed"]
 [connection signal="pressed" from="panel/margin/hbox/settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="panel/margin/hbox/delete" to="." method="_on_delete_pressed"]
 [connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_confirmation_dialog_confirmed"]

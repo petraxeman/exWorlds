@@ -63,9 +63,9 @@ func get_system(codename: String) -> Dictionary:
 	var cached_system: Dictionary = Global.cache.get_content('system/{0}'.format([codename]))
 	var need_update: bool = false
 	if cached_system["Ok"]:
-		var response: Dictionary = await UrlLib.post("get_game_system_hash", [], {"codename": codename})
-		if response["Ok"]:
-			if response["hash"] == cached_system["hash"]:
+		var hash_response: Dictionary = await UrlLib.post("get_game_system_hash", [], {"codename": codename})
+		if hash_response["Ok"]:
+			if hash_response["hash"] == cached_system["hash"]:
 				return cached_system["data"]
 			else:
 				need_update = true
@@ -118,8 +118,8 @@ func get_table(game_system: String, table_name: String) -> Dictionary:
 	var cached_table = Global.cache.get_content(cache_address)
 	var need_update: bool = false
 	if cached_table["Ok"]:
-		var response: Dictionary = await UrlLib.post("get_table_hash", [], {"table_name": table_name, "game_system": game_system})
-		if response["hash"] == cached_table["hash"]:
+		var hash_response: Dictionary = await UrlLib.post("get_table_hash", [], {"table_name": table_name, "game_system": game_system})
+		if hash_response["hash"] == cached_table["hash"]:
 			var loaded_data: Dictionary = cached_table["data"].duplicate(true)
 			loaded_data["Ok"] = true
 			return loaded_data
@@ -154,3 +154,44 @@ func delete_table(game_system: String, table_name: String) -> bool:
 	if response["Ok"]:
 		return true
 	return false
+
+
+# SEND A NOTE
+func send_note(game_system: String, table_codename: String, data: Dictionary):
+	var response: Dictionary = await UrlLib.post("create_note", ["Game-System: %s"%game_system, "Table-Codename: %s"%table_codename], data)
+	if response["Ok"]:
+		Global.cache.put_content("(type=note,system_name={0},table_name={1},note_name={2})".format([
+			game_system,
+			table_codename,
+			data["codename"]["value"]
+		]),
+		response["hash"],
+		data)
+		return true
+	return false
+
+
+func get_note(game_system: String, table_codename: String, note_codename: String) -> Dictionary:
+	var need_update: bool = false
+	var cache_address: String = "(type=note,system_name={0},table_name={1},note_name={2})".format([
+			game_system,
+			table_codename,
+			note_codename
+			])
+	var headers: Array = ["Game-System: "+game_system, "Table-Codename: "+table_codename, "Note-Codename: "+note_codename]
+	var cached_note = Global.cache.get_content(cache_address)
+	
+	if cached_note["Ok"]:
+		var hash_response: Dictionary = await UrlLib.post("get_note_hash", headers)
+		if hash_response["hash"] == cached_note["hash"]:
+			var loaded_data: Dictionary = cached_note["data"].duplicate(true)
+			loaded_data["Ok"] = true
+			return loaded_data
+		else:
+			need_update = true
+	
+	var response: Dictionary = await UrlLib.post("get_note", headers)
+	if response["Ok"]:
+		Global.cache.put_content(cache_address, response["hash"], response["note"], need_update)
+		return response["note"]
+	return {"Ok": false}

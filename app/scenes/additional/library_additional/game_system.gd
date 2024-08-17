@@ -2,7 +2,7 @@ extends Control
 
 var game_system_codename: String
 var rendering_categories: bool = false
-var is_author: bool
+var can_change: bool = false
 @onready var parent: Node = get_node("/root/library")
 
 
@@ -19,9 +19,11 @@ func setup_view(system_name: String, system_codename: String, author: String, no
 	$delete_popup/margin/vbox/label.text = "You want to remove \"{0}\" system.\nWrite \"{0}\" in the field below.".format([game_system_codename])
 	$delete_popup/margin/vbox/lineedit.placeholder_text = game_system_codename
 	
-	if not is_author:
+	if author != Global.get_current_user()["username"]:
 		$vbox/margin/hbox/variants/delete.hide()
 		$vbox/margin/hbox/variants/create_new_table.hide()
+	else:
+		can_change = true
 	
 	render_categories()
 
@@ -40,6 +42,9 @@ func render_categories():
 		category_button.table_codename = category["codename"]
 		category_button.game_system = game_system_codename
 		category_button.game_system_view = self
+		
+		if not can_change:
+			category_button.disable_changment()
 		$vbox/scroll/grid.add_child(category_button)
 	$vbox/margin/hbox/variants/refresh.disabled = false
 	rendering_categories = false

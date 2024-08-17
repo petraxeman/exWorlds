@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3 uid="uid://sxoetudl4h4o"]
+
+[ext_resource type="Texture2D" uid="uid://7xwqudu7eh6d" path="res://assets/icons/trash-can.svg" id="1_j4g6t"]
+[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="1_or0wf"]
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_creation_add/gelery_image_item.gd" id="2_t8xwj"]
+
+[node name="image" type="TextureRect"]
+custom_minimum_size = Vector2(150, 150)
+texture = ExtResource("1_or0wf")
+expand_mode = 1
+stretch_mode = 6
+script = ExtResource("2_t8xwj")
+
+[node name="actions" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="del" type="Button" parent="actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "       "
+icon = ExtResource("1_j4g6t")
+icon_alignment = 1
+expand_icon = true
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]
+[connection signal="mouse_entered" from="actions/del" to="." method="_on_del_mouse_entered"]
+[connection signal="mouse_exited" from="actions/del" to="." method="_on_del_mouse_exited"]
+[connection signal="pressed" from="actions/del" to="." method="_on_del_pressed"]

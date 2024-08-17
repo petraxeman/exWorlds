@@ -1,7 +1,7 @@
 from server import app, db
 from flask import request, send_file, Response
 from werkzeug.utils import secure_filename
-import uuid, io, jwt, datetime, re, json, hashlib
+import uuid, io, jwt, datetime, re, json, hashlib, copy
 from functools import wraps
 
 
@@ -16,13 +16,14 @@ def token_required(fn):
         try:
             data = jwt.decode(token, app.config["JWT_SECRET"], algorithms=["HS256"])
             if datetime.datetime.strptime(data["expire_date"], "%d-%m-%Y") < datetime.datetime.utcnow():
-                return {"msg": "Token expired"}, 401
+                return {"msg": "Token expired"}, 403
             current_user = db.users.find_one({"username": data["username"]})
             if not current_user:
-                return {"msg": "Undefined token"}, 401
+                return {"msg": "Undefined token"}, 403
             return fn(*args, **kwargs)
         except Exception as err:
-            return {"msg": "Wrong token"}, 401
+            print(err)
+            return {"msg": "Wrong token"}, 403
     return decorator 
 
 
@@ -197,7 +198,7 @@ def get_system():
         return {"msg": "Undefined system"}, 401
     del system["type"]
     del system["_id"]
-    system["can_change"] = True if current_user["username"] == system["author"] else False
+    #system["can_change"] = True if current_user["username"] == system["author"] else False
     return system, 200
 
 
@@ -254,7 +255,6 @@ def get_table():
     if not request.json.get("game_system", False) or not request.json.get("table_name", False):
         return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
     schema = db.structs.find_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
-    print(schema)
     return {"table": schema["table_data"], "hash": schema["hash"]}, 200
 
 
@@ -264,7 +264,6 @@ def get_table_hash():
     if not request.json.get("game_system", False) or not request.json.get("table_name", False):
         return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
     schema = db.structs.find_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
-    print(schema)
     return {"hash": schema["hash"]}, 200
 
 
@@ -275,6 +274,44 @@ def get_tables():
     schemas = db.structs.find({"type": "schema", "game_system": system_codename})
     schemas = [{"codename": schema["codename"], "icon": schema["icon"], "name": schema["name"], } for schema in schemas]
     return {"schemas": schemas}, 200
+
+
+def get_fields(table: list) -> dict:
+    fields: dict = {}
+    for row in table:
+        new_fields: dict = parse_row(row, 0)
+        for codename in new_fields.keys():
+            if codename in fields.keys():
+                continue
+            fields[codename] = new_fields[codename]
+    return fields
+
+def parse_row(data: list, rlvl: int = 0):
+    if rlvl >= 15:
+        return []
+    
+    fields: dict = {}
+    for element in data:
+        if element["type"] == "block":
+            for row in element["rows"]:
+                new_fields: dict = parse_row(row, rlvl + 1)
+                for codename in new_fields.keys():
+                    if codename in fields.keys():
+                        continue
+                    fields[codename] = new_fields[codename]
+        if element["type"] == "tabs_container":
+            for tab in element["tabs"]:
+                for row in tab["rows"]:
+                    new_fields: dict = parse_row(row, rlvl + 1)
+                    for codename in new_fields.keys():
+                        if codename in fields.keys():
+                            continue
+                        fields[codename] = new_fields[codename]
+        else:
+            codename = element.get("codename", "")
+            if codename:
+                fields[codename] = {"type": element.get("type", "string")}
+    return fields
 
 
 @app.route("/gameSystem/createTable", methods = ["POST"])
@@ -288,18 +325,25 @@ def create_table():
         return {"msg": "Not name or codename"}, 401
     
     table_hash = hashlib.md5(str(request.json).encode()).hexdigest()
-
-    if db.structs.find_one({"author": current_user["username"], "codename": request.json["common"]["table_codename"], "type": "schema"}):
-        db.structs.update_one({"author": current_user["username"], "codename": request.json["common"]["table_codename"], "type": "schema"}, {
+    table_filter = {
+        "type": "schema",
+        "author": current_user["username"],
+        "game_system": request.headers.get("Game-System"), 
+        "codename": request.json["common"]["table_codename"]
+        }
+    search_fields = {}
+    if db.structs.find_one(table_filter):
+        db.structs.update_one(table_filter, {
             "$set": {
                 "name": request.json["common"]["table_name"],
                 "hash": table_hash,
+                "search_fields": search_fields,
                 "table_data": request.json,
+                "table_fields": get_fields(request.json["table"]),
                 "icon": request.json["common"]["table_icon"]
             }
         })
     else:
-        print(current_user["username"])
         table = {
             "author": current_user["username"],
             "game_system": request.headers.get("Game-System"),
@@ -308,7 +352,9 @@ def create_table():
             "codename": request.json["common"]["table_codename"],
             "hash": table_hash,
             "type": "schema",
-            "table_data": request.json
+            "search_fields": search_fields,
+            "table_data": request.json,
+            "table_fields": get_fields(request.json["table"])
         }
         db.structs.insert_one(table)
     return {"Ok": True, "hash": table_hash}, 200
@@ -321,3 +367,93 @@ def delete_table():
         return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
     db.structs.delete_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
     return {}, 200
+
+
+@app.route("/gameSystem/table/createNote", methods = ["POST"])
+@token_required
+def create_note():
+    if not request.headers.get("Game-System", False) or not request.headers.get("Table-Codename", False):
+        return {"msg": "Bad request"}, 401
+    
+    if db.structs.count_documents({"author": current_user["username"], "type": "game_system", "codename": request.headers.get("Game-System", False)}) == 0:
+        return {"msg": "Game system not found"}, 401
+    
+    if db.structs.count_documents({
+        "author": current_user["username"],
+        "type": "schema",
+        "game_system": request.headers.get("Game-System", ""),
+        "codename": request.headers.get("Table-Codename", "")}
+        ) == 0:
+        return {"msg": "Table not found"}, 401
+    
+    note_filter = {
+        "author": current_user["username"],
+        "type": "note",
+        "game_system": request.headers.get("Game-System", ""),
+        "table_codename": request.headers.get("Table-Codename", ""),
+        "codename": request.json["codename"]["value"]
+        }
+    
+    note_hash = ""
+    if db.structs.count_documents(note_filter) != 0:
+        data = copy.copy(request.json)
+        data["codename"]["value"] = db.structs.find_one(note_filter)["codename"]
+        note_hash = hashlib.md5(str(data).encode()).hexdigest()
+        db.structs.update_one(note_filter, {
+            "$set": {
+                "hash": note_hash,
+                "note": data
+            }
+        })
+    else:
+        note_hash = hashlib.md5(str(request.json).encode()).hexdigest()
+        note: dict = {
+            "author": current_user["username"],
+            "type": "note",
+            "game_system": request.headers.get("Game-System", ""),
+            "table_codename": request.headers.get("Table-Codename", ""),
+            "codename": request.json["codename"]["value"],
+            "note": request.json,
+            "hash": note_hash,
+        }
+        db.structs.insert_one(note)
+    
+    return {"Ok": True, "hash": note_hash}
+
+
+@app.route("/gameSystem/table/getNote", methods = ["POST"])
+@token_required
+def get_note():
+    if not request.headers.get("Game-System", False) or not request.headers.get("Table-Codename", False) or not request.headers.get("Note-Codename", False):
+        return {"msg": "Bad request"}, 401
+
+    finded_note = db.structs.find_one({
+        "author": current_user["username"],
+        "game_system": request.headers["Game-System"],
+        "table_codename": request.headers["Table-Codename"],
+        "codename": request.headers["Note-Codename"],
+        "type": "note"})
+    if not finded_note:
+        return {"msg": "Wrong data, note does not exists"}, 401
+    
+    return {"note": finded_note["note"], "hash": finded_note["hash"]}, 200
+
+
+@app.route("/gameSystem/table/getNoteHash", methods = ["POST"])
+@token_required
+def get_note_hash():
+    if not request.headers.get("Game-System", False) or not request.headers.get("Table-Codename", False) or not request.headers.get("Note-Codename", False):
+        return {"msg": "Bad request"}, 401
+
+    finded_note = db.structs.find_one({
+        "author": current_user["username"],
+        "game_system": request.headers["Game-System"],
+        "table_codename": request.headers["Table-Codename"],
+        "codename": request.headers["Note-Codename"],
+        "type": "note"})
+    
+    
+    if not finded_note:
+        return {"msg": "Wrong data, note does not exists"}, 401
+    
+    return {"hash": finded_note["hash"]}, 200

@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://0q5tkry7k6e0"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_search_additional/pages.gd" id="1_yyvrw"]
+
+[node name="pages" type="VBoxContainer"]
+script = ExtResource("1_yyvrw")
+
+[node name="pages" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="Button" type="Button" parent="pages"]
+layout_mode = 2
+text = "<"
+
+[node name="Button2" type="Button" parent="pages"]
+layout_mode = 2
+text = "1"
+
+[node name="Button3" type="Button" parent="pages"]
+layout_mode = 2
+text = "2"
+
+[node name="Button4" type="Button" parent="pages"]
+layout_mode = 2
+text = "3"
+
+[node name="Button5" type="SpinBox" parent="pages"]
+layout_mode = 2
+alignment = 1
+
+[node name="Button6" type="Button" parent="pages"]
+layout_mode = 2
+text = "101"
+
+[node name="Button7" type="Button" parent="pages"]
+layout_mode = 2
+text = "102"
+
+[node name="Button8" type="Button" parent="pages"]
+layout_mode = 2
+text = "103"
+
+[node name="Button9" type="Button" parent="pages"]
+layout_mode = 2
+text = ">"

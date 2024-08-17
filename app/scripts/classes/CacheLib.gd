@@ -55,8 +55,8 @@ func get_content(address: String) -> Dictionary:
 	return {"Ok": false}
 
 
-func put_content(address: String, hash: String, data: Dictionary, update: bool = false) -> void:
+func put_content(address: String, content_hash: String, data: Dictionary, update: bool = false) -> void:
 	var request_address = "server:{0};content_marks:{1}".format([Global.active_server["address"], address])
 	if update:
-		cache.update_rows("contents", 'address="{0}"'.format([request_address]), {"hash": hash, "data": JSON.stringify(data)})
-	cache.insert_row("contents", {"address": request_address, "hash": hash, "data": JSON.stringify(data)})
+		cache.update_rows("contents", 'address="{0}"'.format([request_address]), {"hash": content_hash, "data": JSON.stringify(data)})
+	cache.insert_row("contents", {"address": request_address, "hash": content_hash, "data": JSON.stringify(data)})

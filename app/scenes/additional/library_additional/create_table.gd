@@ -23,7 +23,7 @@ var types_map = {
 	8: {"data": {"type": "gelery", "codename": "undefined", "name": ""}},
 	9: {"data": {"type": "macro", "codename": "undefined", "name": ""}},
 	11: {"data": {"type": "block", "name": "Common", "rows": []}},
-	12: {"data": {"type": "tab", "tabs": []}},
+	12: {"data": {"type": "tab_container", "tabs": []}},
 }
 
 var type_to_field = {
@@ -70,7 +70,8 @@ var type_to_field = {
 	},
 	"table": {
 		"table_category": {"type": "Label", "name": "Table settings:"},
-		"possible_types": {"type": "LineEdit", "name": "Possible tables:", "placeholder": "@table1; @table2; @table3"}
+		"possible_types": {"type": "LineEdit", "name": "Possible tables:", "placeholder": "@table1; @table2; @table3"},
+		"max_cols": {"type": "SpinBox", "name": "Max columns", "min": 0, "max": 50}
 	},
 	"image": {},
 	"gelery": {
@@ -93,11 +94,12 @@ var field_setup_source: Dictionary = {}
 
 
 var game_system: String
-var table: Array = []
+var table: Array = [[{"type": "string", "codename": "codename", "name": "Codename"}]]
 
 
 
 func _ready():
+	render_table()
 	for icon_name in Icons.get_icons():
 		$margin/vbox/scroll/vbox/settings/table_icon/OptionButton.add_item(icon_name)
 	#@render_table()
@@ -113,7 +115,6 @@ func render_table():
 	add_zero.pressed.connect(_add_field_at.bind(table, 0, true))
 	froot.add_child(add_zero)
 	for row_index in range(table.size()):
-		var row = table[row_index]
 		var row_box: HBoxContainer = HBoxContainer.new()
 		parse_data(row_box, table[row_index])
 		froot.add_child(row_box)
@@ -158,7 +159,7 @@ func parse_data(container: Node, data: Array):
 				block_box.add_child(add_field_after)
 				
 			container.add_child(block_box)
-		elif data[index]["type"] == "tab":
+		elif data[index]["type"] == "tab_container":
 			var new_tabs: VBoxContainer = tab_scene.instantiate()
 			new_tabs.change_tab.connect(_on_settings_tab_pressed.bind(data[index]))
 			new_tabs.delete_tab.connect(_on_delete_field_pressed.bind(data, data[index]))
@@ -300,9 +301,9 @@ func compress_row(data: Array):
 	for index in range(data.size()):
 		
 		var fields: Dictionary = {}
-		if not data[index]["type"] in ["block", "tab"]:
+		if not data[index]["type"] in ["block", "tab_container"]:
 			if data[index]["type"] in ["image", "gelery", "macro"]:
-				fields.merge(type_to_field["default_for_images"])
+				fields.merge(type_to_field["default_for_image"])
 			else:
 				fields.merge(type_to_field["default"])
 			fields.merge(type_to_field[data[index]["type"]])
@@ -311,7 +312,7 @@ func compress_row(data: Array):
 		if data[index]["type"] == "block":
 			for row in data[index]["rows"]:
 				compress_row(row)
-		elif data[index]["type"] == "tab":
+		elif data[index]["type"] == "tab_container":
 			for tab in data[index]["tabs"]:
 				for row in tab["rows"]:
 					compress_row(row)
@@ -375,7 +376,7 @@ func collect_codenames(rows: Array) -> Array:
 	
 	for row in rows:
 		for field in row:
-			if field["type"] == "tab":
+			if field["type"] == "tab_container":
 				for tab in field["tabs"]:
 					codenames += collect_codenames(tab["rows"])
 			elif field["type"] == "block":
@@ -386,8 +387,8 @@ func collect_codenames(rows: Array) -> Array:
 	for property in get_properties():
 		codenames.append(property["codename"])
 	
-	for macro_field in $margin/vbox/scroll/vbox/macros/elements/vbox.get_children():
-		var macro_data: Dictionary = macro_field.get_data()
+	for macro_field_node in $margin/vbox/scroll/vbox/macros/elements/vbox.get_children():
+		var macro_data: Dictionary = macro_field_node.get_data()
 		codenames.append(macro_data["codename"])
 	
 	return codenames
@@ -488,7 +489,7 @@ func _on_save_and_upload_pressed():
 	
 	if validation_result["Ok"]:
 		var preapred_table: Dictionary = build_upload_request()
-		ResLoader.create_table(preapred_table, game_system)
+		await ResLoader.create_table(preapred_table, game_system)
 		parent.remove_tab_by_ref(self)
 	else:
 		var warnings_text: String = "Wait, i find this errors:\n" 

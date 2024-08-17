@@ -5,7 +5,8 @@ const tabs_dict: Dictionary = {
 	"game_systems": ["Game systems", preload("res://scenes/additional/library_additional/game_systems.tscn")],
 	"create_system": ["Create new system", preload("res://scenes/additional/library_additional/create_system.tscn")],
 	"game_system": ["System view", preload("res://scenes/additional/library_additional/game_system.tscn")],
-	"create_table": ["Create table", preload("res://scenes/additional/library_additional/create_table.tscn")]
+	"create_table": ["Create table", preload("res://scenes/additional/library_additional/create_table.tscn")],
+	"create_note": ["Create note", preload("res://scenes/additional/library_additional/note_creation.tscn")]
 }
 
 
@@ -27,6 +28,8 @@ func create_tab(tab_name: String) -> Node:
 	var new_tab_scene = new_tab[1].instantiate()
 	$tab_container.add_child(new_tab_scene)
 	$tab_bar.add_tab(new_tab[0])
+	
+	$tab_bar.current_tab = $tab_container.get_children().size() - 1
 	return new_tab_scene
 
 
