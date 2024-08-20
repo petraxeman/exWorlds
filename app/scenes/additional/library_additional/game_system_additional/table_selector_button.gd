@@ -43,6 +43,7 @@ func _on_settings_pressed():
 	if not result.get("Ok", false):
 		return
 	var create_table_view = library.create_tab("create_table")
+	create_table_view.game_system = game_system
 	create_table_view.table = result["table"]
 	create_table_view.apply_common(result["common"])
 	create_table_view.apply_macros(result["macros"])

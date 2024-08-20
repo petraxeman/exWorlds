@@ -104,8 +104,6 @@ func _login_pressed():
 	#Global.cache = CacheLib.init_cache_db(Global.active_server["address"])
 	var library_scene: PackedScene = preload("res://scenes/library.tscn")
 	get_tree().root.add_child(library_scene.instantiate())
-	var s = preload("res://test.tscn").instantiate()
-	get_node("/root").add_child(s)
 	get_node("/root/server_selection").free()
 	
 

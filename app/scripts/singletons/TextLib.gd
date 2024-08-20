@@ -16,8 +16,8 @@ func _ready():
 	words_arg_parser.compile(r"([0-9]+) words")
 
 
-func format(text: String, current_address: Dictionary) -> String:
-	var context: Dictionary = await build_context(text, current_address)
+func format(text: String, current_address: Dictionary, context: Dictionary = {}, path: Array = []) -> String:
+	await update_context(context, text, current_address)
 	var formated_text: String = text
 	for row in get_formating_rows_regex.search_all(text):
 		var elements: Array = row.get_string("content").split(" or ", false)
@@ -32,10 +32,32 @@ func format(text: String, current_address: Dictionary) -> String:
 			if not context.get("{0}:{1}".format([table, note]), false):
 				continue
 			
+			var element_string: String
 			if dict_el["ref"] == "field":
-				if str(context.get("{0}:{1}".format([table, note])).get(dict_el["field"])) != "":
-					element_text = str(context.get("{0}:{1}".format([table, note])).get(dict_el["field"]))
-					break
+				element_string = str(context.get("{0}:{1}".format([table, note]), {}).get(dict_el["field"], ""))
+			else:
+				if str(context.get("{0}:{1}".format([table, note]), {}).get(dict_el["field"], "")) != "":
+					element_string = str(context.get("{0}:{1}".format([table, note]), {}).get(dict_el["field"], ""))
+				else:
+					element_string = str(context.get(table+":properties", {}).get(dict_el["field"], ""))
+			
+			if current_address in path:
+				element_text = element_string
+				continue
+			
+			var element_address: Dictionary = current_address.duplicate(true)
+			element_address["talbe"] = table
+			element_address["note"] = note
+			var element_path: Array = path.duplicate(true)
+			element_path.append(current_address)
+			
+			#if dict_el["ref"] == "field":
+			element_string = await format(element_string, element_address, context, element_path)
+				
+			if element_string != "":
+				context["{0}:{1}".format([table, note])][dict_el["field"]] = element_string
+				element_text = element_string
+				break
 		
 		var raw_args: Array = row.get_string("content").split(";")
 		var args: Dictionary = {}
@@ -62,14 +84,12 @@ func format(text: String, current_address: Dictionary) -> String:
 			var abs_dict_el = rel_to_abs(dict_el, current_address)
 			var link: String = "open_note/{0}/{1}/{2}".format([current_address["game_system"], abs_dict_el["table"], abs_dict_el["note"]])
 			element_text = "[url={0}]{1}[/url]".format([link, element_text])
-		
 		formated_text = formated_text.replace(row.strings[0], element_text)
-
+	print(context, "\n\n\n")
 	return formated_text
 
 
-func build_context(text: String, current_address: Dictionary) -> Dictionary:
-	var context: Dictionary = {}
+func update_context(context: Dictionary, text: String, current_address: Dictionary):
 	for row in get_formating_rows_regex.search_all(text):
 		var elements: Array = row.get_string("content").split(" or ", false)
 		for element in elements:
@@ -79,10 +99,18 @@ func build_context(text: String, current_address: Dictionary) -> Dictionary:
 			
 			if "{0}:{1}".format([table, note]) in context.keys():
 				continue
+			
+			if dict_el.get("ref", "field") == "property" and (not table in context.keys()):
+				var req_table = await ResLoader.get_table(current_address["game_system"], table)
+				var properties: Dictionary = {}
+				for property in req_table["properties"]:
+					properties[property["codename"]] = property["value"]
+				context[table+":properties"] = properties
+				pass
+				
 			var req_note = await ResLoader.get_note(current_address["game_system"], table, note)
 			req_note.erase("Ok")
 			context["{0}:{1}".format([table, note])] = req_note
-	return context
 
 
 func rel_to_abs(element: Dictionary, current_address: Dictionary) -> Dictionary:
