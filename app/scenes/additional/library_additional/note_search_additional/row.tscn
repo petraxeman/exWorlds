@@ -35,7 +35,8 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Additional element data"
 horizontal_alignment = 1
-visible_ratio = -0.0434783
+visible_characters = 0
+visible_ratio = 0.0
 
 [node name="label3" type="Label" parent="margin/hbox"]
 layout_mode = 2

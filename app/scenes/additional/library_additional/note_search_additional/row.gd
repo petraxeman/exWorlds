@@ -1,12 +1,14 @@
 extends PanelContainer
 
-signal open_note(note_codename: String)
+signal open_note(note_addr: Dictionary)
 
-var note_codename: String
+#var note_codename: String
+var note_data: Array
+var note_addr: Dictionary
 
 
-func build(codename: String, data: Array):
-	note_codename = codename
+func build(addr: Dictionary, data: Array):
+	note_addr = addr
 	for child in $margin/hbox.get_children():
 		child.queue_free()
 	
@@ -21,7 +23,7 @@ func build(codename: String, data: Array):
 			$margin/hbox.add_child(image_texture)
 		elif element is String:
 			var label: Label = Label.new()
-			label.text = element if element else " "
+			label.text = element.replace("\n", "") if element else " "
 			label.clip_text = true
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -37,4 +39,11 @@ func build(codename: String, data: Array):
 func _on_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-			emit_signal("open_note", note_codename)
+			emit_signal("open_note", note_addr)
+			_open_note()
+
+
+func _open_note():
+	var parent = get_node("/root/library")
+	var note_view = parent.create_tab("note_view")
+	note_view.setup(note_addr)

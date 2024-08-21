@@ -38,7 +38,7 @@ func render_notes(game_system: String, table_codename: String, notes: Array, fie
 			elif dict_field["ref"] == "property":
 				rendering_note_data.append(await TextLib.format("#[%s]"%field["codename"], current_address, context))
 			
-		new_row.build(note, rendering_note_data)
+		new_row.build(current_address, rendering_note_data)
 		$content.add_child(new_row)
 
 

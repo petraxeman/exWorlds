@@ -33,6 +33,7 @@ const endpoints: Dictionary = {
 	"get_note": "/gameSystem/table/getNote",
 	"get_note_hash": "/gameSystem/table/getNoteHash",
 	"get_notes": "/gameSystem/table/getNotes",
+	"delete-note": "/tabletop/game-system/table/delete-note"
 }
 
 

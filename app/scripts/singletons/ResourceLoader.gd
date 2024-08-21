@@ -208,9 +208,18 @@ func get_notes(game_system: String, table_codename: String, page: int = 1, searc
 		return result
 	return {"Ok": false}
 
+
 func get_notes_count(game_system: String, table_codename: String, page: int = 1, search_request: Dictionary = {"text": "", "fields": {}}):
 	var headers: Array = ["Game-System: %s"%game_system, "Table-Codename: %s"%table_codename, "Page: %s"%str(page), "Note-Count: true"]
 	var result = await UrlLib.post("get_notes", headers, search_request)
 	if result["Ok"]:
 		return result
 	return {"Ok": false}
+
+
+func delete_note(game_system: String, table_codename: String, note_codename: String):
+	var headers: Array = ["Game-System: "+game_system, "Table-Codename: "+table_codename, "Note-Codename: "+note_codename]
+	var response: Dictionary = await UrlLib.post("delete-note", headers)
+	if response["Ok"]:
+		return true
+	return false

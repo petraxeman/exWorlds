@@ -41,6 +41,7 @@ func parse_row(container, row_data: Array):
 						if item.strip_edges(true, true) == "":
 							continue
 						entry.add_item(item.strip_edges(true, true))
+					table_nodes[element["codename"]] = entry
 					entry.text = note_data.get(element["codename"], {}).get("value", "")
 					base.add_child(entry)
 				else:
@@ -88,6 +89,7 @@ func parse_row(container, row_data: Array):
 				var toggle_mode = note_data.get(element["codename"], {}).get("value", false) 
 				if str(toggle_mode) == "true":
 					check_button.button_pressed = true
+				table_nodes[element["codename"]] = check_button
 				base.add_child(check_button)
 				row_box.add_child(base)
 			"list":
@@ -98,8 +100,6 @@ func parse_row(container, row_data: Array):
 				table_nodes[element["codename"]] = list
 				base.add_child(list)
 				row_box.add_child(base)
-			"table":
-				pass
 			"block":
 				var block_box: VBoxContainer = VBoxContainer.new()
 				block_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -170,9 +170,7 @@ func build_note_data() -> Dictionary:
 		match field_data["type"]:
 			"number":
 				match field_data.get("subtype", "integer"):
-					"integer":
-						prep_note_data[codename] = {"type": "number", "value": table_nodes[codename].value}
-					"float":
+					"integer", "float":
 						prep_note_data[codename] = {"type": "number", "value": table_nodes[codename].value}
 					"dice":
 						prep_note_data[codename] = {"type": "number", "value": table_nodes[codename].text}
@@ -224,6 +222,7 @@ func validate_note(prep_note_data: Dictionary) -> bool:
 
 func _on_create_pressed():
 	var prepared_note_data: Dictionary = build_note_data()
+	print(prepared_note_data)
 	if not validate_note(prepared_note_data):
 		return
 	await upload_parts(prepared_note_data)

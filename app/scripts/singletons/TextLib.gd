@@ -18,6 +18,7 @@ func _ready():
 
 func format(text: String, current_address: Dictionary, context: Dictionary = {}, path: Array = []) -> String:
 	await update_context(context, text, current_address)
+	
 	var formated_text: String = text
 	for row in get_formating_rows_regex.search_all(text):
 		var elements: Array = row.get_string("content").split(" or ", false)

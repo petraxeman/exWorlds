@@ -34,11 +34,34 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "Note \"Axe\" view"
 
+[node name="edit" type="Button" parent="content/note_name/hbox"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Edit"
+
+[node name="delete" type="Button" parent="content/note_name/hbox"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Delete"
+
 [node name="scroll" type="ScrollContainer" parent="content"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="vbox" type="VBoxContainer" parent="content/scroll"]
+[node name="margin" type="MarginContainer" parent="content/scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="vbox" type="VBoxContainer" parent="content/scroll/margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[connection signal="pressed" from="content/note_name/hbox/edit" to="." method="_on_edit_pressed"]
+[connection signal="pressed" from="content/note_name/hbox/delete" to="." method="_on_delete_pressed"]

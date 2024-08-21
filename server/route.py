@@ -577,7 +577,7 @@ def conver_text_to_regex(text: str):
 
 
 @app.route("/gameSystem/table/getNotes", methods = ["POST"])
-#@token_required
+@token_required
 def get_notes():
     if not request.headers.get("Game-System", False) or not request.headers.get("Table-Codename", False):
         return {"msg": "Bad request"}, 401
@@ -595,3 +595,21 @@ def get_notes():
     for row in result:
         response.append(row["codename"])
     return {"notes": response}
+
+
+@app.route("/tabletop/game-system/table/delete-note", methods = ["POST"])
+@token_required
+def delete_note():
+    if not request.headers.get("Game-System", False) or not request.headers.get("Table-Codename", False) or not request.headers.get("Note-Codename", False):
+        return {"msg": "Bad request"}, 401
+    
+    filter = {"type": "note", "game_system": request.headers.get("Game-System"), "table_codename": request.headers.get("Table-Codename"), "codename": request.headers.get("Note-Codename")}
+    note = db.structs.find_one(filter)
+    for field in note["note"]:
+        try:
+            if field.get("type", "undefined") == "image":
+                db.images.delete_one({"name": field.get("value")})
+        except:
+            pass
+    db.structs.delete_one(filter)
+    return {}, 200
