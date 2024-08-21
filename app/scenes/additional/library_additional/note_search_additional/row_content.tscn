@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://c6q5s0v5fwxwp"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_search_additional/row_content.gd" id="1_b2n4i"]
+
+[node name="scroll" type="ScrollContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_b2n4i")
+
+[node name="content" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://b6ckjs1ud563j"]
+[gd_scene load_steps=5 format=3 uid="uid://b6ckjs1ud563j"]
 
 [ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="1_6rbau"]
 [ext_resource type="Script" path="res://scenes/additional/library_additional/notes_search.gd" id="1_j3qyx"]
 [ext_resource type="PackedScene" uid="uid://0q5tkry7k6e0" path="res://scenes/additional/library_additional/note_search_additional/pages.tscn" id="2_fq1uo"]
+[ext_resource type="PackedScene" uid="uid://dml43dmpcyrki" path="res://scenes/additional/library_additional/note_search_additional/fitlers_window.tscn" id="4_b8tok"]
 
 [node name="table_notes" type="Control"]
 layout_mode = 3
@@ -38,7 +39,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Text entry"
 
-[node name="Button" type="Button" parent="margin/vbox/search"]
+[node name="fitlers" type="Button" parent="margin/vbox/search"]
 layout_mode = 2
 text = "Filters (0)"
 
@@ -47,255 +48,117 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "Seacrh"
 
-[node name="columns" type="MarginContainer" parent="margin/vbox"]
+[node name="view" type="VBoxContainer" parent="margin/vbox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="columns" type="MarginContainer" parent="margin/vbox/view"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_right = 10
 
-[node name="columns" type="HBoxContainer" parent="margin/vbox/columns"]
+[node name="columns" type="HBoxContainer" parent="margin/vbox/view/columns"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="margin/vbox/columns/columns"]
+[node name="Label" type="Label" parent="margin/vbox/view/columns/columns"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Image"
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="margin/vbox/columns/columns"]
+[node name="Label2" type="Label" parent="margin/vbox/view/columns/columns"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Item name"
 horizontal_alignment = 1
 
-[node name="Label3" type="Label" parent="margin/vbox/columns/columns"]
+[node name="Label3" type="Label" parent="margin/vbox/view/columns/columns"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Item desc"
 horizontal_alignment = 1
 
-[node name="Label4" type="Label" parent="margin/vbox/columns/columns"]
+[node name="Label4" type="Label" parent="margin/vbox/view/columns/columns"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Item damage"
 horizontal_alignment = 1
 
-[node name="content" type="VBoxContainer" parent="margin/vbox"]
+[node name="pages" parent="margin/vbox" instance=ExtResource("2_fq1uo")]
+layout_mode = 2
+
+[node name="scroll" type="ScrollContainer" parent="margin"]
 visible = false
 layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HFlowContainer" type="HFlowContainer" parent="margin/scroll"]
+layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="row" type="PanelContainer" parent="margin/vbox/content"]
+[node name="item" type="PanelContainer" parent="margin/scroll/HFlowContainer"]
 layout_mode = 2
 
-[node name="margin" type="MarginContainer" parent="margin/vbox/content/row"]
+[node name="MarginContainer" type="MarginContainer" parent="margin/scroll/HFlowContainer/item"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="hbox" type="HBoxContainer" parent="margin/vbox/content/row/margin"]
+[node name="vbox" type="VBoxContainer" parent="margin/scroll/HFlowContainer/item/MarginContainer"]
 layout_mode = 2
 
-[node name="image" type="TextureRect" parent="margin/vbox/content/row/margin/hbox"]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-texture = ExtResource("1_6rbau")
-expand_mode = 1
-stretch_mode = 6
-
-[node name="label" type="Label" parent="margin/vbox/content/row/margin/hbox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Element name"
-horizontal_alignment = 1
-
-[node name="label2" type="Label" parent="margin/vbox/content/row/margin/hbox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Additional element data"
-horizontal_alignment = 1
-
-[node name="label3" type="Label" parent="margin/vbox/content/row/margin/hbox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Damage: 1d4"
-horizontal_alignment = 1
-
-[node name="scroll" type="ScrollContainer" parent="margin/vbox"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="HFlowContainer" type="HFlowContainer" parent="margin/vbox/scroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="item" type="PanelContainer" parent="margin/vbox/scroll/HFlowContainer"]
-layout_mode = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="margin/vbox/scroll/HFlowContainer/item"]
-layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll/HFlowContainer/item/MarginContainer"]
-layout_mode = 2
-
-[node name="image" type="TextureRect" parent="margin/vbox/scroll/HFlowContainer/item/MarginContainer/vbox"]
+[node name="image" type="TextureRect" parent="margin/scroll/HFlowContainer/item/MarginContainer/vbox"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 texture = ExtResource("1_6rbau")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="margin/vbox/scroll/HFlowContainer/item/MarginContainer/vbox"]
+[node name="Label" type="Label" parent="margin/scroll/HFlowContainer/item/MarginContainer/vbox"]
 layout_mode = 2
 text = "Horikine pike"
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="margin/vbox/scroll/HFlowContainer/item/MarginContainer/vbox"]
+[node name="Label2" type="Label" parent="margin/scroll/HFlowContainer/item/MarginContainer/vbox"]
 layout_mode = 2
 text = "1d4 + 3"
 horizontal_alignment = 1
 
-[node name="item2" type="PanelContainer" parent="margin/vbox/scroll/HFlowContainer"]
+[node name="item2" type="PanelContainer" parent="margin/scroll/HFlowContainer"]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="margin/vbox/scroll/HFlowContainer/item2"]
+[node name="MarginContainer" type="MarginContainer" parent="margin/scroll/HFlowContainer/item2"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="vbox" type="VBoxContainer" parent="margin/vbox/scroll/HFlowContainer/item2/MarginContainer"]
+[node name="vbox" type="VBoxContainer" parent="margin/scroll/HFlowContainer/item2/MarginContainer"]
 layout_mode = 2
 
-[node name="image" type="TextureRect" parent="margin/vbox/scroll/HFlowContainer/item2/MarginContainer/vbox"]
+[node name="image" type="TextureRect" parent="margin/scroll/HFlowContainer/item2/MarginContainer/vbox"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 texture = ExtResource("1_6rbau")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="margin/vbox/scroll/HFlowContainer/item2/MarginContainer/vbox"]
+[node name="Label" type="Label" parent="margin/scroll/HFlowContainer/item2/MarginContainer/vbox"]
 layout_mode = 2
 text = "Hellblade super sword"
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="margin/vbox/scroll/HFlowContainer/item2/MarginContainer/vbox"]
+[node name="Label2" type="Label" parent="margin/scroll/HFlowContainer/item2/MarginContainer/vbox"]
 layout_mode = 2
 text = "1d4 + 3"
 horizontal_alignment = 1
 
-[node name="pages" parent="margin/vbox" instance=ExtResource("2_fq1uo")]
-layout_mode = 2
+[node name="filters" parent="." instance=ExtResource("4_b8tok")]
+visible = false
 
-[node name="Popup" type="Popup" parent="."]
-title = "Filters"
-initial_position = 1
-size = Vector2i(341, 249)
-visible = true
-borderless = false
-always_on_top = true
-
-[node name="margin" type="MarginContainer" parent="Popup"]
-offset_right = 40.0
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="rows" type="VBoxContainer" parent="Popup/margin"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="text" type="HBoxContainer" parent="Popup/margin/rows"]
-layout_mode = 2
-alignment = 1
-
-[node name="label" type="Label" parent="Popup/margin/rows/text"]
-layout_mode = 2
-text = "Name:"
-
-[node name="lineedit" type="LineEdit" parent="Popup/margin/rows/text"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-placeholder_text = "Contains"
-
-[node name="integer" type="HBoxContainer" parent="Popup/margin/rows"]
-layout_mode = 2
-alignment = 1
-
-[node name="label" type="Label" parent="Popup/margin/rows/integer"]
-layout_mode = 2
-text = "Damage: from"
-
-[node name="min" type="SpinBox" parent="Popup/margin/rows/integer"]
-layout_mode = 2
-step = 0.1
-
-[node name="to" type="Label" parent="Popup/margin/rows/integer"]
-layout_mode = 2
-text = "to"
-
-[node name="max" type="SpinBox" parent="Popup/margin/rows/integer"]
-layout_mode = 2
-step = 0.1
-value = 100.0
-
-[node name="bool" type="HBoxContainer" parent="Popup/margin/rows"]
-layout_mode = 2
-alignment = 1
-
-[node name="label" type="Label" parent="Popup/margin/rows/bool"]
-layout_mode = 2
-text = "Is unique:"
-
-[node name="check_button" type="CheckButton" parent="Popup/margin/rows/bool"]
-layout_mode = 2
-
-[node name="variants" type="HBoxContainer" parent="Popup/margin/rows"]
-layout_mode = 2
-alignment = 1
-
-[node name="label" type="Label" parent="Popup/margin/rows/variants"]
-layout_mode = 2
-text = "Variant:"
-
-[node name="option" type="OptionButton" parent="Popup/margin/rows/variants"]
-layout_mode = 2
-item_count = 2
-selected = 0
-popup/item_0/text = "Item 1"
-popup/item_0/id = 0
-popup/item_1/text = "Item 2"
-popup/item_1/id = 1
-
-[node name="list_or_table" type="HBoxContainer" parent="Popup/margin/rows"]
-layout_mode = 2
-alignment = 1
-
-[node name="label" type="Label" parent="Popup/margin/rows/list_or_table"]
-layout_mode = 2
-text = "List contains:"
-
-[node name="option" type="LineEdit" parent="Popup/margin/rows/list_or_table"]
-custom_minimum_size = Vector2(180, 0)
-layout_mode = 2
-placeholder_text = "Element name"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Popup/margin/rows"]
-layout_mode = 2
-alignment = 2
-
-[node name="apply" type="Button" parent="Popup/margin/rows/HBoxContainer"]
-layout_mode = 2
-text = "Apply"
-
-[node name="cancel" type="Button" parent="Popup/margin/rows/HBoxContainer"]
-layout_mode = 2
-text = "Cancel"
+[connection signal="pressed" from="margin/vbox/search/fitlers" to="." method="_on_fitlers_pressed"]
+[connection signal="pressed" from="margin/vbox/search/search" to="." method="_on_search_pressed"]

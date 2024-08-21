@@ -1,7 +1,7 @@
 from server import app, db
 from flask import request, send_file, Response
 from werkzeug.utils import secure_filename
-import uuid, io, jwt, datetime, re, json, hashlib, copy, numexpr
+import uuid, io, jwt, datetime, re, json, hashlib, copy, numexpr, math
 from functools import wraps
 
 
@@ -255,7 +255,7 @@ def get_table():
     if not request.json.get("game_system", False) or not request.json.get("table_name", False):
         return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
     schema = db.structs.find_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
-    return {"table": schema["table_data"], "hash": schema["hash"]}, 200
+    return {"table_data": schema["table_data"], "search_fields": schema["search_fields"], "table_fields": schema["table_fields"], "hash": schema["hash"]}, 200
 
 
 @app.route("/gameSystem/getTableHash", methods = ["POST"])
@@ -310,7 +310,17 @@ def parse_row(data: list, rlvl: int = 0):
         else:
             codename = element.get("codename", "")
             if codename:
-                fields[codename] = {"type": element.get("type", "string")}
+                match element.get("type", "undefined"):
+                    case "string":
+                        if element.get("as_type", "") != "":
+                            fields[codename] = {"type": "string", "name": element.get("name", ""), "as_type": [substr.strip() for substr in element.get("as_type").split(";")]}
+                        else:
+                            fields[codename] = {"type": "string", "name": element.get("name", "")}
+                    case "number":
+                        fields[codename] = {"type": "number", "name": element.get("name", ""), "subtype": element.get("subtype", "integer")}
+                    case field_type:
+                        fields[codename] = {"type": field_type, "name": element.get("name", "")}
+                #fields[codename] = {"type": element.get("type", "string")}
     return fields
 
 
@@ -328,7 +338,7 @@ def create_table():
     table_filter = {
         "type": "schema",
         "author": current_user["username"],
-        "game_system": request.headers.get("Game-System"), 
+        "game_system": request.headers.get("Game-System"),
         "codename": request.json["common"]["table_codename"]
         }
     
@@ -396,7 +406,7 @@ def dice_to_statistic(text: str) -> dict:
     min_value = int(numexpr.evaluate(build_string_from_list(min_array)).item())
     max_value = int(numexpr.evaluate(build_string_from_list(max_array)).item())
     avg_value = (max_value + min_value) // 2
-    return {"min": min_value, "max": max_value, "avg": avg_value, "org": text}
+    return {"min": min_value, "max": max_value, "avg": avg_value, "org": text, "type": "number"}
 
 def is_dice(text: str) -> bool:
     if re.findall("([1-9][0-9]?d\d+|d\d+|\d+|\+|\-|\*|\/)", str(text)):
@@ -408,7 +418,7 @@ def format_note(note_data: dict):
     for codename in note_data:
         if note_data[codename]["type"] == "number":
             if isinstance(note_data[codename], int) or isinstance(note_data[codename], float):
-                new_note_data[codename] = {"min": note_data[codename], "max": note_data[codename], "avg": note_data[codename], "org": note_data[codename]}
+                new_note_data[codename] = {"min": note_data[codename], "max": note_data[codename], "avg": note_data[codename], "org": note_data[codename], "type": "number"}
             elif is_dice(note_data[codename]["value"]):
                 new_note_data[codename] = dice_to_statistic(note_data[codename]["value"])
     return new_note_data
@@ -477,6 +487,7 @@ def get_note():
         "table_codename": request.headers["Table-Codename"],
         "codename": request.headers["Note-Codename"],
         "type": "note"})
+    
     if not finded_note:
         return {"msg": "Wrong data, note does not exists"}, 401
     
@@ -503,15 +514,15 @@ def get_note_hash():
     return {"hash": finded_note["hash"]}, 200
 
 
-def search_by_user_filter(base_filter: dict, user_filter: dict, page: int):
+def search_by_user_filter(base_filter: dict, user_filter: dict, page: int, count: bool = False):
     filters = []
     table = db.structs.find_one({"game_system": base_filter["game_system"], "codename": base_filter["table_codename"], "type": "schema"})
+    
     if user_filter["text"] != "":
-        search_regex = conver_text_to_regex(user_filter["text"])
         indexes = []
         for field in table["table_fields"]:
             if table["table_fields"][field]["type"] in ["string", "paragraph"]:
-                indexes.append((f"note.{field}", "text"))
+                indexes.append((f"note.{field}.value", "text"))
         db.structs.create_index(indexes)
         filters.append({"$match": {"$text": {"$search": user_filter["text"]}}})
     filters.append({"$match": base_filter})
@@ -523,7 +534,7 @@ def search_by_user_filter(base_filter: dict, user_filter: dict, page: int):
                 continue
             case x if x in ["string", "paragraph"]:
                 filters.append({
-                    "$match": { f"note.{field}": {"$regex": conver_text_to_regex(user_filter["fields"][field].get("value", ""))}}
+                    "$match": { f"note.{field}.value": {"$regex": conver_text_to_regex(user_filter["fields"][field].get("value", ""))}}
                 })
             case "number":
                 postfix = "avg"
@@ -532,11 +543,11 @@ def search_by_user_filter(base_filter: dict, user_filter: dict, page: int):
                 elif user_filter["fields"][field].get("cehck_max_value", False):
                     postfix = "max"
                 filters.append({
-                        "$match": { f"note.{field}.{postfix}": {"$gt": user_filter["fields"][field].get("min", 0), "$lt": user_filter["fields"][field].get("max", 1000)}}
+                        "$match": { f"note.{field}.{postfix}": {"$gte": user_filter["fields"][field].get("min", 0), "$lte": user_filter["fields"][field].get("max", 1000)}}
                     })
             case "bool":
                 filters.append({
-                    "$match": { f"note.{field}": {"$eq": user_filter["fields"][field].get("value", False)}}
+                    "$match": { f"note.{field}.value": {"$eq": user_filter["fields"][field].get("value", False)}}
                 })
             case "list":
                 filters.append({
@@ -544,34 +555,43 @@ def search_by_user_filter(base_filter: dict, user_filter: dict, page: int):
                                f"note.{field}.value": {"$regex": conver_text_to_regex(user_filter["fields"][field].get("value", ""))}
                             }
                         })
-
+    if count:
+        filters.append({"$count": "notes"})
+        result = db.structs.aggregate(filters)
+        db.structs.drop_indexes()
+        return result
     if page > 1:
-        filters.append({"$skip": (page - 1) * 10})
-    filters.append({"$limit": 10})
-    #print(filters)
+        filters.append({"$skip": (page - 1) * 15})
+    filters.append({"$limit": 15})
+    print(filters)
     result = db.structs.aggregate(filters)
     db.structs.drop_indexes()
     return result
 
 def conver_text_to_regex(text: str):
     tokens = text.split(" ")
-    regex = ""
+    regex = "(?i)"
     for token in tokens:
-        regex += f"(?i)(?=.*{token})(?-i)"
+        regex += f"(?=.*{token})"
     return regex
 
 
 @app.route("/gameSystem/table/getNotes", methods = ["POST"])
 #@token_required
 def get_notes():
-    if not request.headers.get("Game-System", False) or not request.headers.get("Table-Codename", False) or not request.headers.get("Page", False):
+    if not request.headers.get("Game-System", False) or not request.headers.get("Table-Codename", False):
         return {"msg": "Bad request"}, 401
     
     page = int(request.headers.get("Page", 1))
     base_filter = {"game_system": request.headers["Game-System"], "table_codename": request.headers["Table-Codename"], "type": "note"}
     user_filter = {"text": request.json["text"], "fields": request.json["fields"]}
-    result = search_by_user_filter(base_filter, user_filter, page)
+    
+    if request.headers.get("Note-Count", False):
+        for result in search_by_user_filter(base_filter, user_filter, page, True):
+            return {"count": math.ceil(result["notes"] / 15)}
+        return {"count": 0}
     response = []
+    result = search_by_user_filter(base_filter, user_filter, page)
     for row in result:
         response.append(row["codename"])
     return {"notes": response}

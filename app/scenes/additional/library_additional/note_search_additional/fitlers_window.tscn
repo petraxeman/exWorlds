@@ -1,0 +1,144 @@
+[gd_scene load_steps=2 format=3 uid="uid://dml43dmpcyrki"]
+
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_search_additional/fitlers_window.gd" id="1_mihec"]
+
+[node name="fitlers" type="Popup"]
+title = "Filters"
+initial_position = 2
+size = Vector2i(411, 337)
+visible = true
+borderless = false
+always_on_top = true
+script = ExtResource("1_mihec")
+
+[node name="margin" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="content" type="VBoxContainer" parent="margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="rows" type="VBoxContainer" parent="margin/content"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="text" type="HBoxContainer" parent="margin/content"]
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="label" type="Label" parent="margin/content/text"]
+layout_mode = 2
+text = "Name:"
+
+[node name="lineedit" type="LineEdit" parent="margin/content/text"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+placeholder_text = "Contains"
+
+[node name="integer" type="HBoxContainer" parent="margin/content"]
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="OptionButton" type="OptionButton" parent="margin/content/integer"]
+layout_mode = 2
+item_count = 3
+selected = 2
+popup/item_0/text = "min"
+popup/item_0/id = 0
+popup/item_1/text = "max"
+popup/item_1/id = 1
+popup/item_2/text = "avg"
+popup/item_2/id = 2
+
+[node name="label" type="Label" parent="margin/content/integer"]
+layout_mode = 2
+text = "from"
+
+[node name="min" type="SpinBox" parent="margin/content/integer"]
+layout_mode = 2
+step = 0.1
+
+[node name="to" type="Label" parent="margin/content/integer"]
+layout_mode = 2
+text = "to"
+
+[node name="max" type="SpinBox" parent="margin/content/integer"]
+layout_mode = 2
+step = 0.1
+value = 100.0
+
+[node name="bool" type="HBoxContainer" parent="margin/content"]
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="label" type="Label" parent="margin/content/bool"]
+layout_mode = 2
+text = "Is unique:"
+
+[node name="check_button" type="CheckButton" parent="margin/content/bool"]
+layout_mode = 2
+
+[node name="variants" type="HBoxContainer" parent="margin/content"]
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="label" type="Label" parent="margin/content/variants"]
+layout_mode = 2
+text = "Variant:"
+
+[node name="option" type="OptionButton" parent="margin/content/variants"]
+layout_mode = 2
+item_count = 2
+selected = 0
+popup/item_0/text = "Item 1"
+popup/item_0/id = 0
+popup/item_1/text = "Item 2"
+popup/item_1/id = 1
+
+[node name="list_or_table" type="HBoxContainer" parent="margin/content"]
+visible = false
+layout_mode = 2
+alignment = 1
+
+[node name="label" type="Label" parent="margin/content/list_or_table"]
+layout_mode = 2
+text = "List contains:"
+
+[node name="option" type="LineEdit" parent="margin/content/list_or_table"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+placeholder_text = "Element name"
+
+[node name="actions" type="HBoxContainer" parent="margin/content"]
+layout_mode = 2
+alignment = 1
+
+[node name="apply" type="Button" parent="margin/content/actions"]
+layout_mode = 2
+text = "Apply"
+
+[node name="discard" type="Button" parent="margin/content/actions"]
+layout_mode = 2
+text = "Discard"
+
+[node name="cancel" type="Button" parent="margin/content/actions"]
+layout_mode = 2
+text = "Cancel"
+
+[connection signal="pressed" from="margin/content/actions/apply" to="." method="_on_apply_pressed"]
+[connection signal="pressed" from="margin/content/actions/discard" to="." method="_on_discard_pressed"]
+[connection signal="pressed" from="margin/content/actions/cancel" to="." method="_on_cancel_pressed"]

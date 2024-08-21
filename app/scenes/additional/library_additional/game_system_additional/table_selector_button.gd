@@ -42,6 +42,7 @@ func _on_settings_pressed():
 	var result = await ResLoader.get_table(game_system, table_codename)
 	if not result.get("Ok", false):
 		return
+	result = result["table_data"]
 	var create_table_view = library.create_tab("create_table")
 	create_table_view.game_system = game_system
 	create_table_view.table = result["table"]
@@ -56,6 +57,7 @@ func _on_create_new_pressed():
 	var result = await ResLoader.get_table(game_system, table_codename)
 	if not result.get("Ok", false):
 		return
+	result = result["table_data"]
 	var note_creation = library.create_tab("create_note")
 	note_creation.table_name = result["common"]["table_name"]
 	note_creation.game_system = game_system
@@ -68,3 +70,9 @@ func _on_panel_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 			emit_signal("button_pressed")
+			_on_table_selected()
+
+
+func _on_table_selected():
+	var note_viewer = library.create_tab("note_viewer")
+	note_viewer.setup(game_system, table_codename)

@@ -6,7 +6,8 @@ const tabs_dict: Dictionary = {
 	"create_system": ["Create new system", preload("res://scenes/additional/library_additional/create_system.tscn")],
 	"game_system": ["System view", preload("res://scenes/additional/library_additional/game_system.tscn")],
 	"create_table": ["Create table", preload("res://scenes/additional/library_additional/create_table.tscn")],
-	"create_note": ["Create note", preload("res://scenes/additional/library_additional/note_creation.tscn")]
+	"create_note": ["Create note", preload("res://scenes/additional/library_additional/note_creation.tscn")],
+	"note_viewer": ["View notes", preload("res://scenes/additional/library_additional/notes_search.tscn")]
 }
 
 

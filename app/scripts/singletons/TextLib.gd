@@ -33,15 +33,27 @@ func format(text: String, current_address: Dictionary, context: Dictionary = {},
 				continue
 			
 			var element_string: String
-			if dict_el["ref"] == "field":
-				element_string = str(context.get("{0}:{1}".format([table, note]), {}).get(dict_el["field"], ""))
-			else:
-				if str(context.get("{0}:{1}".format([table, note]), {}).get(dict_el["field"], "")) != "":
-					element_string = str(context.get("{0}:{1}".format([table, note]), {}).get(dict_el["field"], ""))
-				else:
-					element_string = str(context.get(table+":properties", {}).get(dict_el["field"], ""))
 			
-			if current_address in path:
+			if dict_el["ref"] == "field":
+				var element_data = context.get("{0}:{1}".format([table, note]), {}).get(dict_el["field"])
+				if element_data is String:
+					element_string = element_data
+					continue
+				elif not element_data:
+					element_string = ""
+					continue
+				element_string = str(element_data.get("value", ""))
+			else:
+				var element_data = context.get("{0}:properties".format([table]), {}).get(dict_el["field"])
+				if not element_data:
+					element_string = ""
+					continue
+				if str(element_data) != "":
+					element_string = str(element_data)
+				else:
+					element_string = str(element_data)
+			
+			if path.count(current_address) > 2:
 				element_text = element_string
 				continue
 			
@@ -51,7 +63,6 @@ func format(text: String, current_address: Dictionary, context: Dictionary = {},
 			var element_path: Array = path.duplicate(true)
 			element_path.append(current_address)
 			
-			#if dict_el["ref"] == "field":
 			element_string = await format(element_string, element_address, context, element_path)
 				
 			if element_string != "":
@@ -69,7 +80,6 @@ func format(text: String, current_address: Dictionary, context: Dictionary = {},
 					args["default"] = default_parser_match.strings[1]
 				elif "words" in arg:
 					var words_parser_match = words_arg_parser.search(arg)
-					var a: String = ""
 					if words_parser_match.strings[1].is_valid_int():
 						args["words"] = int(words_parser_match.strings[1])
 				elif "as link" == arg:
@@ -85,7 +95,6 @@ func format(text: String, current_address: Dictionary, context: Dictionary = {},
 			var link: String = "open_note/{0}/{1}/{2}".format([current_address["game_system"], abs_dict_el["table"], abs_dict_el["note"]])
 			element_text = "[url={0}]{1}[/url]".format([link, element_text])
 		formated_text = formated_text.replace(row.strings[0], element_text)
-	print(context, "\n\n\n")
 	return formated_text
 
 
@@ -103,7 +112,7 @@ func update_context(context: Dictionary, text: String, current_address: Dictiona
 			if dict_el.get("ref", "field") == "property" and (not table in context.keys()):
 				var req_table = await ResLoader.get_table(current_address["game_system"], table)
 				var properties: Dictionary = {}
-				for property in req_table["properties"]:
+				for property in req_table["table_data"]["properties"]:
 					properties[property["codename"]] = property["value"]
 				context[table+":properties"] = properties
 				pass

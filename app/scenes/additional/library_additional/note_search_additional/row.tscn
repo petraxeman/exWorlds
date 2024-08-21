@@ -1,0 +1,46 @@
+[gd_scene load_steps=3 format=3 uid="uid://br60t1aom6u2y"]
+
+[ext_resource type="Texture2D" uid="uid://ch1ins151k217" path="res://assets/placeholder.png" id="1_q0q76"]
+[ext_resource type="Script" path="res://scenes/additional/library_additional/note_search_additional/row.gd" id="1_s2ptn"]
+
+[node name="row" type="PanelContainer"]
+script = ExtResource("1_s2ptn")
+
+[node name="margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="hbox" type="HBoxContainer" parent="margin"]
+layout_mode = 2
+
+[node name="image" type="TextureRect" parent="margin/hbox"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+texture = ExtResource("1_q0q76")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="label" type="Label" parent="margin/hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Element name"
+horizontal_alignment = 1
+
+[node name="label2" type="Label" parent="margin/hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Additional element data"
+horizontal_alignment = 1
+visible_ratio = -0.0434783
+
+[node name="label3" type="Label" parent="margin/hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Damage: 1d4"
+horizontal_alignment = 1
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]

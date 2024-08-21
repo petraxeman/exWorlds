@@ -3,6 +3,7 @@ extends Control
 var game_system_codename: String
 var rendering_categories: bool = false
 var can_change: bool = false
+
 @onready var parent: Node = get_node("/root/library")
 
 
@@ -43,6 +44,7 @@ func render_categories():
 		category_button.game_system = game_system_codename
 		category_button.game_system_view = self
 		
+		#category_button.button_pressed.connect(_on_table_selected.bind(category["codename"]))
 		if not can_change:
 			category_button.disable_changment()
 		$vbox/scroll/grid.add_child(category_button)

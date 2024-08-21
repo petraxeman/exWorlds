@@ -7,22 +7,36 @@ var current_page: int = 1
 var page_selection_focused: bool = false
 var page_selector_node: SpinBox
 
+var disabled_buttons: bool = true
+
 
 
 func _ready():
 	render()
 
 
-func _input(event):
+func _input(_event):
 	if Input.is_action_pressed("Enter") and page_selection_focused:
 		page_selector_node.apply()
 		page_selection_focused = false
-		_on_numeric_pressed(page_selector_node.value)
+		_on_numeric_pressed(int(page_selector_node.value))
+
+
+func disable():
+	disabled_buttons = true
+	render()
+
+
+func enable():
+	disabled_buttons = false
+	render()
 
 
 func set_page_count(count: int):
 	max_page = count
-	current_page = 1
+	if current_page > count:
+		current_page = count
+	render()
 
 
 func render():
@@ -40,7 +54,7 @@ func render():
 
 func render_short_bar():
 	var prev_button: Button = Button.new()
-	prev_button.disabled = current_page == 1
+	prev_button.disabled = current_page == 1 or disabled_buttons
 	prev_button.pressed.connect(_on_prev_pressed)
 	prev_button.text = "<"
 	$pages.add_child(prev_button)
@@ -48,12 +62,12 @@ func render_short_bar():
 	for i in range(max_page):
 		var numeric_button: Button = Button.new()
 		numeric_button.text = str(i + 1)
-		numeric_button.disabled = i+1 == current_page
+		numeric_button.disabled = i+1 == current_page or disabled_buttons
 		numeric_button.pressed.connect(_on_numeric_pressed.bind(i+1))
 		$pages.add_child(numeric_button)
 	
 	var next_button: Button = Button.new()
-	next_button.disabled = current_page == max_page
+	next_button.disabled = current_page == max_page or disabled_buttons
 	next_button.pressed.connect(_on_next_pressed)
 	next_button.text = ">"
 	$pages.add_child(next_button)
@@ -61,7 +75,7 @@ func render_short_bar():
 
 func render_long_bar():
 	var prev_button: Button = Button.new()
-	prev_button.disabled = current_page == 1
+	prev_button.disabled = current_page == 1 or disabled_buttons
 	prev_button.pressed.connect(_on_prev_pressed)
 	prev_button.text = "<"
 	$pages.add_child(prev_button)
@@ -71,11 +85,12 @@ func render_long_bar():
 			continue
 		var numeric_button: Button = Button.new()
 		numeric_button.text = str(i + 1)
-		numeric_button.disabled = i+1 == current_page
+		numeric_button.disabled = i+1 == current_page or disabled_buttons
 		numeric_button.pressed.connect(_on_numeric_pressed.bind(i+1))
 		$pages.add_child(numeric_button)
 	
 	var page_selector: SpinBox = SpinBox.new()
+	page_selector.editable = not disabled_buttons
 	page_selector.min_value = 1
 	page_selector.max_value = max_page
 	page_selector.get_line_edit().focus_entered.connect(_on_page_selection_focused)
@@ -89,12 +104,12 @@ func render_long_bar():
 			continue
 		var numeric_button: Button = Button.new()
 		numeric_button.text = str(i + 1)
-		numeric_button.disabled = i+1 == current_page
+		numeric_button.disabled = i+1 == current_page or disabled_buttons
 		numeric_button.pressed.connect(_on_numeric_pressed.bind(i+1))
 		$pages.add_child(numeric_button)
 	
 	var next_button: Button = Button.new()
-	next_button.disabled = current_page == max_page
+	next_button.disabled = current_page == max_page or disabled_buttons
 	next_button.pressed.connect(_on_next_pressed)
 	next_button.text = ">"
 	$pages.add_child(next_button)

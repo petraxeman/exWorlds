@@ -116,19 +116,21 @@ func delete_system(codename: String) -> bool:
 func get_table(game_system: String, table_name: String) -> Dictionary:
 	var cache_address: String = "(type=table,system_name={0},table_name={1})".format([game_system, table_name])
 	var cached_table = Global.cache.get_content(cache_address)
+	
 	var need_update: bool = false
 	if cached_table["Ok"]:
 		var hash_response: Dictionary = await UrlLib.post("get_table_hash", [], {"table_name": table_name, "game_system": game_system})
 		if hash_response["hash"] == cached_table["hash"]:
-			var loaded_data: Dictionary = cached_table["data"].duplicate(true)
-			loaded_data["Ok"] = true
-			return loaded_data
+			cached_table["Ok"] = true
+			return cached_table["data"]
 		else:
 			need_update = true
+	
 	var response: Dictionary = await UrlLib.post("get_table", [], {"table_name": table_name, "game_system": game_system})
 	if response["Ok"]:
-		Global.cache.put_content(cache_address, response["hash"], response["table"], need_update)
-		return response["table"]
+		Global.cache.put_content(cache_address, response["hash"], response, need_update)
+		response["Ok"] = true
+		return response
 	return {"Ok": false}
 
 
@@ -143,8 +145,8 @@ func get_tables(system_codename: String) -> Array:
 # CREATE NEW TABLE
 func create_table(data: Dictionary, system_name: String):
 	var response: Dictionary = await UrlLib.post("create_table", ["Game-System: %s"%system_name], data)
+	#var cache_address: String = "(type=table,system_name={0},table_name={1})".format([system_name, data["common"]["table_codename"]])
 	if response["Ok"]:
-		Global.cache.put_content("(type=table,system_name={0},table_name={1})".format([system_name, data["common"]["table_codename"]]), response["hash"], data)
 		return true
 	return false
 
@@ -160,13 +162,15 @@ func delete_table(game_system: String, table_name: String) -> bool:
 func send_note(game_system: String, table_codename: String, data: Dictionary):
 	var response: Dictionary = await UrlLib.post("create_note", ["Game-System: %s"%game_system, "Table-Codename: %s"%table_codename], data)
 	if response["Ok"]:
+		var headers: Array = ["Game-System: "+game_system, "Table-Codename: "+table_codename, "Note-Codename: "+data["codename"]["value"]]
+		response = await UrlLib.post("get_note", headers)
 		Global.cache.put_content("(type=note,system_name={0},table_name={1},note_name={2})".format([
 			game_system,
 			table_codename,
 			data["codename"]["value"]
 		]),
 		response["hash"],
-		data)
+		response["note"])
 		return true
 	return false
 
@@ -194,4 +198,19 @@ func get_note(game_system: String, table_codename: String, note_codename: String
 	if response["Ok"]:
 		Global.cache.put_content(cache_address, response["hash"], response["note"], need_update)
 		return response["note"]
+	return {"Ok": false}
+
+
+func get_notes(game_system: String, table_codename: String, page: int = 1, search_request: Dictionary = {"text": "", "fields": {}}):
+	var headers: Array = ["Game-System: %s"%game_system, "Table-Codename: %s"%table_codename, "Page: %s"%str(page)]
+	var result = await UrlLib.post("get_notes", headers, search_request)
+	if result["Ok"]:
+		return result
+	return {"Ok": false}
+
+func get_notes_count(game_system: String, table_codename: String, page: int = 1, search_request: Dictionary = {"text": "", "fields": {}}):
+	var headers: Array = ["Game-System: %s"%game_system, "Table-Codename: %s"%table_codename, "Page: %s"%str(page), "Note-Count: true"]
+	var result = await UrlLib.post("get_notes", headers, search_request)
+	if result["Ok"]:
+		return result
 	return {"Ok": false}
