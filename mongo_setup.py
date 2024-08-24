@@ -23,6 +23,15 @@ structs = Collection(db, "structs", create=True)
 notes = Collection(db, "notes", create=True)
 images = Collection(db, "images", create=True)
 
+users.insert_one({
+    "username": "Server",
+    "role": "server-admin",
+    "info": {
+        "server-name": "exWorlds",
+        "custom-roles": {}
+    }
+})
+
 try:
     client.exworlds.command("createUser", mongo_exowrlds_login, pwd=mongo_exowrlds_passwd, roles = [{"role": "readWrite", "db": "exworlds"}])
 except errors.OperationFailure:
