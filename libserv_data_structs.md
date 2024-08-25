@@ -8,7 +8,6 @@ Game system:
 
 User:
 - username - Nickname
-- password - password for log in (This is unsecure change it)
 - password-hash - Hash of password what user for check login 
 - role - Basic role for get info abour what user can do
 - waiting-registration - System wait when user register new account with this login

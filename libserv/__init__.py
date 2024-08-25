@@ -11,9 +11,9 @@ def create_app():
     app: Flask = Flask(__name__)
     
     # PRE CONFIG INITIALS
-    app.config["MONGO_URI"] = "mongodb://devu:devp@localhost:27017/exworlds"
+    app.config["MONGO_URI"] = "mongodb://dbadmin:dbpasswd@localhost:27017/exworlds"
     app.config["JWT_SECRET"] = "03lh6fhrl3pa91f2oyov4syba65sjwvemshe2-5xn1mv1wfhxa4v-mxtrzm6dvy-3dum8xd1awb1atqa1oy8cspv3p7zynoic6cf"
-    app.config["REGISTRATION"] = "on_request"     # allowed - In concept, on_reques - required, forbidden - required
+    app.config["REGISTRATION"] = "allowed"     # allowed - In concept, on_reques - required, forbidden - required
     
     # MODULES INITIALS
     mongo.init_app(app)

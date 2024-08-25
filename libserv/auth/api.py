@@ -13,7 +13,6 @@ bp = Blueprint("api-auth", __name__)
 
 
 @bp.route("/api/login", methods = ["POST"])
-@token_required
 def login():
     db = current_app.config["MONGODB_INST"]
     
@@ -40,7 +39,9 @@ def register():
     password_hash = get_hash(request.json.get('password'))
     user_document = build_user({"username": username, "password-hash": password_hash})
     
-    if finded_user := db.users.find_one({"username": username, "waiting": {"registration": True}}):
+    if finded_user := db.users.find_one({"username": username, "waiting.registration": True}):
+        print("Register here")
+        user_document["role"] = finded_user["role"]
         db.users.update_one(finded_user, {"$set": user_document})
         return {"msg": "Registration success"}, 200
     
@@ -55,7 +56,7 @@ def register():
     if not result:
         return {"msg": "Somthing went wrong. Try again later."}, 401
     
-    return {"msg": "Registration forbidden"}, 401
+    return {"msg": "Registration success"}, 200
 
 def register_user(db, rjson: dict, user_document: dict) -> bool:
     if db.users.find_one({"username": rjson.get("username")}):
@@ -65,7 +66,7 @@ def register_user(db, rjson: dict, user_document: dict) -> bool:
 
 def register_request(db, rjson: dict, user_document: dict) -> bool:
     if  db.users.find_one({"username": rjson.get("username")}):
-        return Flase
+        return False
     user_document["waiting"]["approval"] = True
     user_document["role"] = "user"
     db.users.insert_one(user_document)
@@ -88,9 +89,8 @@ def add_user_to_register_queue():
         "waiting": {"registration": True}
         })
     db.users.insert_one(user_document)
-    return {"msg": f"User <{result["username"]}> was created and waiting registration"}, 200
+    return {"msg": f"User <{result['username']}> was created and waiting registration"}, 200
 
-# VALIDATION
 def validate_add_user_to_queue(db, rjson: dict, current_user: dict) -> bool:
     sender_role = current_user["role"]
     

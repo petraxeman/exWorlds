@@ -1,3 +1,4 @@
+import hashlib
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
@@ -32,6 +33,22 @@ users.insert_one({
     }
 })
 
+users.insert_one({
+        "username": mongo_app_login,
+        "password-hash": hashlib.md5(mongo_app_password.encode()).hexdigest(),
+        "role": "admin",
+        "waiting": {
+            "registration": False,
+            "approval": False
+            },
+        "friends": {
+            "list": [],
+            "sended": [],
+            "recieved": []
+            },
+    })
+
+
 try:
     client.exworlds.command("createUser", mongo_exowrlds_login, pwd=mongo_exowrlds_passwd, roles = [{"role": "readWrite", "db": "exworlds"}])
 except errors.OperationFailure:
@@ -39,6 +56,6 @@ except errors.OperationFailure:
 except Exception as err:
     print(err)
 
-users.insert_one({"username": mongo_app_login, "password": mongo_app_password, "await": False, "role": "admin"})
+
 
 quit()
