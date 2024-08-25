@@ -33,9 +33,9 @@ def create_system():
     new_system = {
         "name": data["name"],
         "codename": data["codename"],
-        "image_name": data["image_name"],
+        "image-name": data["image-name"],
         "type": "game-system",
-        "author": current_user["username"]
+        "owner": current_user["username"]
         }
     
     hash = hashlib.md5(str(new_system).encode()).hexdigest()
@@ -130,4 +130,4 @@ def delete_system():
         db.structs.delete_many({"type": "note", "author": current_user["username"], "game-system": game_system["codename"], "table": table["codename"]})
     db.structs.delete_many({"type": "table", "author": current_user["username"], "game-system": game_system["codename"]})
     
-    return {"Ok": True}, 200
+    return {"msg": f"System <{request.json.get("codename")}> deleted."}, 200
