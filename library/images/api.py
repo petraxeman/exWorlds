@@ -1,7 +1,7 @@
 import datetime
 import io
 import uuid
-from libserv.jwtokens import token_required
+from library.jwtokens import token_required
 from flask import (
     Blueprint,
     request,

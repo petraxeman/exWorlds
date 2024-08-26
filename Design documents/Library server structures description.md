@@ -12,7 +12,7 @@ User:
 - role - Basic role for get info abour what user can do
 - waiting-registration - System wait when user register new account with this login
 - waiting-approval - System wait when admin or server-admin approve this registration
-- firends - List of firends
+- black-list - List of users who can't write for this user
 
 Message:
 - text - Text of message what using for showing
