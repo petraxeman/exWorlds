@@ -2,11 +2,11 @@ import re, copy
 
 
 
-def validate_game_system_create(db, data: dict, sender_username: str) -> bool:
+def validate_game_system_create(db, data: dict) -> bool:
     if False in [data.get("codename", False), data.get("name", False), data.get("image-name", False)]:
         return False
     
-    if db.structs.find_one({"codename": data.get("codename"), "type": "game-system"}):
+    if db.structs.find_one({"codename": data.get("codename"), "meta-type": "collection"}):
         return False
     
     if not db.images.find_one({"name": data.get("image_name")}):
@@ -61,6 +61,7 @@ def build_game_system(reference: dict, sender_user: dict) -> dict:
         "codename": reference.get("codename"),
         "image-name": reference.get("image-name"),
         "type": "game-system",
+        "meta-type": "collection",
         "owner": sender_user["username"],
         "redactors": reference.get("redactors", [])
         }

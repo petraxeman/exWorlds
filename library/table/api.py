@@ -48,61 +48,13 @@ def get_tables():
     return {"schemas": schemas}, 200
 
 
-def get_fields(table: list) -> dict:
-    fields: dict = {}
-    for row in table:
-        new_fields: dict = parse_row(row, 0)
-        for codename in new_fields.keys():
-            if codename in fields.keys():
-                continue
-            fields[codename] = new_fields[codename]
-    return fields
-
-def parse_row(data: list, rlvl: int = 0):
-    if rlvl >= 15:
-        return []
-    
-    fields: dict = {}
-    for element in data:
-        if element["type"] == "block":
-            for row in element["rows"]:
-                new_fields: dict = parse_row(row, rlvl + 1)
-                for codename in new_fields.keys():
-                    if codename in fields.keys():
-                        continue
-                    fields[codename] = new_fields[codename]
-        if element["type"] == "tabs_container":
-            for tab in element["tabs"]:
-                for row in tab["rows"]:
-                    new_fields: dict = parse_row(row, rlvl + 1)
-                    for codename in new_fields.keys():
-                        if codename in fields.keys():
-                            continue
-                        fields[codename] = new_fields[codename]
-        else:
-            codename = element.get("codename", "")
-            if codename:
-                match element.get("type", "undefined"):
-                    case "string":
-                        if element.get("as_type", "") != "":
-                            fields[codename] = {"type": "string", "name": element.get("name", ""), "as_type": [substr.strip() for substr in element.get("as_type").split(";")]}
-                        else:
-                            fields[codename] = {"type": "string", "name": element.get("name", "")}
-                    case "number":
-                        fields[codename] = {"type": "number", "name": element.get("name", ""), "subtype": element.get("subtype", "integer")}
-                    case field_type:
-                        fields[codename] = {"type": field_type, "name": element.get("name", "")}
-                #fields[codename] = {"type": element.get("type", "string")}
-    return fields
-
-
-@bp.route("/gameSystem/createTable", methods = ["POST"])
+@bp.route("/collection/upload-table", methods = ["POST"])
 @token_required
-def create_table():
+def upload_table():
     db = current_app.config["MNOGODB_INST"]
-    game_system = db.structs.find_one({"type": "game-system", "codename": request.json.get("game-system", "")})
+    collection = db.structs.find_one({"type": "game-system", "codename": request.json.get("game-system-codename", "")})
 
-    result = handlers.validate_table_creation_request(db, request.json, game_system, request.current_user)
+    result = handlers.validate_table_creation_request(db, request.json, collection, request.current_user)
     if not result:
         return {"msg": "Somthing went wrong. Try again later."}, 401
 
@@ -112,10 +64,14 @@ def create_table():
     return {"hash": table["hash"]}, 200
 
 
-@bp.route("/gameSystem/deleteTable", methods = ["POST"])
+@bp.route("/collection/delete-table", methods = ["POST"])
 @token_required
 def delete_table():
-    if not request.json.get("game_system", False) or not request.json.get("table_name", False):
-        return {"msg": "\"Game system\" or \"Table name\" is undefined"}, 401
-    db.structs.delete_one({"author": current_user["username"], "type": "schema", "codename": request.json["table_name"], "game_system": request.json["game_system"]})
-    return {}, 200
+    db = current_app.config["MNOGODB_INST"]
+    
+    result = handlers.validate_table_deletion(db, request.json, request.current_user)
+    if not result:
+        return {"msg": "Somthing went wrong. Try again later."}, 401
+    
+    handlers.delete_table_and_notes(db, request.json["game-system-codename"], request.json["table-codename"])
+    return {"msg": "Table deletion complete"}, 200
