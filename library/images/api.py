@@ -30,13 +30,13 @@ def upload_image():
         return {"msg": "Wrong extension"}, 401
 
     username = current_user["username"]
-    image_date = datetime.datetime.now().strftime("%H-%M-%d-%m-%y")
+    image_date = datetime.datetime.now().strftime("%H%M%d%m%y")
     image_uuid = str(uuid.uuid4())
     image_name = f"{username}-{image_date}-{image_uuid}.webp"
 
     image_bytes = request.files['image'].read()
-    db.images.insert_one({"author": current_user["username"], "name": image_name, "image": image_bytes})
-    return {"filename": image_name, "author": current_user["username"]}, 200
+    db.images.insert_one({"owner": current_user["username"], "name": image_name, "image": image_bytes})
+    return {"filename": image_name, "owner": current_user["username"]}, 200
 
 
 @bp.route("/image/info", methods = ["POST"])
@@ -49,7 +49,7 @@ def image_info():
     if not image:
         return {"msg": "File dont exist"}, 401
     
-    return {"author": image["author"], "image_name": image["name"]}, 200
+    return {"owner": image["owner"], "image_name": image["name"]}, 200
 
 
 @bp.route("/image/download", methods = ["POST"])

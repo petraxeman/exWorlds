@@ -489,8 +489,9 @@ func _on_save_and_upload_pressed():
 	
 	if validation_result["Ok"]:
 		var preapred_table: Dictionary = build_upload_request()
-		await ResLoader.create_table(preapred_table, game_system)
-		parent.remove_tab_by_ref(self)
+		print(preapred_table)
+		#await ResLoader.create_table(preapred_table, game_system)
+		#parent.remove_tab_by_ref(self)
 	else:
 		var warnings_text: String = "Wait, i find this errors:\n" 
 		for message_index in range(validation_result["messages"].size()):
