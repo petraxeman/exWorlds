@@ -24,7 +24,7 @@ def login():
     if db.users.find_one({"username": username, "password-hash": password_hash}) is None:
         return {"msg": "Wrong login or password"}, 401
 
-    expire_data = (datetime.datetime.utcnow() + datetime.timedelta(days=1)).strftime("%d-%m-%Y")
+    expire_data = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%d-%m-%Y")
     token = jwt.encode({"username": username, "expire_date": expire_data}, key = current_app.config["JWT_SECRET"], algorithm="HS256")
     return {"token": token}, 200
 

@@ -12,7 +12,7 @@ def validate_game_system_create(db, data: dict) -> bool:
     if not db.images.find_one({"name": data.get("image_name")}):
         return False
     
-    if not re.fullmatch("[0-9a-z\-_]+", data.get("codename")) or len(data.get("codename")) > 45:
+    if not re.fullmatch(r"[0-9a-z\-_]+", data.get("codename")) or len(data.get("codename")) > 45:
         return False
     
     if len(data["name"]) > 45:

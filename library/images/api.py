@@ -16,7 +16,7 @@ bp = Blueprint("api-images", __name__)
 @bp.route("/image/upload", methods = ["POST"])
 @token_required
 def upload_image():
-    db = current_app.config["MNOGODB_INST"]
+    db = current_app.config["MONGODB_INST"]
     current_user = request.current_user
     
     if 'image' not in request.files:
@@ -42,7 +42,7 @@ def upload_image():
 @bp.route("/image/info", methods = ["POST"])
 @token_required
 def image_info():
-    db = current_app.config["MNOGODB_INST"]
+    db = current_app.config["MONGODB_INST"]
     
     filename = request.json.get("filename")
     image = db.images.find_one({"name": filename})
@@ -55,7 +55,7 @@ def image_info():
 @bp.route("/image/download", methods = ["POST"])
 @token_required
 def download_image():
-    db = current_app.config["MNOGODB_INST"]
+    db = current_app.config["MONGODB_INST"]
     
     filename = request.json.get("filename")
     image = db.images.find_one({"name": filename})

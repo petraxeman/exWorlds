@@ -1,5 +1,5 @@
 import os
-import utils
+import library.utils
 
 from flask import Flask
 from flask_pymongo import PyMongo
@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from library.auth.api import bp as api_auth_bp
 from library.common.api import bp as api_common_bp
 from library.game_system.api import bp as api_game_systems_bp
+from library.images.api import bp as api_images
+
 load_dotenv()
 
 mongo: PyMongo = PyMongo()
@@ -19,7 +21,7 @@ def create_app():
     # PRE CONFIG INITIALS
     app.config["MONGO_URI"] = "mongodb://devu:devp@localhost:27017/exworlds"
     app.config["JWT_SECRET"] = "03lh6fhrl3pa91f2oyov4syba65sjwvemshe2-5xn1mv1wfhxa4v-mxtrzm6dvy-3dum8xd1awb1atqa1oy8cspv3p7zynoic6cf"
-    app.config["REGISTRATION"] = "allowed"     # allowed - In concept, on_reques - required, forbidden - required
+    app.config["REGISTRATION"] = "allowed"
     app.config["PASSWORD_SALT"] = os.getenv("GLOBAL_PASSWORD_SALT")
     app.config["TOKEN_SALT"] = os.getenv("GLOBAL_TOKEN_SALT")
 
@@ -33,6 +35,7 @@ def create_app():
         app.register_blueprint(api_auth_bp)
         app.register_blueprint(api_common_bp)
         app.register_blueprint(api_game_systems_bp)
+        app.register_blueprint(api_images)
     return app
 
 
