@@ -13,7 +13,7 @@ def token_required(fn):
         global current_user
         token = request.headers.get("auth-token", None)
         if not token:
-            return {"msg": "Valid token is missing"}
+            return {"msg": "Valid token is missing"}, 403
         try:
             data = jwt.decode(token, current_app.config["JWT_SECRET"], algorithms=["HS256"])
             if datetime.datetime.strptime(data["expire_date"], "%d-%m-%Y") < datetime.datetime.now():

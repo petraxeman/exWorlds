@@ -3,3 +3,4 @@ flask-pymongo
 pyjwt
 numexpr
 python-dotenv
+pytest
