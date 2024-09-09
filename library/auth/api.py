@@ -1,6 +1,3 @@
-import datetime
-import jwt
-import hashlib
 from library.jwtokens import token_required
 from library.auth import handlers
 from library import utils
@@ -17,16 +14,11 @@ bp = Blueprint("api-auth", __name__)
 @bp.route("/api/login", methods = ["POST"])
 def login():
     db = current_app.config["MONGODB_INST"]
-    
+    password_salt = current_app.config["PASSWORD_SALT"]
     username = request.json.get('username')
-    password_hash = utils.get_password_hash(request.json.get('password'), current_app.config["PASSWORD_SALT"])
-
-    if db.users.find_one({"username": username, "password-hash": password_hash}) is None:
-        return {"msg": "Wrong login or password"}, 401
-
-    expire_data = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%d-%m-%Y")
-    token = jwt.encode({"username": username, "expire_date": expire_data}, key = current_app.config["JWT_SECRET"], algorithm="HS256")
-    return {"token": token}, 200
+    password = request.json.get('password')
+    result = handlers.validate_auth(db, username, password, password_salt)
+    return result
 
 
 # USER REGISTRATION

@@ -2,24 +2,24 @@ import re, copy, hashlib
 
 
 
-def validate_game_system_upload(db, data: dict, sender: dict) -> bool:
+def validate_pack_upload(db, data: dict, sender: dict) -> bool:
     if not data.get("codename", False):
         return False, None
     
     action = "nothing"
     if db.structs.find_one({"codename": data.get("codename"), "type": "game-system"}):
         action = "change"
-        if not validate_game_system_change(db, data, sender):
+        if not validate_pack_change(db, data, sender):
             return False, None
     else:
         action = "create"
-        if not validate_game_system_create(db, data):
+        if not validate_pack_change(db, data):
             return False, None
     
     return True, action
     
 
-def validate_game_system_create(db, data: dict) -> bool:
+def validate_pack_create(db, data: dict) -> bool:
     if not data.get("name", None) or not data.get("image-name", None):
         return False
     
@@ -32,7 +32,7 @@ def validate_game_system_create(db, data: dict) -> bool:
     return True
 
 
-def validate_game_system_change(db, data: dict, sender: dict) -> bool:
+def validate_pack_change(db, data: dict, sender: dict) -> bool:
     game_system = db.structs.find_one({"codename": data.get("codename"), "type": "game-system"})
 
     if game_system.get("owner", "") != sender["username"] and (sender["role"] != "admin" and sender["role"] != "server-admin"): 

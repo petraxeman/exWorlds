@@ -1,6 +1,4 @@
-import hashlib
-import re
-from library.game_system import handlers
+from library.pack import handlers
 from library.jwtokens import token_required
 from flask import (
     Blueprint,
@@ -12,12 +10,12 @@ bp = Blueprint("api-game-systems", __name__)
 
 
 
-@bp.route("/game-system/upload", methods = ["POST"])
+@bp.route("/pack/upload", methods = ["POST"])
 @token_required
 def game_system_upload():
     db = current_app.config["MONGODB_INST"]
     
-    result = handlers.validate_game_system_upload(db, request.json, request.current_user)
+    result = handlers.validate_pack_upload(db, request.json, request.current_user)
 
     if not result[0]:
         return {"msg": "Somthing went wrong. Try again later."}, 401

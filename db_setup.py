@@ -49,13 +49,16 @@ if not users.find_one({"username": exworlds_admin_login}):
     users.insert_one({
             "username": exworlds_admin_login,
             "password-hash": hashlib.pbkdf2_hmac("sha512", str(exworlds_admin_password).encode(), str(salt).encode(), 2 ** 8).hex(),
-            "role": "admin",
+            "rights": ["any-create", "any-delete", "any-account", "cant-be-blocked"],
+            "blocked": "",
             "waiting": {
                 "registration": False,
                 "approval": False
                 },
-            "black-list": [],
-        })
+            "relationship": {
+                "black-list": []
+                }
+            })
 
 
 try:
