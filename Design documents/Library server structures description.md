@@ -38,7 +38,6 @@
 
 - username: Nickname
 - password-hash: Hash of password what user for check login 
-- role: Basic role for get info abour what user can do
 - rights: List of accesses
 - blocked: String with date after user can sign in
 - waiting
@@ -71,13 +70,15 @@
 - delete-games    |
 
 ### Accounts rights
-- any-account       | All but not a "cant-be-blocked"
-- cant-be-blocked
-
+- any-account
 - approve-requests
 - add-to-queue
 - delete-user
 - ban-user
+
+### Can have only server admin
+- server-admin          | Any rights
+- cant-be-blocked
 
 
 # Message:

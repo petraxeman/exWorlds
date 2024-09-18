@@ -17,64 +17,27 @@ def login():
     password_salt = current_app.config["PASSWORD_SALT"]
     username = request.json.get('username')
     password = request.json.get('password')
-    result = handlers.validate_auth(db, username, password, password_salt)
-    return result
+    return handlers.process_auth(db, username, password, password_salt)
 
 
-# USER REGISTRATION
 @bp.route("/api/register", methods = ["POST"])
 def register():
     if not request.json.get("username", False) or not request.json.get("password", False):
         return {"msg": "No username or password"}, 401
-    
     db = current_app.config["MONGODB_INST"]
-
-    username = request.json.get('username')
-    password_hash = utils.get_password_hash(request.json.get('password'), current_app.config["PASSWORD_SALT"])
-    user_document = handlers.build_user({"username": username, "password-hash": password_hash})
-    
-    if finded_user := db.users.find_one({"username": username, "waiting.registration": True}):
-        user_document["role"] = finded_user["role"]
-        db.users.update_one(finded_user, {"$set": user_document})
-        return {"msg": "Registration success"}, 200
-    
-    match current_app.config.get("REGISTRATION", "forbidden"):
-        case "allowed":
-            result = handlers.register_user(db, request.json.get("username", ""), user_document)
-        case "on-request":
-            result = handlers.register_request(db, request.json.get("username", ""), user_document)
-        case _:
-            result = False
-        
-    if not result:
-        return {"msg": "Somthing went wrong. Try again later."}, 401
-    
-    return {"msg": "Registration success"}, 200
+    username = request.json.get('username', None)
+    password = request.json.get('password', None)
+    return handlers.process_registration(db, username, password, current_app.config["PASSWORD_SALT"])
 
 
-
-
-# ADD USER TO QUEUE
 @bp.route("/api/account/add-user-to-queue", methods = ["POST"])
 @token_required
 def add_user_to_register_queue():
     db = current_app.config["MONGODB_INST"]
     
-    result: bool = handlers.validator_add_user_to_queue(
+    return handlers.process_add_user_to_queue(
         db,
-        request.json.get("username", ""),
-        request.current_user.get("role", ""),
-        request.json.get("role", "")
+        request.json.get("username", None),
+        request.json.get("rights", None),
+        request.current_user.get("rights", None),
         )
-    
-    if not result["ok"]:
-        return {"msg": "Somthing went wrong. Try again later."}
-    
-    user_document = handlers.build_user({
-        "username": result["username"],
-        "role": result["role"],
-        "waiting": {"registration": True}
-        })
-    
-    db.users.insert_one(user_document)
-    return {"msg": f"User <{result['username']}> was created and waiting registration"}, 200

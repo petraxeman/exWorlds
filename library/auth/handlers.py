@@ -8,7 +8,7 @@ from flask import (
 )
 
 
-def validate_auth(db, username: str, password: str, password_salt: str) -> Union[dict, int]:
+def process_auth(db, username: str, password: str, password_salt: str) -> Union[dict, int]:
     password_hash = utils.get_password_hash(password, password_salt)
     user = db.users.find_one({"username": username, "password-hash": password_hash})
 
@@ -27,47 +27,84 @@ def validate_auth(db, username: str, password: str, password_salt: str) -> Union
     return {"token": token}, 200
 
 
-def validator_add_user_to_queue(db, required_username: str, sender_role: str, required_role: str = "user")  -> bool:
-    if required_username != "":
-        username = required_username
-    else:
-        return {"ok": False}
+def process_registration(db, username: str, password: str, password_salt: str) -> Union[dict, int]:
+    if username == None or password == None:
+        return {"msg": "Wrong username or password"}, 200
     
-    role = "nobody" if required_role == "" else required_role
+    password_hash = utils.get_password_hash(password, password_salt)
+    user_document = build_user({"username": username, "password-hash": password_hash})
+
+    if finded_user := db.users.find_one({"username": username, "waiting.registration": True}):
+        db.users.update_one(finded_user, {"$set": {"waiting.registration": False}})
+        return {"msg": "Registration success"}, 200
     
-    if sender_role != "admin" and sender_role != "server-admin":
-        return {"ok": False}
-    
-    if db.users.find_one({"username": username}) is not None:
-        return {"ok": False}
-    
-    return {"ok": True, "username": username, "role": role}
+    match current_app.config.get("REGISTRATION", "forbidden"):
+        case "allowed":
+            return register_user(db, user_document)
+        case "on-request":
+            return register_request(db, username, user_document)
+        case _:
+            return {"msg": "Registration forbidden"}, 401
 
 
-def register_user(db, username: str, user_document: dict) -> bool:
-    if db.users.find_one({"username": username}):
-        return False
+def register_user(db, user_document: dict) -> Union[dict, int]:
+    if db.users.find_one({"username": user_document["username"]}):
+        return {"msg": "This login already used."}, 401
+    
     db.users.insert_one(user_document)
-    return True
+    return {"msg": "Registration success"}, 200
 
 
-def register_request(db, username: str, user_document: dict) -> bool:
+def register_request(db, username: str, user_document: dict) -> Union[dict, int]:
     if  db.users.find_one({"username": username}):
-        return False
+        return {"msg": "User already exists"}, 401
     user_document["waiting"]["approval"] = True
     user_document["role"] = "user"
     db.users.insert_one(user_document)
-    return True
+    return {"msg": "Registration success"}, 200
+
+
+def match_rights(required_rights: list, creator_rights: list):
+    if {"server-admin", "cant-be-blocked"}.intersection(required_rights):
+        if "server-admin" not in creator_rights:
+            return False
+    if {"add-to-queue", "server-admin"}.intersection(creator_rights):
+        return True
+    return False
+
+
+def process_add_user_to_queue(db, required_username: str, required_rights: list, sender_rights: list)  -> Union[dict, int]:
+    if not required_username or required_rights == None or required_username == "":
+        return {"msg": "Not found expected fields"}, 401
+
+    if db.users.find_one({"username": required_username}):
+        return {"msg": "Username already used"}, 401
+    
+    if not match_rights(required_rights, sender_rights):
+        return {"msg": "Unexpected rights"}, 401
+    
+    user_document = build_user(
+        {"username": required_username,
+         "password-hash": "",
+         "rights": required_rights,
+         "waiting": {"registration": True}}
+        )
+    db.users.insert_one(user_document)
+    
+    return {"msg": "Registration success"}, 200
 
 
 def build_user(reference: dict):
     return {
         "username": reference["username"],
-        "password-hash": reference.get("password-hash", ""),
-        "role": reference.get("role", "user"),
+        "password-hash": reference.get("password-hash"),
+        "rights": reference.get("rights", []),
+        "blocked": reference.get("blocked", False),
         "waiting": {
             "registration": reference.get("waiting", {}).get("registration", False),
             "approval": reference.get("waiting", {}).get("approval", False)
             },
-        "black-list": reference.get("friends", {}).get("black-list", [])
+        "relationship": {
+            "black-list": reference.get("friends", {}).get("black-list", [])
+            },
     }

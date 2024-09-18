@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from library.auth.api import bp as api_auth_bp
 from library.common.api import bp as api_common_bp
-from library.game_system.api import bp as api_game_systems_bp
+from library.pack.api import bp as api_game_systems_bp
 from library.images.api import bp as api_images
 
 load_dotenv()
