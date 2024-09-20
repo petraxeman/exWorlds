@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 
 from library.auth.api import bp as api_auth_bp
 from library.common.api import bp as api_common_bp
-from library.pack.api import bp as api_game_systems_bp
-from library.images.api import bp as api_images
+from library.pack.api import bp as api_pack_bp
+from library.image.api import bp as api_image
 
 load_dotenv()
 
@@ -34,8 +34,8 @@ def create_app():
     with app.app_context():
         app.register_blueprint(api_auth_bp)
         app.register_blueprint(api_common_bp)
-        app.register_blueprint(api_game_systems_bp)
-        app.register_blueprint(api_images)
+        app.register_blueprint(api_pack_bp)
+        app.register_blueprint(api_image)
     return app
 
 

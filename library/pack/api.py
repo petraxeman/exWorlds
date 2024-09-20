@@ -6,33 +6,15 @@ from flask import (
     current_app
     )
 
-bp = Blueprint("api-game-systems", __name__)
+bp = Blueprint("api-pack", __name__)
 
 
 
 @bp.route("/pack/upload", methods = ["POST"])
 @token_required
-def game_system_upload():
+def pack_upload():
     db = current_app.config["MONGODB_INST"]
-    
-    result = handlers.validate_pack_upload(db, request.json, request.current_user)
-
-    if not result[0]:
-        return {"msg": "Somthing went wrong. Try again later."}, 401
-    
-    system = None
-    if result[1] == "create":
-        system = handlers.build_game_system(request.json, request.current_user)
-        db.structs.insert_one(system)
-    elif result[1] == "change":
-        instance = db.structs.find_one({"codename": request.json["codename"], "type": "game-system"})
-        system = handlers.update_game_system(instance, request.json)
-        db.structs.update_one(instance, {"$set": system})
-    else:
-        return {"msg": "Somthing went wrong. Try again later."}, 401
-
-    
-    return {"hash": system["hash"]}, 200
+    return handlers.process_pack_upload(db, request.json, request.current_user)
 
 
 @bp.route("/game-system/get", methods = ["POST"])

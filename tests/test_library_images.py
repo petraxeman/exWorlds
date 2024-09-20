@@ -10,14 +10,17 @@ def app():
     salt = app.config["PASSWORD_SALT"]
     admin = {
             "username": "test-admin",
-            "password-hash": hashlib.pbkdf2_hmac("sha512", "test-passwd".encode(), str(salt).encode(), 2 ** 8).hex(),
-            "role": "admin",
+            "password-hash": hashlib.pbkdf2_hmac("sha512", str("test-passwd").encode(), str(salt).encode(), 2 ** 8).hex(),
+            "rights": ["server-admin"],
+            "blocked": "",
             "waiting": {
                 "registration": False,
                 "approval": False
                 },
-            "black-list": [],
-        }
+            "relationship": {
+                "black-list": []
+                }
+            }
     app.config["MONGODB_INST"].users.insert_one(admin)
     yield app
     app.config["MONGODB_INST"].users.delete_one(admin)

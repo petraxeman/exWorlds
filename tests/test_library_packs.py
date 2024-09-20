@@ -10,14 +10,17 @@ def app():
     salt = app.config["PASSWORD_SALT"]
     admin = {
             "username": "test-admin",
-            "password-hash": hashlib.pbkdf2_hmac("sha512", "test-passwd".encode(), str(salt).encode(), 2 ** 8).hex(),
-            "role": "admin",
+            "password-hash": hashlib.pbkdf2_hmac("sha512", str("test-passwd").encode(), str(salt).encode(), 2 ** 8).hex(),
+            "rights": ["server-admin"],
+            "blocked": "",
             "waiting": {
                 "registration": False,
                 "approval": False
                 },
-            "black-list": [],
-        }
+            "relationship": {
+                "black-list": []
+                }
+            }
     app.config["MONGODB_INST"].users.insert_one(admin)
     yield app
     app.config["MONGODB_INST"].users.delete_one(admin)
@@ -51,18 +54,22 @@ def image(app, client):
         yield filename
         database.images.delete_one({"name": filename})
 
+
 @pytest.fixture()
 def second_user(app):
     salt = app.config["PASSWORD_SALT"]
     test_user = {
             "username": "test-user",
             "password-hash": hashlib.pbkdf2_hmac("sha512", "test-passwd".encode(), str(salt).encode(), 2 ** 8).hex(),
-            "role": "user",
+            "rights": [],
+            "blocked": "",
             "waiting": {
                 "registration": False,
                 "approval": False
                 },
-            "black-list": [],
+            "relationship": {
+                "black-list": [],
+                }
         }
     app.config["MONGODB_INST"].users.insert_one(test_user)
     yield test_user
@@ -70,27 +77,37 @@ def second_user(app):
 
 
 
-def test_game_system_create_by_admin(db, client, image):
+def build_test_game_system(image_name):
+    return {
+        "name": "Game system",
+        "codename": "game-system",
+        "image-name": image_name,
+        "type": "game-system"
+        }
+
+
+def test_create_pack_by_admin(db, client, image):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
-    body = {"name": "Game system", "codename": "game-system", "image-name": image}
-    response = client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
+    pack = build_test_game_system(image)
+    response = client.post("/pack/upload", headers = {"auth-token": admin}, json = pack)
     assert response.status_code == 200
     assert response.json["hash"]
-    assert db.structs.find_one({"type": "game-system", "codename": "game-system"})
+    assert db.packs.find_one({"type": "game-system", "codename": "game-system"})
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_game_system_create_by_user(db, client, image, second_user):
+def test_create_pack_create_by_user_with_rights(db, client, image, second_user):
+    db.users.update_one({"username": "test-user"}, {"$set": {"rights": ["create-pack"]}})
     user = client.post("/api/login", json = {"username": "test-user", "password": "test-passwd"}).json.get("token")
-    body = {"name": "Game system", "codename": "game-system", "image-name": image}
-    response = client.post("/game-system/upload", headers = {"auth-token": user}, json = body)
+    pack = build_test_game_system(image)
+    response = client.post("/pack/upload", headers = {"auth-token": user}, json = pack)
     assert response.status_code == 200
     assert response.json["hash"]
     assert db.structs.find_one({"type": "game-system", "codename": "game-system"})
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_double_creating_game_system(db, client, image, second_user):
+def test_double_create_pack(db, client, image, second_user):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     user = client.post("/api/login", json = {"username": "test-user", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
@@ -100,7 +117,7 @@ def test_double_creating_game_system(db, client, image, second_user):
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_changing_game_system(db, client, image):
+def test_changing_pack(db, client, image):
     token = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system 1", "codename": "game-system", "image-name": image}
     response = client.post("/game-system/upload", headers = {"auth-token": token}, json = body)
@@ -113,7 +130,7 @@ def test_changing_game_system(db, client, image):
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_changing_user_game_system_by_admin(db, client, image, second_user):
+def test_changing_user_pack_by_admin(db, client, image, second_user):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     user = client.post("/api/login", json = {"username": "test-user", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system 1", "codename": "game-system", "image-name": image}
@@ -125,7 +142,7 @@ def test_changing_user_game_system_by_admin(db, client, image, second_user):
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_getting_game_system(db, client, image):
+def test_getting_pack(db, client, image):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
     client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
@@ -134,7 +151,7 @@ def test_getting_game_system(db, client, image):
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_getting_game_system_wrong(db, client, image):
+def test_getting_pack_wrong(db, client, image):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
     client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
@@ -143,7 +160,7 @@ def test_getting_game_system_wrong(db, client, image):
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_getting_game_system_hash(db, client, image):
+def test_getting_pack_hash(db, client, image):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
     client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
@@ -153,7 +170,7 @@ def test_getting_game_system_hash(db, client, image):
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_getting_game_system_by_pages(db, client, image):
+def test_getting_pack_by_pages(db, client, image):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
     client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
@@ -163,7 +180,7 @@ def test_getting_game_system_by_pages(db, client, image):
     db.structs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_getting_game_system_get_count(db, client, image):
+def test_pack_get_count(db, client, image):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
     client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
@@ -174,7 +191,7 @@ def test_getting_game_system_get_count(db, client, image):
 
 
 
-def test_getting_game_system_delete(db, client, image):
+def test_pack_delete(db, client, image):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
     client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)

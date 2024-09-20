@@ -17,7 +17,8 @@ def login():
     password_salt = current_app.config["PASSWORD_SALT"]
     username = request.json.get('username')
     password = request.json.get('password')
-    return handlers.process_auth(db, username, password, password_salt)
+    result = handlers.process_auth(db, username, password, password_salt)
+    return result
 
 
 @bp.route("/api/register", methods = ["POST"])

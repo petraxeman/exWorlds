@@ -46,7 +46,6 @@ def runner(app):
 
 def test_auth(app, client):
     response = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"})
-    print(response.data)
     assert response.status_code == 200
 
 

@@ -1,48 +1,52 @@
 import re, copy, hashlib
+from typing import Union
 
 
+def process_pack_upload(db, data: dict, sender: dict) -> Union[dict, int]:
+    if not data.get("codename"):
+        return {"msg": "Undefined pack"}, 401
 
-def validate_pack_upload(db, data: dict, sender: dict) -> bool:
-    if not data.get("codename", False):
-        return False, None
-    
-    action = "nothing"
-    if db.structs.find_one({"codename": data.get("codename"), "type": "game-system"}):
-        action = "change"
-        if not validate_pack_change(db, data, sender):
-            return False, None
+    if pack := db.packs.find_one({"codename": data["codename"]}):
+        print(pack)
+        return pack_change(db, data, sender)
     else:
-        action = "create"
-        if not validate_pack_change(db, data):
-            return False, None
-    
-    return True, action
-    
+        return pack_create(db, data, sender)
 
-def validate_pack_create(db, data: dict) -> bool:
+
+def pack_create(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("name", None) or not data.get("image-name", None):
-        return False
+        return {"msg": "Undefined pack"}, 401
     
-    if db.structs.find_one({"codename": data["codename"], "is-collection": True}):
-        return False
+    if not db.images.find_one({"name": data["image-name"]}):
+        return {"msg": "Image does not exists"}, 401
+
+    existed_rights = {"create-pack", "any-create", "server-admin"}.intersection(sender["rights"])
+    if not existed_rights:
+        print("create", sender['rights'], existed_rights)
+        return {"msg": "You can't do that."}, 401
     
-    if not db.images.find_one({"name": data.get("image-name")}):
-        return False
+    new_pack = build_pack(data, sender)
+    db.packs.insert_one(new_pack)
 
-    return True
+    return {"hash": new_pack["hash"]}
 
 
-def validate_pack_change(db, data: dict, sender: dict) -> bool:
-    game_system = db.structs.find_one({"codename": data.get("codename"), "type": "game-system"})
+def pack_change(db, data: dict, sender: dict) -> Union[dict, int]:
+    pack = db.packs.find_one({"codename": data.get("codename"), "type": "game-system"})
 
-    if game_system.get("owner", "") != sender["username"] and (sender["role"] != "admin" and sender["role"] != "server-admin"): 
-        return False
+    existed_rights = {"server-admin", "change-pack", "any-change"}.intersection(sender["rights"])
+    if not existed_rights and pack["owner"] != sender["username"]:
+        print("change", sender['rights'], existed_rights)
+        return {"msg": "You can't do that."}, 401
     
-    return True
-    
+    updated_pack = update_pack(pack, data)
+    db.packs.update_one(pack, {"$set": updated_pack})
+
+    return {"hash": updated_pack["hash"]}, 200
+
 
 def delete_game_system(db, codename: str, sender: dict) -> bool:
-    game_system = db.structs.find_one({"codename": codename, "type": "game-system"})
+    game_system = db.packs.find_one({"codename": codename, "type": "game-system"})
 
     if not game_system:
         return False
@@ -51,10 +55,10 @@ def delete_game_system(db, codename: str, sender: dict) -> bool:
         return False
 
     db.images.delete_one({"name": game_system["image-name"]})
-    db.structs.delete_one(game_system)
-    db.structs.delete_many({"type": "table", "game-system": codename})
+    db.packs.delete_one(game_system)
+    db.packs.delete_many({"type": "table", "game-system": codename})
 
-    notes = db.structs.find({"type": "note", "game-system": codename})
+    notes = db.packs.find({"type": "note", "game-system": codename})
     for note in notes:
         for field in note.get("note", []):
             if field.get("type", "") == "image":
@@ -63,24 +67,30 @@ def delete_game_system(db, codename: str, sender: dict) -> bool:
     return True
 
 
-def build_game_system(reference: dict, sender_user: dict) -> dict:
+def build_pack(data: dict, sender_user: dict) -> dict:
     game_system = {
-        "name": reference.get("name"),
-        "codename": reference.get("codename"),
-        "image-name": reference.get("image-name"),
-        "is-collection": True,
-        "type": "game-system",
+        "name": data.get("name"),
+        "codename": data.get("codename"),
+        "image-name": data.get("image-name"),
+        "type": data.get("type"),
+        "reference": data.get("reference"),
+        "hash": get_pack_hash(data),
         "owner": sender_user["username"],
-        "redactors": reference.get("redactors", [])
+        "redactors": data.get("redactors", [])
         }
-    game_system["hash"] = hashlib.md5(f'{game_system["name"]} {game_system["codename"]} {game_system["image-name"]}'.encode()).hexdigest()
     return game_system
 
 
-def update_game_system(instance: dict, reference: dict) -> dict:
+def update_pack(instance: dict, reference: dict) -> dict:
     new_instance = copy.deepcopy(instance)
     new_instance["name"] = reference.get("name", None) or instance.get("name")
     new_instance["image-name"] = reference.get("image-name", None) or instance.get("image-name")
     new_instance["redactors"] = reference.get("redactors", None) or instance.get("redactors")
-    new_instance["hash"] = hashlib.md5(f'{new_instance["name"]} {new_instance["codename"]} {new_instance["image-name"]}'.encode()).hexdigest()
+    new_instance["hash"] = get_pack_hash(new_instance)
     return new_instance
+
+
+def get_pack_hash(instance: dict) -> str:
+    return hashlib.md5(
+        f"{instance["name"]} {instance["codename"]} {instance["image-name"]}".encode()
+        ).hexdigest()
