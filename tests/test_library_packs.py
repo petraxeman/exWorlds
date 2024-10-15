@@ -82,7 +82,7 @@ def build_test_game_system(image_name):
         "name": "Game system",
         "codename": "game-system",
         "image-name": image_name,
-        "type": "game-system"
+        "type": "game-system",
         }
 
 
@@ -93,28 +93,28 @@ def test_create_pack_by_admin(db, client, image):
     assert response.status_code == 200
     assert response.json["hash"]
     assert db.packs.find_one({"type": "game-system", "codename": "game-system"})
-    db.structs.delete_one({"codename": "game-system", "type": "game-system"})
+    db.packs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
-def test_create_pack_create_by_user_with_rights(db, client, image, second_user):
+def test_pack_create_by_user_with_rights(db, client, image, second_user):
     db.users.update_one({"username": "test-user"}, {"$set": {"rights": ["create-pack"]}})
     user = client.post("/api/login", json = {"username": "test-user", "password": "test-passwd"}).json.get("token")
     pack = build_test_game_system(image)
     response = client.post("/pack/upload", headers = {"auth-token": user}, json = pack)
     assert response.status_code == 200
     assert response.json["hash"]
-    assert db.structs.find_one({"type": "game-system", "codename": "game-system"})
-    db.structs.delete_one({"codename": "game-system", "type": "game-system"})
+    assert db.packs.find_one({"type": "game-system", "codename": "game-system"})
+    db.packs.delete_one({"codename": "game-system", "type": "game-system"})
 
 
 def test_double_create_pack(db, client, image, second_user):
     admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
     user = client.post("/api/login", json = {"username": "test-user", "password": "test-passwd"}).json.get("token")
     body = {"name": "Game system", "codename": "game-system", "image-name": image}
-    client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
-    response = client.post("/game-system/upload", headers = {"auth-token": user}, json = body)
+    client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
+    response = client.post("/pack/upload", headers = {"auth-token": user}, json = body)
     assert response.status_code != 200
-    db.structs.delete_one({"codename": "game-system", "type": "game-system"})
+    db.pack.delete_one({"codename": "game-system", "type": "game-system"})
 
 
 def test_changing_pack(db, client, image):

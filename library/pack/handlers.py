@@ -2,12 +2,12 @@ import re, copy, hashlib
 from typing import Union
 
 
+
 def process_pack_upload(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("codename"):
         return {"msg": "Undefined pack"}, 401
 
-    if pack := db.packs.find_one({"codename": data["codename"]}):
-        print(pack)
+    if db.packs.find_one({"codename": data["codename"]}):
         return pack_change(db, data, sender)
     else:
         return pack_create(db, data, sender)
@@ -22,27 +22,46 @@ def pack_create(db, data: dict, sender: dict) -> Union[dict, int]:
 
     existed_rights = {"create-pack", "any-create", "server-admin"}.intersection(sender["rights"])
     if not existed_rights:
-        print("create", sender['rights'], existed_rights)
         return {"msg": "You can't do that."}, 401
     
     new_pack = build_pack(data, sender)
     db.packs.insert_one(new_pack)
 
-    return {"hash": new_pack["hash"]}
+    return {"hash": new_pack["hash"]}, 200
 
 
 def pack_change(db, data: dict, sender: dict) -> Union[dict, int]:
     pack = db.packs.find_one({"codename": data.get("codename"), "type": "game-system"})
 
     existed_rights = {"server-admin", "change-pack", "any-change"}.intersection(sender["rights"])
-    if not existed_rights and pack["owner"] != sender["username"]:
-        print("change", sender['rights'], existed_rights)
+    if (not existed_rights) and pack["owner"] != sender["username"]:
         return {"msg": "You can't do that."}, 401
     
     updated_pack = update_pack(pack, data)
     db.packs.update_one(pack, {"$set": updated_pack})
 
     return {"hash": updated_pack["hash"]}, 200
+
+
+def process_pack_get(db, data: dict):
+    codenames = data.get("codenames", [])
+
+    if not codenames:
+        return {"msg": "Undefined system"}, 401
+    
+    packs = []
+    for codename in codenames:
+        existed_pack = db.structs.find_one({"type": "game-system", "codename": codename})
+        
+        if existed_pack:
+            del existed_pack["type"]
+            del existed_pack["_id"]
+            packs.append(existed_pack)
+
+    if not packs:
+        return {"msg": "Undefined packs"}, 401
+    
+    return {"packs": packs}, 200
 
 
 def delete_game_system(db, codename: str, sender: dict) -> bool:

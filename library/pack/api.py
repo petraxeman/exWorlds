@@ -16,25 +16,11 @@ def pack_upload():
     db = current_app.config["MONGODB_INST"]
     return handlers.process_pack_upload(db, request.json, request.current_user)
 
-
-@bp.route("/game-system/get", methods = ["POST"])
+@bp.route("/pack/get", methods = ["POST"])
 @token_required
 def get_system():
     db = current_app.config["MONGODB_INST"]
-    codename = request.json.get("codename", "")
-    
-    if not codename:
-        return {"msg": "Undefined system"}, 401
-    
-    existed_game_system = db.structs.find_one({"type": "game-system", "codename": codename})
-    
-    if not existed_game_system:
-        return {"msg": "Undefined system"}, 401
-    
-    del existed_game_system["type"]
-    del existed_game_system["_id"]
-
-    return existed_game_system, 200
+    return handlers.process_pack_get(db, request.json)
 
 
 @bp.route("/game-system/get-hash", methods = ["POST"])
