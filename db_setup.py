@@ -29,7 +29,6 @@ client = MongoClient(f"mongodb://{mongo_admin_login}:{mongo_admin_passwd}@{serve
 
 db = Database(client, "exworlds")
 users = Collection(db, "users", create=True)
-structs = Collection(db, "structs", create=True)
 packs = Collection(db, "packs", create=True)
 notes = Collection(db, "notes", create=True)
 images = Collection(db, "images", create=True)

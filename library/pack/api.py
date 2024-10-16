@@ -16,6 +16,7 @@ def pack_upload():
     db = current_app.config["MONGODB_INST"]
     return handlers.process_pack_upload(db, request.json, request.current_user)
 
+
 @bp.route("/pack/get", methods = ["POST"])
 @token_required
 def get_system():
@@ -23,37 +24,29 @@ def get_system():
     return handlers.process_pack_get(db, request.json)
 
 
-@bp.route("/game-system/get-hash", methods = ["POST"])
+@bp.route("/pack/get-hash", methods = ["POST"])
 @token_required
 def get_system_hash():
     db = current_app.config["MONGODB_INST"]
-    codename = request.json.get("codename", "")
-    
-    if not codename:
-        return {"msg": "Undefined system"}, 401
-    
-    existed_game_system = db.structs.find_one({"type": "game-system", "codename": codename})
-    if not existed_game_system:
-        return {"msg": "Undefined system"}, 401
-    
-    return {"hash": existed_game_system["hash"]}, 200
+    return handlers.process_pack_get_hash(db, request.json)
 
 
-@bp.route("/game-system/get-systems-by-page", methods = ["POST"])
+@bp.route("/pack/get-by-page", methods = ["POST"])
 @token_required
 def get_systems():
     db = current_app.config["MONGODB_INST"]
-    page = int(request.json.get("page", 1))
-    systems = db.structs.find({"type": "game-system"}).skip(10 * (page - 1)).limit(10)
-    codenames = [el["codename"] for el in systems]
-    return {"systems": codenames}, 200
+    return handlers.process_pack_get_by_page(db, request.json)
 
 
-@bp.route("/game-systems/get-count", methods = ["POST"])
+@bp.route("/pack/get-count", methods = ["POST"])
 @token_required
 def get_systems_count():
     db = current_app.config["MONGODB_INST"]
-    count = db.structs.count_documents({"type": "game-system"})
+    
+    if not request.json.get("type", ""):
+        return {"msg": "Undefined pack"}, 401
+
+    count = db.packs.count_documents({"type": request.json.get("type", "")})
     return {"count": count}
 
 

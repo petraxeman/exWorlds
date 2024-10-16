@@ -43,7 +43,7 @@ def pack_change(db, data: dict, sender: dict) -> Union[dict, int]:
     return {"hash": updated_pack["hash"]}, 200
 
 
-def process_pack_get(db, data: dict):
+def process_pack_get(db, data: dict) -> Union[dict, int]:
     codenames = data.get("codenames", [])
 
     if not codenames:
@@ -51,7 +51,7 @@ def process_pack_get(db, data: dict):
     
     packs = []
     for codename in codenames:
-        existed_pack = db.structs.find_one({"type": "game-system", "codename": codename})
+        existed_pack = db.packs.find_one({"codename": codename})
         
         if existed_pack:
             del existed_pack["type"]
@@ -59,9 +59,48 @@ def process_pack_get(db, data: dict):
             packs.append(existed_pack)
 
     if not packs:
-        return {"msg": "Undefined packs"}, 401
+        return {"msg": "Undefined packs", "p": packs}, 401
     
     return {"packs": packs}, 200
+
+
+def process_pack_get_hash(db, data: dict) -> Union[dict, int]:
+    codenames = data.get("codenames", [])
+    
+    if not codenames:
+        return {"msg": "Undefined system"}, 401
+    
+    hashes = []
+    for codename in codenames:
+        existed_pack = db.packs.find_one({"type": "game-system", "codename": codename})
+
+        if existed_pack:
+            del existed_pack["type"]
+            del existed_pack["_id"]
+            hashes.append(existed_pack.get("hash"))
+        
+    if not hashes:
+        return {"msg": "Undefined packs"}, 401
+    
+    return {"hashes": hashes}, 200
+
+
+def process_pack_get_by_page(db, data: dict) -> Union[dict, int]:
+    if not data.get("type", False):
+        return {"msg": "Type undefined"}, 401
+    
+    pack_type = data.get("type")
+    page = int(data.get("page", 1))
+    if page < 1:
+        return {"msg": "Wrong page range"}, 401
+    
+    packs = db.packs.find({"type": pack_type}).skip(10 * (page - 1)).limit(10)
+    codenames = [el["codename"] for el in packs]
+    
+    if not codenames:
+        return {"msg": "Undefined packs"}
+    
+    return {"codenames": codenames}, 200
 
 
 def delete_game_system(db, codename: str, sender: dict) -> bool:
