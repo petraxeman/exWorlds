@@ -49,7 +49,7 @@
 ## User rights
 ### Content rights
 
-- any-create | This access using as all create rights
+- any-create      | This access using as all create rights
 
 - create-pack     |
 - create-table    | 
@@ -59,7 +59,7 @@
 - create-world    |
 - create-games    |
 
-- any-delete | This access using as all delete rights
+- any-delete      | This access using as all delete rights
 
 - delete-pack     |
 - delete-table    | 

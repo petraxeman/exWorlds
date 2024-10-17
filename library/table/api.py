@@ -12,7 +12,14 @@ bp = Blueprint("api-table", __name__)
 
 
 
-@bp.route("/game-system/get-table", methods = ["POST"])
+@bp.route("/pack/table/upload")
+@token_required
+def talbe_upload():
+    db = current_app.config["MONGODB_INST"]
+    return handlers.process_table_creation(db, request.json, request.current_user)
+
+
+@bp.route("/pack/table/get", methods = ["POST"])
 @token_required
 def get_table():
     db = current_app.config["MNOGODB_INST"]
@@ -48,20 +55,7 @@ def get_tables():
     return {"schemas": schemas}, 200
 
 
-@bp.route("/collection/upload-table", methods = ["POST"])
-@token_required
-def upload_table():
-    db = current_app.config["MNOGODB_INST"]
-    collection = db.structs.find_one({"type": "game-system", "codename": request.json.get("game-system-codename", "")})
 
-    result = handlers.validate_table_creation_request(db, request.json, collection, request.current_user)
-    if not result:
-        return {"msg": "Somthing went wrong. Try again later."}, 401
-
-    table = handlers.build_table(request.json, request.current_user)
-    db.structs.insert_one(table)
-
-    return {"hash": table["hash"]}, 200
 
 
 @bp.route("/collection/delete-table", methods = ["POST"])

@@ -1,4 +1,37 @@
 from library import utils
+from typing import Union
+
+
+
+def process_table_creation(db, data: dict, sender: dict) -> Union[dict, int]:
+    if not data.get("pack-codename", "") or not data.get("codename", ""):
+        return {"msg": "Undefined path"}, 401
+
+    if table := db.structs.find_one({"reference": data.get("pack-codename"), "type": "table", "codename": data.get("codename", "")}):
+        return update_table(db, data, sender, table)
+    else:
+        return create_table(db, data, sender)
+
+
+def update_table(db, data: dict, sender: dict, original_table: dict) -> Union[dict, int]:
+    if "server-admin" not in sender["rights"] and not sender["username"] != original_table["owner"]:
+        return {"msg": "You can't do that."}, 401
+    
+    new_table = build_table(data)
+    db.tables.update_one(original_table, {"$set": new_table})
+    
+    return {"hash": new_table["hash"]}, 200
+
+
+def create_table(db, data: dict, sender: dict) -> Union[dict, int]:
+    existed_rights = {"create-table", "any-create", "server-admin"}.intersection(sender["rights"])
+    if not existed_rights:
+        return {"msg": "You can't do that."}, 401
+
+    table = build_table(data, sender)
+    db.structs.insert_one(table)
+
+    return {"hash": table["hash"]}, 200
 
 
 
@@ -46,25 +79,31 @@ def validate_table_creation_request(db, request: dict, collection: dict, sender:
 
 def build_table(reference: dict, creator: dict) -> dict:
     table = {
-        # Inheritance
-        "owner": creator["username"],
-        "collection": reference.get("collection"),
-        "game-system": reference.get("game-system"),
-        "type": "table",
-        # Table information
         "name": reference.get("name"),
         "codename": reference.get("codename"),
-        "search-fields": reference.get("search-fields", []),
-        "short-view": reference.get("short-view", ["name"]),
-        "table-icon": reference.get("table-icon", "opened-book"),
-        "table-display": reference.get("search-display", "list"),
-        "properties": reference.get("properties", {}),
-        "macros": reference.get("macros", {}),
-        "schema": reference.get("schema", {}),
-        "table-fields": reference.get("table-fields", {})
+        "owner": creator["username"],
+        "type": "table",
+        "reference": reference.get("pack-codename"),
+        "common": {
+            "search-fields": reference.get("search-fields", []),
+            "short-view": reference.get("short-view", ["name"]),
+            "table-icon": reference.get("table-icon", "opened-book"),
+            "table-display": reference.get("search-display", "list"),
+        },
+        "data": {
+            "properties": reference.get("properties", {}),
+            "macros": reference.get("macros", {}),
+            "schema": reference.get("schema", {}),
+            "table-fields": reference.get("table-fields", {})
+        }
     }
     table["hash"] = utils.get_hash(str(table))
     return table
+
+
+def validate_table(reference: dict):
+    pass
+
 
 
 # FixMe: REWRITE THIS CODE! THIS CODE IS TEMP BECOUSE NOTE FORMAT UNDEFINED 27.08.2024

@@ -33,8 +33,7 @@ def pack_create(db, data: dict, sender: dict) -> Union[dict, int]:
 def pack_change(db, data: dict, sender: dict) -> Union[dict, int]:
     pack = db.packs.find_one({"codename": data.get("codename"), "type": "game-system"})
 
-    existed_rights = {"server-admin", "change-pack", "any-change"}.intersection(sender["rights"])
-    if (not existed_rights) and pack["owner"] != sender["username"]:
+    if "server-admin" not in sender["rights"] and pack["owner"] != sender["username"]:
         return {"msg": "You can't do that."}, 401
     
     updated_pack = update_pack(pack, data)
