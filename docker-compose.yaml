@@ -1,0 +1,11 @@
+version: "1.0.0"
+
+services:
+  mongodb:
+    container_name: mongodb
+    image: docker.io/mongo:latest
+    env_file: .env
+    ports:
+      - 27017:27017
+    volume:
+      - /home/pt/db:/data/db
