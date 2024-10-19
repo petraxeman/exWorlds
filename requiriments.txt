@@ -3,3 +3,4 @@ flask-pymongo
 pyjwt
 python-dotenv
 pytest
+podman-compose

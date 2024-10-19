@@ -34,6 +34,53 @@ def create_table(db, data: dict, sender: dict) -> Union[dict, int]:
     return {"hash": table["hash"]}, 200
 
 
+def process_table_get(db, data: dict) -> Union[dict, int]:
+    count = data.get("count", "one")
+    if count == "one":
+        return get_one_table(db, data)
+    elif count == "many":
+        return get_meny_tables(db, data)
+    else:
+        return {"msg": "Undefined count."}, 401
+    
+
+def get_meny_tables(db, data):
+    if 0 > len(data.get("tables", [])) > 10:
+        return {"msg": "Tables count is wrong."}, 401
+
+    tables = []
+    for el in data["tables"]:
+        table = db.tables.find_one({
+        "type": "table",
+        "codename": el["table_name"],
+        "reference": el["reference"]
+        })
+        if table:
+            del table["_id"]
+            tables.append(table)
+
+    if not tables:
+        return {"msg": "Somthing went wrong. Tables not found."}, 401
+    
+    return {"tables": tables}, 200
+
+
+def get_one_table(db, data):
+    if not data.get("reference", False) or not data.get("table-name", False):
+        return {"msg": "Missing some required data."}, 401
+
+    table = db.tables.find_one({
+        "type": "table",
+        "codename": data["table_name"],
+        "reference": data["reference"]
+        })
+    
+    if not table:
+        return {"msg": "Table not found."}
+    del table["_id"]
+    
+    return table, 200
+
 
 def validate_table_deletion(db, request: dict, sender: dict) -> bool:
     if not request.get("collection-codename", False) or not request.get("table-codename", False):

@@ -187,7 +187,7 @@ def test_getting_pack_by_pages(client, image, admin):
     assert response.json["codenames"]
 
 
-def test_pack_get_count(db, client, image, admin):
+def test_pack_get_count(client, image, admin):
     body = build_test_game_system(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
     response = client.post("/pack/get-count", headers = {"auth-token": admin}, json = {"type": "game-system"})
@@ -196,10 +196,8 @@ def test_pack_get_count(db, client, image, admin):
 
 
 
-def __test_pack_delete(db, client, image):
-    admin = client.post("/api/login", json = {"username": "test-admin", "password": "test-passwd"}).json.get("token")
-    body = {"name": "Game system", "codename": "game-system", "image-name": image}
-    client.post("/game-system/upload", headers = {"auth-token": admin}, json = body)
-    response = client.post("/game-systems/delete", headers = {"auth-token": admin}, json = {"codename": "game-system"})
+def test_pack_delete(client, image, admin):
+    body = build_test_game_system(image)
+    client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
+    response = client.post("/pack/delete", headers = {"auth-token": admin}, json = {"codename": "game-system", "type": "game-system"})
     assert response.status_code == 200
-    db.structs.delete_one({"codename": "game-system", "type": "game-system"})

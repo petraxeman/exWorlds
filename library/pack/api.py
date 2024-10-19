@@ -50,17 +50,8 @@ def get_systems_count():
     return {"count": count}
 
 
-@bp.route("/game-systems/delete", methods = ["POST"])
+@bp.route("/pack/delete", methods = ["POST"])
 @token_required
 def delete_system():
     db = current_app.config["MONGODB_INST"]
-    
-    if not request.json.get("codename", False):
-        return {"msg": "Undefined codename"}, 401
-
-    result = handlers.delete_game_system(db, request.json.get("codename"), request.current_user)
-
-    if not result:
-        return {"msg": "Somthing went wrong. Try again later"}, 401
-    
-    return {"msg": f"System <{request.json.get("codename")}> deleted."}, 200
+    return handlers.process_pack_delete(db, request.json, request.current_user)

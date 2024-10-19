@@ -6,7 +6,10 @@ from typing import Union
 def process_pack_upload(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("codename"):
         return {"msg": "Undefined pack"}, 401
-
+    
+    if data.get("type", "") and (not data.get("type") in ("game-system", "addon", "resource", "adventure", "world", "game")):
+        return {"msg": "Wrong type"}
+    
     if db.packs.find_one({"codename": data["codename"]}):
         return pack_change(db, data, sender)
     else:
@@ -53,7 +56,6 @@ def process_pack_get(db, data: dict) -> Union[dict, int]:
         existed_pack = db.packs.find_one({"codename": codename})
         
         if existed_pack:
-            del existed_pack["type"]
             del existed_pack["_id"]
             packs.append(existed_pack)
 
@@ -102,25 +104,30 @@ def process_pack_get_by_page(db, data: dict) -> Union[dict, int]:
     return {"codenames": codenames}, 200
 
 
-def delete_game_system(db, codename: str, sender: dict) -> bool:
-    game_system = db.packs.find_one({"codename": codename, "type": "game-system"})
+def process_pack_delete(db, data: dict, sender: dict) -> Union[dict, int]:
+    codename = data.get("codename", "")
+    pack_type = data.get("type", "")
+    if not data.get("codename", False) or not pack_type:
+        return {"msg": "Undefined codename"}, 401
 
-    if not game_system:
-        return False
+    pack = db.packs.find_one({"codename": codename, "type": pack_type})
+    if not pack:
+        return {"msg": "Selected pack not found."}, 401
     
-    if game_system["owner"] != sender["username"] and (sender["role"] not in ["admin", "server-admin"]):
-        return False
+    existed_rights = {"delete-pack", "any-delete", "server-admin"}.intersection(sender["rights"])
+    if sender["username"] != pack["owner"] and (not existed_rights):
+        return {"msg": "You can't do that."}, 401
+    
+    try:
+        assert delete_pack(db, pack)
+    except Exception:
+        return {"msg": "Somthing went wrong. Try again later."}, 401
+    return {"msg": f"System {codename} deleted."}, 200
 
-    db.images.delete_one({"name": game_system["image-name"]})
-    db.packs.delete_one(game_system)
-    db.packs.delete_many({"type": "table", "game-system": codename})
 
-    notes = db.packs.find({"type": "note", "game-system": codename})
-    for note in notes:
-        for field in note.get("note", []):
-            if field.get("type", "") == "image":
-                db.images.delete_one({"name": field.get("value", "")})
-    db.structs.delete_many({"type": "note", "game-system": codename})
+def delete_pack(db, pack: dict) -> bool:
+    db.images.delete_one({"name": pack["image-name"]})
+    db.packs.delete_one(pack)
     return True
 
 
