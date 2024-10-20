@@ -4,20 +4,24 @@ from typing import Union
 
 
 def process_table_creation(db, data: dict, sender: dict) -> Union[dict, int]:
-    if not data.get("pack-codename", "") or not data.get("codename", ""):
+    if not data.get("reference", "") or not data.get("codename", "") or not data.get("reference-type"):
         return {"msg": "Undefined path"}, 401
-
-    if table := db.structs.find_one({"reference": data.get("pack-codename"), "type": "table", "codename": data.get("codename", "")}):
+    if table := db.tables.find_one({"reference": data.get("reference"), "type": "table", "codename": data.get("codename", "")}):
         return update_table(db, data, sender, table)
     else:
         return create_table(db, data, sender)
 
 
 def update_table(db, data: dict, sender: dict, original_table: dict) -> Union[dict, int]:
-    if "server-admin" not in sender["rights"] and not sender["username"] != original_table["owner"]:
+    pack = db.packs.find_one({"codename": data["reference"], "type": data["reference-type"]})
+    if not pack:
+        return {"msg": "Reference pack does not exists."}, 401
+    
+    if "server-admin" not in sender["rights"] and \
+        sender["username"] not in [pack["owner"], *pack["redactors"]]:
         return {"msg": "You can't do that."}, 401
     
-    new_table = build_table(data)
+    new_table = build_table(data, sender)
     db.tables.update_one(original_table, {"$set": new_table})
     
     return {"hash": new_table["hash"]}, 200
@@ -29,32 +33,27 @@ def create_table(db, data: dict, sender: dict) -> Union[dict, int]:
         return {"msg": "You can't do that."}, 401
 
     table = build_table(data, sender)
-    db.structs.insert_one(table)
+    db.tables.insert_one(table)
 
     return {"hash": table["hash"]}, 200
 
 
 def process_table_get(db, data: dict) -> Union[dict, int]:
-    count = data.get("count", "one")
-    if count == "one":
-        return get_one_table(db, data)
-    elif count == "many":
-        return get_meny_tables(db, data)
-    else:
-        return {"msg": "Undefined count."}, 401
-    
-
-def get_meny_tables(db, data):
     if 0 > len(data.get("tables", [])) > 10:
         return {"msg": "Tables count is wrong."}, 401
 
     tables = []
     for el in data["tables"]:
+        if not el.get("codename", "") or not el.get("reference", "") or not el.get("reference-type", ""):
+            continue
+        
         table = db.tables.find_one({
         "type": "table",
-        "codename": el["table_name"],
-        "reference": el["reference"]
+        "codename": el["codename"],
+        "reference": el["reference"],
+        "reference-type": el["reference-type"]
         })
+        
         if table:
             del table["_id"]
             tables.append(table)
@@ -65,63 +64,43 @@ def get_meny_tables(db, data):
     return {"tables": tables}, 200
 
 
-def get_one_table(db, data):
-    if not data.get("reference", False) or not data.get("table-name", False):
-        return {"msg": "Missing some required data."}, 401
-
-    table = db.tables.find_one({
-        "type": "table",
-        "codename": data["table_name"],
-        "reference": data["reference"]
-        })
+def process_table_get_hash(db, data: dict) -> Union[dict, int]:
+    if 0 > len(data.get("tables", [])) > 50:
+        return {"msg": "Count of tables is wrong."}, 401
+    tables = []
+    for el in data.get("tables"):
+        if not el.get("codename", "") or not el.get("reference", "") or not el.get("reference-type", ""):
+            continue
+        
+        table = db.tables.find_one({"codename": el.get("codename"), "reference": el.get("reference"), "reference-type": el.get("reference-type")})
+        
+        if table:
+            tables.append(table["hash"])
+            
+    return {"tables": tables}, 200
     
+
+def proccess_table_deletion(db, data: dict, sender: dict) -> bool:
+    if not data.get("codename", "") or not data.get("reference", "") or not data.get("reference-type", ""):
+        return {"msg": "Required data is not found."}, 401
+    
+    pack = db.packs.find_one({"codename": data.get("reference"), "type": data.get("reference-type")})
+    
+    if not pack:
+        return {"msg": "Reference pack not found."}, 401
+    
+    table = db.tables.find_one({"codename": data.get("codename"), "reference": data.get("reference"), "reference-type": data.get("reference-type")})
+
     if not table:
-        return {"msg": "Table not found."}
-    del table["_id"]
+        return {"msg": "Table not found."}, 401
     
-    return table, 200
+    existed_rights = {"delete-table", "any-delete", "server-admin"}.intersection(sender["rights"])
+    if sender["username"] not in [pack["owner"], *pack["redactors"]] and not existed_rights:
+        return {"msg": "You can't do that."}, 401
 
-
-def validate_table_deletion(db, request: dict, sender: dict) -> bool:
-    if not request.get("collection-codename", False) or not request.get("table-codename", False):
-        return False
+    db.tables.delete_one(table)
     
-    collection = db.structs.find_one({"meta": "collection", "codename": request["collection-codename"]})
-
-    if sender["username"] not in [*collection["redactors"], collection["owner"]] and sender["role"] not in ["admin", "server-admin"]:
-        return False
-    
-    return True
-
-
-def validate_table_creation_request(db, request: dict, collection: dict, sender: dict) -> bool:
-    expected_properties = ["collection",
-                           "name",
-                           "codename",
-                           "search-fields",
-                           "short-view",
-                           "schema",
-                           "table-fields"]
-    
-    request_keys = list(request.keys())
-    for exp_prop in expected_properties:
-        if exp_prop not in request_keys:
-            return False
-    
-    if not collection:
-        return False
-    
-    if sender["username"] not in [*collection["redactors"], collection["owner"]] and sender["role"] not in ["admin", "server-admin"]:
-        return False
-    
-    if db.structs.find_one({
-        "type": "table",
-        "name": request.json.get("name"),
-        "codename": request.json.get("codename"),
-        "collection": request.json.get("game-system")}):
-        return False
-    
-    return True
+    return {"msg": "Table deletion complete"}, 200
 
 
 def build_table(reference: dict, creator: dict) -> dict:
@@ -130,7 +109,8 @@ def build_table(reference: dict, creator: dict) -> dict:
         "codename": reference.get("codename"),
         "owner": creator["username"],
         "type": "table",
-        "reference": reference.get("pack-codename"),
+        "reference": reference.get("reference"),
+        "reference-type": reference.get("reference-type"),
         "common": {
             "search-fields": reference.get("search-fields", []),
             "short-view": reference.get("short-view", ["name"]),
@@ -146,17 +126,3 @@ def build_table(reference: dict, creator: dict) -> dict:
     }
     table["hash"] = utils.get_hash(str(table))
     return table
-
-
-def validate_table(reference: dict):
-    pass
-
-
-
-# FixMe: REWRITE THIS CODE! THIS CODE IS TEMP BECOUSE NOTE FORMAT UNDEFINED 27.08.2024
-def delete_table_and_notes(db, table_codename: str, collection: str):
-    notes = db.structs.find({"type": "note", "table": table_codename, "collection": collection})
-    for note in notes:
-        del note
-    
-    db.structs.delete_one({"collection": collection, "codename": table_codename,"type": "table"})

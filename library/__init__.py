@@ -10,6 +10,7 @@ from library.auth.api import bp as api_auth_bp
 from library.common.api import bp as api_common_bp
 from library.pack.api import bp as api_pack_bp
 from library.image.api import bp as api_image
+from library.table.api import bp as api_table
 
 load_dotenv()
 
@@ -36,6 +37,7 @@ def create_app():
         app.register_blueprint(api_common_bp)
         app.register_blueprint(api_pack_bp)
         app.register_blueprint(api_image)
+        app.register_blueprint(api_table)
     return app
 
 

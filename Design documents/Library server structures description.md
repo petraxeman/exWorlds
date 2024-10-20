@@ -14,6 +14,7 @@
 - owner: User who create the table
 - type: Can be only "table"
 - reference: Has a codename of reference package. Can take codenames of game-systems or addons.
+- reference-type: Type of reference pack. game-system or addon.
 - common
     - search-fields: Array of strings. Show what fields used for search. Example: ["name", "damage", "description"]
     - short-view: Dictionary of parametres what means how to show it for users. {"alignment": "vertical", "fields": ["image", "name"]}
