@@ -49,12 +49,13 @@ def pack_change(db, data: dict, sender: dict) -> Union[dict, int]:
     return {"hash": updated_pack["hash"]}, 200
 
 
-def process_pack_get(db, data: dict) -> Union[dict, int]:
+def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     path_list = data.get("path-list", [])
 
     if not path_list:
         return {"msg": "Undefined path list."}, 401
     
+    existed_rigths = {"server-admin"}.intersection(sender["rights"])
     packs = []
     for path in path_list:
         if not utils.validate_path(path):
@@ -62,6 +63,10 @@ def process_pack_get(db, data: dict) -> Union[dict, int]:
         
         pack = utils.get_by_path(db, path)
         
+        if pack.get("hidden", False):
+            if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
+                continue
+            
         if pack:
             del pack["_id"]
             packs.append(pack)
@@ -72,18 +77,23 @@ def process_pack_get(db, data: dict) -> Union[dict, int]:
     return {"packs": packs}, 200
 
 
-def process_pack_get_hash(db, data: dict) -> Union[dict, int]:
+def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     path_list = data.get("path-list", [])
     
     if not path_list:
         return {"msg": "Undefined path list."}, 401
     
+    existed_rigths = {"server-admin"}.intersection(sender["rights"])
     hashes = []
     for path in path_list:
         if not utils.validate_path(path):
             continue
         pack = utils.get_by_path(db, path)
 
+        if pack.get("hidden", False):
+            if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
+                continue
+        
         if pack:
             del pack["_id"]
             hashes.append(pack.get("hash"))
@@ -138,6 +148,19 @@ def delete_pack(db, pack: dict) -> bool:
     db.images.delete_one({"name": pack["image-name"]})
     db.packs.delete_one(pack)
     return True
+
+
+def toggle(db, data: dict, sender: dict, arg: str):
+    pack = utils.get_by_path(data)
+    if sender["username"] != pack["owner"] and "server-admin" not in sender["rights"]:
+        return {"msg": "You can't do that."}, 401
+    
+    if pack.get(arg, False):
+        db.pack.update_one(pack, {"$set": {arg: True}})
+    else:
+        db.pack.update_one(pack, {"$set": {arg: True}})
+    
+    return {"msg": "Toggle succefull"}, 200
 
 
 def build_pack(data: dict, sender_user: dict) -> dict:

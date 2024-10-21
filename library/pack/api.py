@@ -1,5 +1,6 @@
 from library.pack import handlers
 from library.jwtokens import token_required
+from library import utils
 from flask import (
     Blueprint,
     request,
@@ -21,14 +22,14 @@ def pack_upload():
 @token_required
 def get_system():
     db = current_app.config["MONGODB_INST"]
-    return handlers.process_pack_get(db, request.json)
+    return handlers.process_pack_get(db, request.json, request.current_user)
 
 
 @bp.route("/pack/get-hash", methods = ["POST"])
 @token_required
 def get_system_hash():
     db = current_app.config["MONGODB_INST"]
-    return handlers.process_pack_get_hash(db, request.json)
+    return handlers.process_pack_get_hash(db, request.json, request.current_user)
 
 
 @bp.route("/pack/get-by-page", methods = ["POST"])
@@ -55,3 +56,19 @@ def get_systems_count():
 def delete_system():
     db = current_app.config["MONGODB_INST"]
     return handlers.process_pack_delete(db, request.json, request.current_user)
+
+
+@bp.route("/pack/toggle-hidden")
+@token_required
+def toggle_hiden():
+    db = current_app.config["MONGODB_INTS"]
+    return handlers.toggle(db, request.json, request.current_user, "hidden")
+
+
+@bp.route("/pack/toggle-freeze")
+@token_required
+def toggle_freeze():
+    db = current_app.config["MONGODB_INTS"]
+    return handlers.toggle(db, request.json, request.current_user, "freezed")
+
+

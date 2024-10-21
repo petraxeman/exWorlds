@@ -4,6 +4,9 @@
 - image-name: preview of system what showing for users
 - type: Can be "game-system", "addon", "resource", "adventure"
 - reference: Used for "addon" and "adventure" to assign to parent system
+- hidden: Show this pack for not owner and not redactos.
+- freezed: Can be updated or not.
+- last-update: Time when this table updated.
 - owner: User who create this system
 - redactors: List of user who can change or create content in this system
 
@@ -14,7 +17,6 @@
 - owner: User who create the table
 - type: Can be only "table"
 - reference: Has a codename of reference package. Can take codenames of game-systems or addons.
-- reference-type: Type of reference pack. game-system or addon.
 - common
     - search-fields: Array of strings. Show what fields used for search. Example: ["name", "damage", "description"]
     - short-view: Dictionary of parametres what means how to show it for users. {"alignment": "vertical", "fields": ["image", "name"]}
