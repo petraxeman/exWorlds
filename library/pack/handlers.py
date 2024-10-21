@@ -1,14 +1,18 @@
-import re, copy, hashlib
+import copy, hashlib
+from library import utils
 from typing import Union
 
 
 
 def process_pack_upload(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("codename"):
-        return {"msg": "Undefined pack"}, 401
+        return {"msg": "Undefined pack."}, 401
     
     if data.get("type", "") and (not data.get("type") in ("game-system", "addon", "resource", "adventure", "world", "game")):
-        return {"msg": "Wrong type"}
+        return {"msg": "Wrong type."}, 401
+    
+    if data.get("reference", {}) and not utils.validate_path(data.get("reference", {})):
+        return {"msg": "Wrong path."}, 401
     
     if db.packs.find_one({"codename": data["codename"]}):
         return pack_change(db, data, sender)
@@ -46,18 +50,21 @@ def pack_change(db, data: dict, sender: dict) -> Union[dict, int]:
 
 
 def process_pack_get(db, data: dict) -> Union[dict, int]:
-    codenames = data.get("codenames", [])
+    path_list = data.get("path-list", [])
 
-    if not codenames:
-        return {"msg": "Undefined system"}, 401
+    if not path_list:
+        return {"msg": "Undefined path list."}, 401
     
     packs = []
-    for codename in codenames:
-        existed_pack = db.packs.find_one({"codename": codename})
+    for path in path_list:
+        if not utils.validate_path(path):
+            continue
         
-        if existed_pack:
-            del existed_pack["_id"]
-            packs.append(existed_pack)
+        pack = utils.get_by_path(db, path)
+        
+        if pack:
+            del pack["_id"]
+            packs.append(pack)
 
     if not packs:
         return {"msg": "Undefined packs", "p": packs}, 401
@@ -66,19 +73,20 @@ def process_pack_get(db, data: dict) -> Union[dict, int]:
 
 
 def process_pack_get_hash(db, data: dict) -> Union[dict, int]:
-    codenames = data.get("codenames", [])
+    path_list = data.get("path-list", [])
     
-    if not codenames:
-        return {"msg": "Undefined system"}, 401
+    if not path_list:
+        return {"msg": "Undefined path list."}, 401
     
     hashes = []
-    for codename in codenames:
-        existed_pack = db.packs.find_one({"type": "game-system", "codename": codename})
+    for path in path_list:
+        if not utils.validate_path(path):
+            continue
+        pack = utils.get_by_path(db, path)
 
-        if existed_pack:
-            del existed_pack["type"]
-            del existed_pack["_id"]
-            hashes.append(existed_pack.get("hash"))
+        if pack:
+            del pack["_id"]
+            hashes.append(pack.get("hash"))
         
     if not hashes:
         return {"msg": "Undefined packs"}, 401
@@ -122,6 +130,7 @@ def process_pack_delete(db, data: dict, sender: dict) -> Union[dict, int]:
         assert delete_pack(db, pack)
     except Exception:
         return {"msg": "Somthing went wrong. Try again later."}, 401
+    
     return {"msg": f"System {codename} deleted."}, 200
 
 
@@ -137,7 +146,7 @@ def build_pack(data: dict, sender_user: dict) -> dict:
         "codename": data.get("codename"),
         "image-name": data.get("image-name"),
         "type": data.get("type"),
-        "reference": data.get("reference"),
+        "reference": data.get("reference", {}),
         "hash": get_pack_hash(data),
         "owner": sender_user["username"],
         "redactors": data.get("redactors", [])

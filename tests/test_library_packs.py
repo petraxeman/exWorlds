@@ -159,14 +159,17 @@ def test_getting_pack(client, image):
     admin = auth(client, "test-admin", "test-passwd")
     body = build_test_game_system(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
-    response = client.post("/pack/get", headers = {"auth-token": admin}, json = {"codenames": ["game-system", "not exist"]})
+    path1 = {"points": ["game-system"], "exp": "pack"}
+    path2 = {"points": ["not-exists"], "exp": "pack"}
+    response = client.post("/pack/get", headers = {"auth-token": admin}, json = {"path-list": [path1, path2]})
     assert response.status_code == 200
 
 
 def test_getting_pack_wrong(client, image, admin):
     body = build_test_game_system(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
-    response = client.post("/pack/get", headers = {"auth-token": admin}, json = {"codenames": ["fake-system"]})
+    path = {"points": ["not-exists"], "exp": "pack"}
+    response = client.post("/pack/get", headers = {"auth-token": admin}, json = {"path-list": [path]})
     assert response.status_code != 200
     assert response.json.get("msg", "") == "Undefined packs"
 
@@ -174,7 +177,8 @@ def test_getting_pack_wrong(client, image, admin):
 def test_getting_pack_hash(client, image, admin):
     body = build_test_game_system(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
-    response = client.post("/pack/get-hash", headers = {"auth-token": admin}, json = {"codenames": ["game-system"]})
+    path = {"points": ["game-system"], "exp": "pack"}
+    response = client.post("/pack/get-hash", headers = {"auth-token": admin}, json = {"path-list": [path]})
     assert response.status_code == 200
     assert response.json["hashes"]
 

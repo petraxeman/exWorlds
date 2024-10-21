@@ -106,13 +106,12 @@ def build_test_game_system(image_name, name: str = "Game system"):
         }
 
 
-def build_test_table(username: str, reference: str, reference_type: str):
+def build_test_table(username: str):
     return {
         "name": "Table",
         "codename": "test-table",
         "owner": username,
-        "reference": reference,
-        "reference-type": reference_type,
+        "reference": {"points": ["game-system"], "exp": "pack"},
         "common": {
             "search-fields": [],
             "short-view": {},
@@ -150,7 +149,7 @@ def auth(client, login: str, passwd: str):
 def test_table_create_by_user_with_rights(db, client, user, image):
     elevate_rights(db, "test-user", ["create-table", "create-pack"])
     assert create_gs(client, image, user)
-    table = build_test_table("test-user", "game-system", "game-system")
+    table = build_test_table("test-user")
     response = client.post("/table/upload", headers = {"auth-token": user}, json = table)
     assert response.status_code == 200
     assert db.tables.find_one({"codename": "test-table"})
@@ -159,7 +158,7 @@ def test_table_create_by_user_with_rights(db, client, user, image):
 def test_table_update_by_creator(db, client, user, image):
     elevate_rights(db, "test-user", ["create-table", "create-pack"])
     assert create_gs(client, image, user)
-    table = build_test_table("test-user", "game-system", "game-system")
+    table = build_test_table("test-user")
     response = client.post("/table/upload", headers = {"auth-token": user}, json = table)
     assert response.status_code == 200
     assert db.tables.find_one({"codename": "test-table"})
@@ -172,7 +171,7 @@ def test_table_update_by_creator(db, client, user, image):
 def test_table_update_by_admin(db, client, user, admin, image):
     elevate_rights(db, "test-user", ["create-table", "create-pack"])
     assert create_gs(client, image, user)
-    table = build_test_table("test-user", "game-system", "game-system")
+    table = build_test_table("test-user")
     response = client.post("/table/upload", headers = {"auth-token": user}, json = table)
     assert response.status_code == 200
     assert db.tables.find_one({"codename": "test-table"})
@@ -185,7 +184,7 @@ def test_table_update_by_admin(db, client, user, admin, image):
 def test_table_create_by_user_without_rights(db, client, image, user):
     elevate_rights(db, "test-user", ["create-pack"])
     assert create_gs(client, image, user)
-    table = build_test_table("test-user", "game-system", "game-system")
+    table = build_test_table("test-user")
     response = client.post("/table/upload", headers = {"auth-token": user}, json = table)
     assert response.status_code != 200
     assert not db.tables.find_one({"codename": "test-table"})
@@ -194,9 +193,9 @@ def test_table_create_by_user_without_rights(db, client, image, user):
 def test_table_get(db, client, image, user):
     elevate_rights(db, "test-user", ["create-table", "create-pack"])
     assert create_gs(client, image, user)
-    table = build_test_table("test-user", "game-system", "game-system")
+    table = build_test_table("test-user")
     client.post("/table/upload", headers = {"auth-token": user}, json = table)
-    query = {"tables": [{"codename": "test-table", "reference": "game-system", "reference-type": "game-system"}]}
+    query = {"path-list": [{"points": ["game-system"], "exp": "pack"}]}
     response = client.post("/table/get", headers = {"auth-token": user}, json = query)
     assert response.status_code == 200
 
@@ -204,9 +203,10 @@ def test_table_get(db, client, image, user):
 def test_table_get_hash(db, client, image, user):
     elevate_rights(db, "test-user", ["create-table", "create-pack"])
     assert create_gs(client, image, user)
-    table = build_test_table("test-user", "game-system", "game-system")
+    table = build_test_table("test-user")
     client.post("/table/upload", headers = {"auth-token": user}, json = table)
-    query = {"tables": [{"codename": "test-table", "reference": "game-system", "reference-type": "game-system"}]}
+    path = {"points": ["game-system"], "exp": "pack"}
+    query = {"tables": [{"codename": "test-table", "reference": path}]}
     response = client.post("/table/get-hash", headers = {"auth-token": user}, json = query)
     assert response.status_code == 200
 
@@ -214,9 +214,9 @@ def test_table_get_hash(db, client, image, user):
 def test_table_delete(db, client, image, user):
     elevate_rights(db, "test-user", ["create-table", "create-pack"])
     assert create_gs(client, image, user)
-    table = build_test_table("test-user", "game-system", "game-system")
+    table = build_test_table("test-user")
     client.post("/table/upload", headers = {"auth-token": user}, json = table)
-    query = {"codename": "test-table", "reference": "game-system", "reference-type": "game-system"}
+    query = {"points": ["game-system", "test-table"], "exp": "table"}
     response = client.post("/table/delete", headers = {"auth-token": user}, json = query)
     assert response.status_code == 200
     assert not db.tables.find_one({"codename": "test-table"})
