@@ -62,12 +62,12 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
             continue
         
         pack = utils.get_by_path(db, path)
-        
-        if pack.get("hidden", False):
-            if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
-                continue
             
         if pack:
+            if pack.get("hidden", False):
+                if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
+                    continue
+            
             del pack["_id"]
             packs.append(pack)
 
@@ -89,12 +89,13 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
         if not utils.validate_path(path):
             continue
         pack = utils.get_by_path(db, path)
-
-        if pack.get("hidden", False):
-            if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
-                continue
         
         if pack:
+            
+            if pack.get("hidden", False):
+                if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
+                    continue
+
             del pack["_id"]
             hashes.append(pack.get("hash"))
         
@@ -104,8 +105,8 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     return {"hashes": hashes}, 200
 
 
-def process_pack_get_by_page(db, data: dict) -> Union[dict, int]:
-    if not data.get("type", False):
+def process_pack_get_by_page(db, data: dict, sender: dict) -> Union[dict, int]:
+    if not data.get("type", ""):
         return {"msg": "Type undefined"}, 401
     
     pack_type = data.get("type")
@@ -113,9 +114,65 @@ def process_pack_get_by_page(db, data: dict) -> Union[dict, int]:
     if page < 1:
         return {"msg": "Wrong page range"}, 401
     
-    packs = db.packs.find({"type": pack_type}).skip(10 * (page - 1)).limit(10)
-    codenames = [el["codename"] for el in packs]
+    pipeline = [
+        {"$match": {"$expr": {"$eq": ["$type", pack_type]}}},
+        {"$match": {
+            "$or": [
+                {"hidden": False},
+                {"$or": [{"owner": sender["username"]}, {"redactors": {"$in": [sender["username"]]}}]}
+                ]
+            }},
+        {
+            "$addFields": {
+                "is-favorite": {
+                "$cond": {
+                        "if": {
+                            "$in": [
+                                {
+                                "$cond": {
+                                    "if": { "$ne": ["$reference", {}] },
+                                    "then": {"points": ["$reference.points.0", "$name"], "exp": "pack"},
+                                    "else": {"points": ["$name"], "exp": "pack"}
+                                    }
+                                },
+                                sender["lists"]["favorites"]
+                            ]
+                        },
+                        "then": True,
+                        "else": False
+                    }
+                }
+            }
+        },
+        {
+            "$addFields": {
+                "toref": {
+                    "$cond": {
+                        "if": { "$ne": ["$reference", {}] },
+                        "then": {"points": ["$reference.points.0", "$name"], "exp": "pack"},
+                        "else": {"points": ["$name"], "exp": "pack"}
+                    }
+                }
+            }
+        },
+        {"$sort": {
+            "is-favorite": -1,
+            "likes": -1
+        }},
+        {"$limit": 10},
+    ]
+
+    if 10 * (page - 1) != 0:
+        pipeline.append({"$skip": 10 * (page - 1)})
+
+    packs = db.packs.aggregate(pipeline)
     
+    codenames = []
+    for el in packs:
+        del el["_id"]
+        print(el)
+        codenames.append(el["codename"])
+    #codenames = [el["codename"] for el in packs]
     if not codenames:
         return {"msg": "Undefined packs"}
     
@@ -151,16 +208,24 @@ def delete_pack(db, pack: dict) -> bool:
 
 
 def toggle(db, data: dict, sender: dict, arg: str):
-    pack = utils.get_by_path(data)
+    pack = utils.get_by_path(db, data)
     if sender["username"] != pack["owner"] and "server-admin" not in sender["rights"]:
         return {"msg": "You can't do that."}, 401
     
     if pack.get(arg, False):
-        db.pack.update_one(pack, {"$set": {arg: True}})
+        db.packs.update_one(pack, {"$set": {arg: False}})
     else:
-        db.pack.update_one(pack, {"$set": {arg: True}})
+        db.packs.update_one(pack, {"$set": {arg: True}})
     
     return {"msg": "Toggle succefull"}, 200
+
+
+def toggle_list(db, data: dict, sender: dict, arg: str):
+    if data in sender["lists"][arg]:
+        db.users.update_one(sender, {"$pull": {"lists." + arg: data}})
+    else:
+        db.users.update_one(sender, {"$push": {"lists." + arg: data}})
+    return {"msg": "Done"}, 200
 
 
 def build_pack(data: dict, sender_user: dict) -> dict:

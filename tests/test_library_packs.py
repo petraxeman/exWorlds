@@ -49,6 +49,10 @@ def user(app, client):
             "password-hash": hashlib.pbkdf2_hmac("sha512", "test-passwd".encode(), str(salt).encode(), 2 ** 8).hex(),
             "rights": [],
             "blocked": "",
+            "lists": {
+                "favorites": [],
+                "likes": []
+            },
             "waiting": {
                 "registration": False,
                 "approval": False
@@ -70,6 +74,10 @@ def admin(app, client):
             "password-hash": hashlib.pbkdf2_hmac("sha512", str("test-passwd").encode(), str(salt).encode(), 2 ** 8).hex(),
             "rights": ["server-admin"],
             "blocked": "",
+            "lists": {
+                "favorites": [],
+                "likes": []
+            },
             "waiting": {
                 "registration": False,
                 "approval": False
@@ -199,9 +207,42 @@ def test_pack_get_count(client, image, admin):
     assert response.json["count"]
 
 
-
 def test_pack_delete(client, image, admin):
     body = build_test_game_system(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
     response = client.post("/pack/delete", headers = {"auth-token": admin}, json = {"codename": "game-system", "type": "game-system"})
     assert response.status_code == 200
+
+def ffc(image, n, cn, h = False, l = 0, r = []):
+    return {
+        "name": n,
+        "codename": cn,
+        "image-name": image,
+        "type": "game-system",
+        "reference": {},
+        "hidden": h,
+        "freezed": False,
+        "likes": l,
+        "last-update": 0,
+        "owner": "test-admin",
+        "redactors": r}
+
+def test_additional_actions(db, client, image, admin, user):
+    db.packs.insert_one(ffc(image, "Sys1", "sys1", l = 500))
+    db.packs.insert_one(ffc(image, "Sys2", "sys2", l = 6))
+    db.packs.insert_one(ffc(image, "Sys3", "sys3", l = 8))
+    db.packs.insert_one(ffc(image, "Sys4", "sys4", l = 10))
+    
+    client.post("/pack/toggle/favorite", headers = {"auth-token": admin}, json = {"points": ["sys2"], "exp": "pack"})
+    client.post("/pack/toggle/hide", headers = {"auth-token": admin}, json = {"points": ["sys3"], "exp": "pack"})
+
+    print(db.users.find_one({"username": "test-admin"}))
+    r = client.post("/pack/get-by-page", headers = {"auth-token": admin}, json = {"page": 1, "type": "game-system"})
+    print("As creator:", r.json)
+    r = client.post("/pack/get-by-page", headers = {"auth-token": user}, json = {"page": 1, "type": "game-system"})
+    print("As another user:", r.json)
+
+    db.packs.delete_one({"codename": "sys1"})
+    db.packs.delete_one({"codename": "sys2"})
+    db.packs.delete_one({"codename": "sys3"})
+    db.packs.delete_one({"codename": "sys4"})

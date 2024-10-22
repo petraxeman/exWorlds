@@ -6,6 +6,7 @@
 - reference: Used for "addon" and "adventure" to assign to parent system
 - hidden: Show this pack for not owner and not redactos.
 - freezed: Can be updated or not.
+- likes: Count of users who liked this pack
 - last-update: Time when this table updated.
 - owner: User who create this system
 - redactors: List of user who can change or create content in this system
@@ -43,6 +44,9 @@
 - password-hash: Hash of password what user for check login 
 - rights: List of accesses
 - blocked: String with date after user can sign in
+- lists:
+    - favorites: Dict of path to marked packs
+    - likes: Dict of path to marked packs
 - waiting
     - registration: System wait when user register new account with this login
     - approval: System wait when admin or server-admin approve this registration

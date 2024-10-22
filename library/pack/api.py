@@ -36,7 +36,7 @@ def get_system_hash():
 @token_required
 def get_systems():
     db = current_app.config["MONGODB_INST"]
-    return handlers.process_pack_get_by_page(db, request.json)
+    return handlers.process_pack_get_by_page(db, request.json, request.current_user)
 
 
 @bp.route("/pack/get-count", methods = ["POST"])
@@ -58,17 +58,27 @@ def delete_system():
     return handlers.process_pack_delete(db, request.json, request.current_user)
 
 
-@bp.route("/pack/toggle-hidden")
+@bp.route("/pack/toggle/hide", methods = ["POST"])
 @token_required
 def toggle_hiden():
-    db = current_app.config["MONGODB_INTS"]
+    db = current_app.config["MONGODB_INST"]
     return handlers.toggle(db, request.json, request.current_user, "hidden")
 
 
-@bp.route("/pack/toggle-freeze")
+@bp.route("/pack/toggle/freeze", methods = ["POST"])
 @token_required
 def toggle_freeze():
-    db = current_app.config["MONGODB_INTS"]
+    db = current_app.config["MONGODB_INST"]
     return handlers.toggle(db, request.json, request.current_user, "freezed")
 
 
+@bp.route("/pack/toggle/favorite", methods = ["POST"])
+@token_required
+def toggle_favorite():
+    return handlers.toggle_list(current_app.config["MONGODB_INST"], request.json, request.current_user, "favorites")
+
+
+@bp.route("/pack/toggle/like", methods = ["POST"])
+@token_required
+def toggle_like():
+    return handlers.toggle_list(current_app.config["MONGODB_INST"], request.json, request.current_user, "likes")
