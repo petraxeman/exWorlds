@@ -236,7 +236,12 @@ def test_additional_actions(db, client, image, admin, user):
     
     client.post("/pack/toggle/favorite", headers = {"auth-token": admin}, json = {"path": "pack://sys2"})
     client.post("/pack/toggle/hide", headers = {"auth-token": admin}, json = {"path": "pack://sys3"})
-
+    print("====================================== Info")
+    print(db.packs.find_one({"path": "pack://sys1"}))
+    print(db.packs.find_one({"path": "pack://sys2"}))
+    print(db.packs.find_one({"path": "pack://sys3"}))
+    print(db.packs.find_one({"path": "pack://sys4"}))
+    print("===========================================")
     #print(db.users.find_one({"username": "test-admin"}))
     r = client.post("/pack/get-by-page", headers = {"auth-token": admin}, json = {"page": 1, "type": "game-system"})
     print("As creator:", r.json)

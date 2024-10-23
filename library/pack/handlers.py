@@ -93,7 +93,11 @@ def process_pack_get_by_page(db, data: dict, sender: dict) -> Union[dict, int]:
             "$match": {
                 "$or": [
                     {"hidden": False},
-                    {"$or": [{"owner": sender["username"]}, {"redactors": {"$in": [sender["username"]]}}]}
+                    {"$or": [
+                        {"owner": sender["username"]}, 
+                        {"redactors": {"$in": [sender["username"]]}}
+                        ]
+                    }
                 ]
             }
         },
@@ -162,7 +166,8 @@ def delete_pack(db, pack: dict) -> bool:
 
 
 def toggle(db, data: dict, sender: dict, arg: str):
-    pack = utils.get_by_path(db, data)
+    pack = utils.get_by_path(db, data.get("path", ""))
+
     if sender["username"] != pack["owner"] and "server-admin" not in sender["rights"]:
         return {"msg": "You can't do that."}, 401
     
@@ -197,7 +202,7 @@ def build_pack(new: dict, sender: dict, origin: dict = {}) -> dict:
         "freezed": False,
         "likes": 0,
         "last-update": 0,
-        "owner": new.get("owner") or origin.get("owner"),
+        "owner": origin.get("owner") or new.get("owner"),
         "readctors": new.get("redactors") or origin.get("redactors"),
     }
     pack["hash"] = get_pack_hash(pack)
