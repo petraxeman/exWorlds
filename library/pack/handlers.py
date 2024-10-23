@@ -120,18 +120,13 @@ def process_pack_get_by_page(db, data: dict, sender: dict) -> Union[dict, int]:
     if 10 * (page - 1) != 0:
         pipeline.append({"$skip": 10 * (page - 1)})
 
-    print("=================== Aggregation ===================")
-    print(pipeline)
-    print("===================================================")
     packs = db.packs.aggregate(pipeline)
     
     codenames = []
     for el in packs:
         del el["_id"]
-        #if el["is-favorite"]:
-        print(el)
         codenames.append(el["codename"])
-    #codenames = [el["codename"] for el in packs]
+
     if not codenames:
         return {"msg": "Undefined packs"}
     

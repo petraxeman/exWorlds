@@ -219,7 +219,8 @@ def ffc(image, n, cn, h = False, l = 0, r = []):
         "codename": cn,
         "image-name": image,
         "type": "game-system",
-        "reference": "pack://" + cn,
+        "reference": "",
+        "path": "pack://" + cn,
         "hidden": h,
         "freezed": False,
         "likes": l,
@@ -236,7 +237,7 @@ def test_additional_actions(db, client, image, admin, user):
     client.post("/pack/toggle/favorite", headers = {"auth-token": admin}, json = {"path": "pack://sys2"})
     client.post("/pack/toggle/hide", headers = {"auth-token": admin}, json = {"path": "pack://sys3"})
 
-    print(db.users.find_one({"username": "test-admin"}))
+    #print(db.users.find_one({"username": "test-admin"}))
     r = client.post("/pack/get-by-page", headers = {"auth-token": admin}, json = {"page": 1, "type": "game-system"})
     print("As creator:", r.json)
     r = client.post("/pack/get-by-page", headers = {"auth-token": user}, json = {"page": 1, "type": "game-system"})
