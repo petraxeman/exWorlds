@@ -6,10 +6,9 @@ from pymongo.database import Database
 from pymongo.collection import Collection
 import pymongo.errors as errors
 
-
 load_dotenv()
 
-server_addr = input("MongoDB server address: ").strip()
+server_addr = os.getenv("MONGODB_SERVER")#input("MongoDB server address: ").strip()
 mongo_admin_login = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_admin_passwd = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 mongo_exowrlds_login = os.getenv("MONGO_EXWORLDS_USERNAME")
@@ -33,6 +32,8 @@ packs = Collection(db, "packs", create=True)
 tables = Collection(db, "tables", create=True)
 notes = Collection(db, "notes", create=True)
 images = Collection(db, "images", create=True)
+
+packs.create_search_index({"name": "default", "definition": {"mappings": {"dynamic": True}}})
 
 
 if not users.find_one({"username": "Server"}):

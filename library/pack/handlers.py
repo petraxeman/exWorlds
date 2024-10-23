@@ -90,6 +90,17 @@ def process_pack_get_by_page(db, data: dict, sender: dict) -> Union[dict, int]:
     pipeline = [
         {"$match": {"$expr": {"$eq": ["$type", pack_type]}}},
         {
+            "$addFields": {
+                "is-favorite": {
+                    "$cond": {
+                        "if": {"$in": ["$path", sender["lists"]["favorites"]]},
+                        "then": True,
+                        "else": False,
+                    }
+                }
+            }
+        },        
+        {
             "$match": {
                 "$or": [
                     {"hidden": False},
@@ -102,18 +113,8 @@ def process_pack_get_by_page(db, data: dict, sender: dict) -> Union[dict, int]:
             }
         },
         {
-            "$addFields": {
-                "is-favorite": {
-                    "$cond": {
-                        "if": {"$in": ["$path", sender["lists"]["favorites"]]},
-                        "then": True,
-                        "else": False,
-                    }
-                }
-            }
-        },
-        {
             "$sort": {
+                "text-score": -1,
                 "is-favorite": -1,
                 "likes": -1
             }

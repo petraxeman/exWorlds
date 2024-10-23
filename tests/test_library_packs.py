@@ -229,10 +229,10 @@ def ffc(image, n, cn, h = False, l = 0, r = []):
         "redactors": r}
 
 def test_additional_actions(db, client, image, admin, user):
-    db.packs.insert_one(ffc(image, "Sys1", "sys1", l = 500))
-    db.packs.insert_one(ffc(image, "Sys2", "sys2", l = 6))
-    db.packs.insert_one(ffc(image, "Sys3", "sys3", l = 8))
-    db.packs.insert_one(ffc(image, "Sys4", "sys4", l = 10))
+    db.packs.insert_one(ffc(image, "Моя игра", "sys1", l = 500))
+    db.packs.insert_one(ffc(image, "Член", "sys2", l = 6))
+    db.packs.insert_one(ffc(image, "Вульва", "sys3", l = 8))
+    db.packs.insert_one(ffc(image, "Герой", "sys4", l = 10))
     
     client.post("/pack/toggle/favorite", headers = {"auth-token": admin}, json = {"path": "pack://sys2"})
     client.post("/pack/toggle/hide", headers = {"auth-token": admin}, json = {"path": "pack://sys3"})
@@ -242,8 +242,8 @@ def test_additional_actions(db, client, image, admin, user):
     print(db.packs.find_one({"path": "pack://sys3"}))
     print(db.packs.find_one({"path": "pack://sys4"}))
     print("===========================================")
-    #print(db.users.find_one({"username": "test-admin"}))
-    r = client.post("/pack/get-by-page", headers = {"auth-token": admin}, json = {"page": 1, "type": "game-system"})
+    print(db.users.find_one({"username": "test-admin"}))
+    r = client.post("/pack/get-by-page", headers = {"auth-token": admin}, json = {"page": 1, "type": "game-system", "search": "герой"})
     print("As creator:", r.json)
     r = client.post("/pack/get-by-page", headers = {"auth-token": user}, json = {"page": 1, "type": "game-system"})
     print("As another user:", r.json)
