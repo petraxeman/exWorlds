@@ -167,8 +167,8 @@ def test_getting_pack(client, image):
     admin = auth(client, "test-admin", "test-passwd")
     body = build_test_game_system(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
-    path1 = {"points": ["game-system"], "exp": "pack"}
-    path2 = {"points": ["not-exists"], "exp": "pack"}
+    path1 = "pack://game-system"
+    path2 = "pack://not-exists"
     response = client.post("/pack/get", headers = {"auth-token": admin}, json = {"path-list": [path1, path2]})
     assert response.status_code == 200
 
@@ -185,7 +185,7 @@ def test_getting_pack_wrong(client, image, admin):
 def test_getting_pack_hash(client, image, admin):
     body = build_test_game_system(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
-    path = {"points": ["game-system"], "exp": "pack"}
+    path = "pack://game-system"
     response = client.post("/pack/get-hash", headers = {"auth-token": admin}, json = {"path-list": [path]})
     assert response.status_code == 200
     assert response.json["hashes"]
@@ -219,7 +219,7 @@ def ffc(image, n, cn, h = False, l = 0, r = []):
         "codename": cn,
         "image-name": image,
         "type": "game-system",
-        "reference": {},
+        "reference": "pack://" + cn,
         "hidden": h,
         "freezed": False,
         "likes": l,
@@ -233,8 +233,8 @@ def test_additional_actions(db, client, image, admin, user):
     db.packs.insert_one(ffc(image, "Sys3", "sys3", l = 8))
     db.packs.insert_one(ffc(image, "Sys4", "sys4", l = 10))
     
-    client.post("/pack/toggle/favorite", headers = {"auth-token": admin}, json = {"points": ["sys2"], "exp": "pack"})
-    client.post("/pack/toggle/hide", headers = {"auth-token": admin}, json = {"points": ["sys3"], "exp": "pack"})
+    client.post("/pack/toggle/favorite", headers = {"auth-token": admin}, json = {"path": "pack://sys2"})
+    client.post("/pack/toggle/hide", headers = {"auth-token": admin}, json = {"path": "pack://sys3"})
 
     print(db.users.find_one({"username": "test-admin"}))
     r = client.post("/pack/get-by-page", headers = {"auth-token": admin}, json = {"page": 1, "type": "game-system"})

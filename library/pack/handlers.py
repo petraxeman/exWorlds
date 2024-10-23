@@ -11,58 +11,33 @@ def process_pack_upload(db, data: dict, sender: dict) -> Union[dict, int]:
     if data.get("type", "") and (not data.get("type") in ("game-system", "addon", "resource", "adventure", "world", "game")):
         return {"msg": "Wrong type."}, 401
     
-    if data.get("reference", {}) and not utils.validate_path(data.get("reference", {})):
-        return {"msg": "Wrong path."}, 401
+    pack = db.packs.find_one({"path": data["codename"]}) or {}
+    new_pack = build_pack(data, sender, pack)
     
-    if db.packs.find_one({"codename": data["codename"]}):
-        return pack_change(db, data, sender)
+    if pack:
+        if "server-admin" not in sender["rights"] and pack["owner"] != sender["username"]:
+            return {"msg": "You can't do that."}, 401
+        db.packs.update_one(pack, {"$set": new_pack})
     else:
-        return pack_create(db, data, sender)
-
-
-def pack_create(db, data: dict, sender: dict) -> Union[dict, int]:
-    if not data.get("name", None) or not data.get("image-name", None):
-        return {"msg": "Undefined pack"}, 401
-    
-    if not db.images.find_one({"name": data["image-name"]}):
-        return {"msg": "Image does not exists"}, 401
-
-    existed_rights = {"create-pack", "any-create", "server-admin"}.intersection(sender["rights"])
-    if not existed_rights:
-        return {"msg": "You can't do that."}, 401
-    
-    new_pack = build_pack(data, sender)
-    db.packs.insert_one(new_pack)
-
-    return {"hash": new_pack["hash"]}, 200
-
-
-def pack_change(db, data: dict, sender: dict) -> Union[dict, int]:
-    pack = db.packs.find_one({"codename": data.get("codename"), "type": "game-system"})
-
-    if "server-admin" not in sender["rights"] and pack["owner"] != sender["username"]:
-        return {"msg": "You can't do that."}, 401
-    
-    updated_pack = update_pack(pack, data)
-    db.packs.update_one(pack, {"$set": updated_pack})
-
-    return {"hash": updated_pack["hash"]}, 200
+        existed_rights = {"create-pack", "any-create", "server-admin"}.intersection(sender["rights"])
+        if not existed_rights:
+            return {"msg": "You can't do that."}, 401
+        db.packs.insert_one(new_pack)
+        return {"hash": new_pack["hash"]}, 200
 
 
 def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     path_list = data.get("path-list", [])
 
-    if not path_list:
+    if 0 > len(path_list) > 10:
         return {"msg": "Undefined path list."}, 401
     
     existed_rigths = {"server-admin"}.intersection(sender["rights"])
     packs = []
     for path in path_list:
-        if not utils.validate_path(path):
-            continue
         
         pack = utils.get_by_path(db, path)
-            
+        
         if pack:
             if pack.get("hidden", False):
                 if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
@@ -79,19 +54,17 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
 
 def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     path_list = data.get("path-list", [])
-    
-    if not path_list:
+
+    if 0 > len(path_list) > 50:
         return {"msg": "Undefined path list."}, 401
     
     existed_rigths = {"server-admin"}.intersection(sender["rights"])
     hashes = []
     for path in path_list:
-        if not utils.validate_path(path):
-            continue
+
         pack = utils.get_by_path(db, path)
         
         if pack:
-            
             if pack.get("hidden", False):
                 if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
                     continue
@@ -116,60 +89,46 @@ def process_pack_get_by_page(db, data: dict, sender: dict) -> Union[dict, int]:
     
     pipeline = [
         {"$match": {"$expr": {"$eq": ["$type", pack_type]}}},
-        {"$match": {
-            "$or": [
-                {"hidden": False},
-                {"$or": [{"owner": sender["username"]}, {"redactors": {"$in": [sender["username"]]}}]}
+        {
+            "$match": {
+                "$or": [
+                    {"hidden": False},
+                    {"$or": [{"owner": sender["username"]}, {"redactors": {"$in": [sender["username"]]}}]}
                 ]
-            }},
+            }
+        },
         {
             "$addFields": {
                 "is-favorite": {
-                "$cond": {
-                        "if": {
-                            "$in": [
-                                {
-                                "$cond": {
-                                    "if": { "$ne": ["$reference", {}] },
-                                    "then": {"points": ["$reference.points.0", "$name"], "exp": "pack"},
-                                    "else": {"points": ["$name"], "exp": "pack"}
-                                    }
-                                },
-                                sender["lists"]["favorites"]
-                            ]
-                        },
+                    "$cond": {
+                        "if": {"$in": ["$path", sender["lists"]["favorites"]]},
                         "then": True,
-                        "else": False
+                        "else": False,
                     }
                 }
             }
         },
         {
-            "$addFields": {
-                "toref": {
-                    "$cond": {
-                        "if": { "$ne": ["$reference", {}] },
-                        "then": {"points": ["$reference.points.0", "$name"], "exp": "pack"},
-                        "else": {"points": ["$name"], "exp": "pack"}
-                    }
-                }
+            "$sort": {
+                "is-favorite": -1,
+                "likes": -1
             }
         },
-        {"$sort": {
-            "is-favorite": -1,
-            "likes": -1
-        }},
         {"$limit": 10},
     ]
 
     if 10 * (page - 1) != 0:
         pipeline.append({"$skip": 10 * (page - 1)})
 
+    print("=================== Aggregation ===================")
+    print(pipeline)
+    print("===================================================")
     packs = db.packs.aggregate(pipeline)
     
     codenames = []
     for el in packs:
         del el["_id"]
+        #if el["is-favorite"]:
         print(el)
         codenames.append(el["codename"])
     #codenames = [el["codename"] for el in packs]
@@ -221,34 +180,39 @@ def toggle(db, data: dict, sender: dict, arg: str):
 
 
 def toggle_list(db, data: dict, sender: dict, arg: str):
+    if not data.get("path", ""):
+        return {"msg": "Path not found"}, 401
+    
     if data in sender["lists"][arg]:
-        db.users.update_one(sender, {"$pull": {"lists." + arg: data}})
+        db.users.update_one(sender, {"$pull": {"lists." + arg: data.get("path")}})
     else:
-        db.users.update_one(sender, {"$push": {"lists." + arg: data}})
+        db.users.update_one(sender, {"$push": {"lists." + arg: data.get("path")}})
     return {"msg": "Done"}, 200
 
 
-def build_pack(data: dict, sender_user: dict) -> dict:
-    game_system = {
-        "name": data.get("name"),
-        "codename": data.get("codename"),
-        "image-name": data.get("image-name"),
-        "type": data.get("type"),
-        "reference": data.get("reference", {}),
-        "hash": get_pack_hash(data),
-        "owner": sender_user["username"],
-        "redactors": data.get("redactors", [])
-        }
-    return game_system
-
-
-def update_pack(instance: dict, reference: dict) -> dict:
-    new_instance = copy.deepcopy(instance)
-    new_instance["name"] = reference.get("name", None) or instance.get("name")
-    new_instance["image-name"] = reference.get("image-name", None) or instance.get("image-name")
-    new_instance["redactors"] = reference.get("redactors", None) or instance.get("redactors")
-    new_instance["hash"] = get_pack_hash(new_instance)
-    return new_instance
+def build_pack(new: dict, sender: dict, origin: dict = {}) -> dict:
+    pack = {
+        "name": new.get("name") or origin.get("name"),
+        "codename": origin.get("codename") or new.get("codename"),
+        "image-name": new.get("image-name") or origin.get("image-name"),
+        "type": origin.get("type") or new.get("type"),
+        "reference": origin.get("reference") or new.get("reference"),
+        "path": origin.get("path"),
+        "hidden": False,
+        "freezed": False,
+        "likes": 0,
+        "last-update": 0,
+        "owner": new.get("owner") or origin.get("owner"),
+        "readctors": new.get("redactors") or origin.get("redactors"),
+    }
+    pack["hash"] = get_pack_hash(pack)
+    if not pack["path"]:
+        points = []
+        if pack["reference"]:
+            points.append(pack["reference"])
+        points.append(pack["codename"])
+        pack["path"] = "pack://" + "/".join(points) 
+    return pack
 
 
 def get_pack_hash(instance: dict) -> str:
