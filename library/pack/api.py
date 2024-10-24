@@ -1,4 +1,4 @@
-from library.pack import handlers
+from library.pack import handlers, get_by_page
 from library.jwtokens import token_required
 from library import utils
 from flask import (
@@ -36,7 +36,7 @@ def get_system_hash():
 @token_required
 def get_systems():
     db = current_app.config["MONGODB_INST"]
-    return handlers.process_pack_get_by_page(db, request.json, request.current_user)
+    return get_by_page.process(db, request.json, request.current_user)
 
 
 @bp.route("/pack/get-count", methods = ["POST"])

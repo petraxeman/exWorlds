@@ -78,66 +78,6 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     return {"hashes": hashes}, 200
 
 
-def process_pack_get_by_page(db, data: dict, sender: dict) -> Union[dict, int]:
-    if not data.get("type", ""):
-        return {"msg": "Type undefined"}, 401
-    
-    pack_type = data.get("type")
-    page = int(data.get("page", 1))
-    if page < 1:
-        return {"msg": "Wrong page range"}, 401
-    
-    pipeline = [
-        {"$match": {"$expr": {"$eq": ["$type", pack_type]}}},
-        {
-            "$addFields": {
-                "is-favorite": {
-                    "$cond": {
-                        "if": {"$in": ["$path", sender["lists"]["favorites"]]},
-                        "then": True,
-                        "else": False,
-                    }
-                }
-            }
-        },        
-        {
-            "$match": {
-                "$or": [
-                    {"hidden": False},
-                    {"$or": [
-                        {"owner": sender["username"]}, 
-                        {"redactors": {"$in": [sender["username"]]}}
-                        ]
-                    }
-                ]
-            }
-        },
-        {
-            "$sort": {
-                "text-score": -1,
-                "is-favorite": -1,
-                "likes": -1
-            }
-        },
-        {"$limit": 10},
-    ]
-
-    if 10 * (page - 1) != 0:
-        pipeline.append({"$skip": 10 * (page - 1)})
-
-    packs = db.packs.aggregate(pipeline)
-    
-    codenames = []
-    for el in packs:
-        del el["_id"]
-        codenames.append(el["codename"])
-
-    if not codenames:
-        return {"msg": "Undefined packs"}
-    
-    return {"codenames": codenames}, 200
-
-
 def process_pack_delete(db, data: dict, sender: dict) -> Union[dict, int]:
     codename = data.get("codename", "")
     pack_type = data.get("type", "")
