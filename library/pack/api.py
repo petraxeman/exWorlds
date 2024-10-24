@@ -1,4 +1,4 @@
-from library.pack import handlers, get_by_page
+from library.pack import handlers, get_by_page, upload
 from library.jwtokens import token_required
 from library import utils
 from flask import (
@@ -15,7 +15,7 @@ bp = Blueprint("api-pack", __name__)
 @token_required
 def pack_upload():
     db = current_app.config["MONGODB_INST"]
-    return handlers.process_pack_upload(db, request.json, request.current_user)
+    return upload.process(db, request.json, request.current_user)
 
 
 @bp.route("/pack/get", methods = ["POST"])
