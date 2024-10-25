@@ -146,21 +146,21 @@ def test_create_by_user_without_rights(client, image, user):
 
 def test_changing(db, client, image, admin):
     # Creating game system
-    body = build_test_gs(image, "Game system 1")
+    body = build_test_gs(image, name = "Game system 1")
     response = client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
     assert response.status_code == 200
-    assert db.packs.find_one({"name": "Game system 1", "codename": "game-system", "type": "game-system"})
+    assert db.packs.find_one({"name": "Game system 1", "path": "pack://game-system"})
     # Changing game system name
     body["name"] = "Game system 2"
     response = client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
     assert response.status_code == 200
-    assert db.packs.find_one({"name": "Game system 2", "codename": "game-system", "type": "game-system"})
+    assert db.packs.find_one({"name": "Game system 2", "path": "pack://game-system"})
 
 
 def test_changing_user_pack_by_admin(db, client, image, admin, user):
     db.users.update_one({"username": "test-user"}, {"$set": {"rights": ["create-pack"]}})
     # User create a system 
-    body = build_test_gs(image, "Game system 1")
+    body = build_test_gs(image, name = "Game system 1")
     response = client.post("/pack/upload", headers = {"auth-token": user}, json = body)
     assert response.status_code == 200
     assert db.packs.find_one({"name": "Game system 1", "codename": "game-system", "type": "game-system"})
@@ -218,9 +218,18 @@ def test_get_count(client, image, admin):
 def test_delete(client, image, admin):
     body = build_test_gs(image)
     client.post("/pack/upload", headers = {"auth-token": admin}, json = body)
-    response = client.post("/pack/delete", headers = {"auth-token": admin}, json = {"codename": "game-system", "type": "game-system"})
+    client.post("/pack/toggle/like", headers = {"auth-token": admin}, json = {"path": "pack://game-system"})
+    client.post("/pack/toggle/favorite", headers = {"auth-token": admin}, json = {"path": "pack://game-system"})
+    response = client.post("/pack/delete", headers = {"auth-token": admin}, json = {"path": "pack://game-system"})
+    print(response.json)
     assert response.status_code == 200
 
 
-def test_favorite(cleint):
+# TODO: Write here tests for
+#   - Favorite
+#   - Likes
+#   - Hide
+#   - Freeze
+
+def test_favorite(client):
     pass

@@ -7,5 +7,5 @@ services:
     env_file: .env
     ports:
       - 27017:27017
-    volume:
+    volumes:
       - /home/pt/db:/data/db

@@ -3,7 +3,7 @@
 - codename: Code name of game system
 - image-name: preview of system what showing for users
 - type: Can be "game-system", "addon", "resource", "adventure"
-- reference: Used for "addon" and "adventure" to assign to parent system
+- path
 - hidden: Show this pack for not owner and not redactos.
 - freezed: Can be updated or not.
 - likes: Count of users who liked this pack
@@ -16,8 +16,8 @@
 - name: Name of table. Used for show in game view.
 - codename: Used for navigate and agreagate.
 - owner: User who create the table
-- type: Can be only "table"
 - reference: Has a codename of reference package. Can take codenames of game-systems or addons.
+- path
 - common
     - search-fields: Array of strings. Show what fields used for search. Example: ["name", "damage", "description"]
     - short-view: Dictionary of parametres what means how to show it for users. {"alignment": "vertical", "fields": ["image", "name"]}

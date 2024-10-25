@@ -97,13 +97,11 @@ def proccess_table_deletion(db, data: dict, sender: dict) -> bool:
     return {"msg": "Table deletion complete"}, 200
 
 
-def build_table(reference: dict, creator: dict) -> dict:
+def build_table(new: dict, origin: dict) -> dict:
     table = {
-        "name": reference.get("name"),
-        "codename": reference.get("codename"),
+        "name": new.get("name") or origin.get("name"),
+        "codename": origin.get("codename") or new.get("codename"),
         "owner": creator["username"],
-        "type": "table",
-        "reference": reference.get("reference"),
         "common": {
             "search-fields": reference.get("search-fields", []),
             "short-view": reference.get("short-view", ["name"]),
@@ -118,4 +116,5 @@ def build_table(reference: dict, creator: dict) -> dict:
         }
     }
     table["hash"] = utils.get_hash(str(table))
+    table["path"]
     return table

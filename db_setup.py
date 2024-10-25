@@ -27,13 +27,21 @@ print(f"Exworlds admin user {exworlds_admin_login}")
 client = MongoClient(f"mongodb://{mongo_admin_login}:{mongo_admin_passwd}@{server_addr}/admin")
 
 db = Database(client, "exworlds")
-users = Collection(db, "users", create=True)
-packs = Collection(db, "packs", create=True)
-tables = Collection(db, "tables", create=True)
-notes = Collection(db, "notes", create=True)
-images = Collection(db, "images", create=True)
+users = Collection(db, "users")
+packs = Collection(db, "packs")
+tables = Collection(db, "tables")
+cards = Collection(db, "cards")
+images = Collection(db, "images")
 
-packs.create_search_index({"name": "default", "definition": {"mappings": {"dynamic": True}}})
+users.drop_indexes()
+packs.drop_indexes()
+cards.drop_indexes()
+images.drop_indexes()
+
+users.create_index({"username": "text", "rigjts": 1, "relationship": 1})
+packs.create_index({"search-field": 1, "owner": 1, "redactors": 1, "likes": 1, "hidden": 1, "image-name": 1})
+cards.create_index({"search-field": 1})
+images.create_index({"name": "text"})
 
 
 if not users.find_one({"username": "Server"}):

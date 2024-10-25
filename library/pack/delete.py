@@ -17,7 +17,8 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     
     try:
         assert delete_pack(db, pack)
-    except Exception:
+    except Exception as err:
+        print(err)
         return {"msg": "Somthing went wrong. Try again later."}, 401
     
     return {"msg": f"System {path} deleted."}, 200
@@ -26,14 +27,14 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
 def delete_pack(db, pack: dict) -> bool:
     db.images.delete_one({"name": pack["image-name"]})
     db.packs.delete_one(pack)
-    delete_from_likes(pack["path"])
-    delete_from_favorite(pack["path"])
+    delete_from_likes(db, pack["path"])
+    delete_from_favorite(db, pack["path"])
     return True
 
 
 def delete_from_likes(db, path: str):
-    db.users.update({"lists.likes": {"$in": path}}, {"$pull": {"lists.likes": path}})
-
+    db.users.update_many({"lists.likes": path}, {"$pull": {"lists.likes": path}})
+    
 
 def delete_from_favorite(db, path: str):
-    db.users.update({"lists.favorites": {"$in": path}}, {"$pull": {"lists.favorites": path}})
+    db.users.update_many({"lists.favorites": path}, {"$pull": {"lists.favorites": path}})

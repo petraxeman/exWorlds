@@ -45,11 +45,11 @@ def build_pack(new: dict, origin: dict = {}) -> dict:
     pack["search-field"] = make_ngram(pack["name"], 3, 4)
     pack["hash"] = get_pack_hash(pack)
     if not pack["path"]:
-        points = []
-        if pack["reference"]:
-            points.append(pack["reference"])
-        points.append(pack["codename"])
-        pack["path"] = "pack://" + "/".join(points) 
+        if new["reference"]:
+            pack["path"] = "pack://" + new["reference"] + "/" + new["codename"]
+        else:
+            pack["path"] = "pack://" + new["codename"]
+    
     return pack
 
 
