@@ -1,4 +1,4 @@
-from library.pack import handlers, get_by_page, upload
+from library.pack import handlers, get_by_page, upload, delete
 from library.jwtokens import token_required
 from library import utils
 from flask import (
@@ -55,7 +55,7 @@ def get_systems_count():
 @token_required
 def delete_system():
     db = current_app.config["MONGODB_INST"]
-    return handlers.process_pack_delete(db, request.json, request.current_user)
+    return delete.process(db, request.json, request.current_user)
 
 
 @bp.route("/pack/toggle/hide", methods = ["POST"])

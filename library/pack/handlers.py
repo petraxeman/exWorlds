@@ -56,34 +56,6 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     return {"hashes": hashes}, 200
 
 
-def process_pack_delete(db, data: dict, sender: dict) -> Union[dict, int]:
-    codename = data.get("codename", "")
-    pack_type = data.get("type", "")
-    if not data.get("codename", False) or not pack_type:
-        return {"msg": "Undefined codename"}, 401
-
-    pack = db.packs.find_one({"codename": codename, "type": pack_type})
-    if not pack:
-        return {"msg": "Selected pack not found."}, 401
-    
-    existed_rights = {"delete-pack", "any-delete", "server-admin"}.intersection(sender["rights"])
-    if sender["username"] != pack["owner"] and (not existed_rights):
-        return {"msg": "You can't do that."}, 401
-    
-    try:
-        assert delete_pack(db, pack)
-    except Exception:
-        return {"msg": "Somthing went wrong. Try again later."}, 401
-    
-    return {"msg": f"System {codename} deleted."}, 200
-
-
-def delete_pack(db, pack: dict) -> bool:
-    db.images.delete_one({"name": pack["image-name"]})
-    db.packs.delete_one(pack)
-    return True
-
-
 def toggle(db, data: dict, sender: dict, arg: str):
     pack = utils.get_by_path(db, data.get("path", ""))
 
