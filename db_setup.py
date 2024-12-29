@@ -8,7 +8,7 @@ import pymongo.errors as errors
 
 load_dotenv()
 
-server_addr = os.getenv("MONGODB_SERVER")#input("MongoDB server address: ").strip()
+server_addr = os.getenv("MONGODB_SERVER")
 mongo_admin_login = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_admin_passwd = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 mongo_exowrlds_login = os.getenv("MONGO_EXWORLDS_USERNAME")

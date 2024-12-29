@@ -16,7 +16,6 @@
 - name: Name of table. Used for show in game view.
 - codename: Used for navigate and agreagate.
 - owner: User who create the table
-- reference: Has a codename of reference package. Can take codenames of game-systems or addons.
 - path
 - common
     - search-fields: Array of strings. Show what fields used for search. Example: ["name", "damage", "description"]

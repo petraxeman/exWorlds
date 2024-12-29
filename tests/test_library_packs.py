@@ -233,3 +233,42 @@ def test_delete(client, image, admin):
 
 def test_favorite(client):
     pass
+
+
+def ffc(image, n, cn, h = False, l = 0, r = []):
+    return {
+        "name": n,
+        "codename": cn,
+        "image-name": image,
+        "type": "game-system",
+        "reference": "",
+        "path": "pack://" + cn,
+        "hidden": h,
+        "freezed": False,
+        "likes": l,
+        "last-update": 0,
+        "owner": "test-admin",
+        "redactors": r}
+
+
+def _test_additional_actions(db, client, image, admin, user):
+    import time
+
+    print()
+    
+    ft = time.time()
+    for i in range(10000):
+        gs = ffc(image, f"Cool system {i}", f"sys-{i}")
+        client.post("/pack/upload", headers = {"auth-token": admin}, json = gs)
+    print("Time add:", time.time() - ft)
+    
+    
+    for i in [1, 100, 1000]:
+        ft = time.time()
+        r = client.post("/pack/get-by-page", headers = {"auth-token": admin}, json = {"page": 1, "type": "game-system", "search": f"Cool system {i}"})
+        print(f"Get by {i}:", time.time() - ft)
+        
+    ft = time.time()
+    for i in range(10000):
+        db.packs.delete_one({"codename": f"sys-{i}"})
+    print("Time del:", time.time() - ft)

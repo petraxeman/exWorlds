@@ -36,11 +36,24 @@ def get_by_path(db, spath: str) -> dict:
 
 
 def path_forward(spath: str, next: str) -> str:
-    return spath + "/" + next
+    prefixes = ["pack", "table", "card"]
+    exp, points = spath.strip().split("://")
+    orig_prefix_index = prefixes.index(exp)
+    
+    if orig_prefix_index == 1:
+        return spath
+    return prefixes[orig_prefix_index + 1] + "://" + points + "/" + next
 
 
 def path_back(spath: str) -> str:
-    return "/".join(spath.strip().split("/")[:-1])
+    prefixes = ["pack", "table", "card"]
+    exp, points = spath.strip().split("://")
+    points = points.split("/")
+    orig_prefix_index = prefixes.index(exp)
+    
+    if orig_prefix_index == 0:
+        return spath
+    return prefixes[orig_prefix_index + 1] + "://" + "/".join(points[:-1])
 
 
 def validate_path(spath: str) -> bool:

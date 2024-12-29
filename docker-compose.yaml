@@ -2,10 +2,14 @@ version: "1.0.0"
 
 services:
   mongodb:
-    container_name: mongodb
-    image: docker.io/mongo:latest
+    container_name: postgres
+    image: docker.io/postgres:latest
     env_file: .env
     ports:
-      - 27017:27017
+      - 27017:5432
     volumes:
-      - /home/pt/db:/data/db
+      - pgdata:/var/lib/postgresql/data 
+
+
+volumes:
+  pgdata:

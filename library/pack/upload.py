@@ -37,13 +37,14 @@ def build_pack(new: dict, origin: dict = {}) -> dict:
         "path": origin.get("path"),
         "hidden": False,
         "freezed": False,
-        "likes": 0,
-        "last-update": 0,
+        "likes": origin["likes"],
+        "last-update": origin["last-update"],
         "owner": origin.get("owner") or new.get("owner"),
         "readctors": new.get("redactors") or origin.get("redactors"),
     }
     pack["search-field"] = make_ngram(pack["name"], 3, 4)
     pack["hash"] = get_pack_hash(pack)
+    
     if not pack["path"]:
         if new["reference"]:
             pack["path"] = "pack://" + new["reference"] + "/" + new["codename"]
@@ -55,5 +56,4 @@ def build_pack(new: dict, origin: dict = {}) -> dict:
 
 def get_pack_hash(instance: dict) -> str:
     return hashlib.md5(
-        f"{instance["name"]} {instance["codename"]} {instance["image-name"]}".encode()
-        ).hexdigest()
+        f'{instance["name"]} {instance["codename"]} {instance["image-name"]}'.encode()).hexdigest()
