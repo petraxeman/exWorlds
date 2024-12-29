@@ -4,3 +4,6 @@ pyjwt
 python-dotenv
 pytest
 podman-compose
+
+flask-sqlalchemy
+psycopg2

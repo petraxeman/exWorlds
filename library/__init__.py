@@ -2,10 +2,10 @@ import os
 import library.utils
 
 from flask import Flask
-from flask_pymongo import PyMongo
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 
+from library.dbext import Postgres
 from library.auth.api import bp as api_auth_bp
 from library.common.api import bp as api_common_bp
 from library.pack.api import bp as api_pack_bp
@@ -14,23 +14,14 @@ from library.table.api import bp as api_table
 
 load_dotenv()
 
-mongo: PyMongo = PyMongo()
+db = Postgres()
 
 def create_app():
     app: Flask = Flask(__name__)
+    app.config.from_mapping(dotenv_values())
     
-    # PRE CONFIG INITIALS
-    app.config["MONGO_URI"] = "mongodb://devu:devp@localhost:27017/exworlds"
-    app.config["JWT_SECRET"] = "03lh6fhrl3pa91f2oyov4syba65sjwvemshe2-5xn1mv1wfhxa4v-mxtrzm6dvy-3dum8xd1awb1atqa1oy8cspv3p7zynoic6cf"
-    app.config["REGISTRATION"] = "allowed"
-    app.config["PASSWORD_SALT"] = os.getenv("GLOBAL_PASSWORD_SALT")
-    app.config["TOKEN_SALT"] = os.getenv("GLOBAL_TOKEN_SALT")
-
     # MODULES INITIALS
-    mongo.init_app(app)
-
-    # POST CONFIG INITIALS
-    app.config["MONGODB_INST"] = mongo.db
+    db.init_app(app)
 
     with app.app_context():
         app.register_blueprint(api_auth_bp)
