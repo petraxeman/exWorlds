@@ -80,7 +80,7 @@ def process_add_user_to_queue(db, required_username: str, sender_rights: list)  
         return {"msg": "Username already used"}, 401
     
     try:
-        db.execute("SELECT add_user(%s, '', registration=>true)", required_username)
+        db.execute("SELECT add_user(%s, '', registration=>true)", (required_username,))
         return {"msg": "Registration success"}, 200
     except:
         return {"msg": "Somthing went wrong. Try again later"}, 500
