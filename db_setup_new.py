@@ -73,8 +73,9 @@ CREATE TABLE IF NOT EXISTS tables (
   );
 
 CREATE TABLE IF NOT EXISTS images (
-  name TEXT,
+  filename TEXT,
   codename TEXT,
+  path TEXT DEFAULT '/',
   owner TEXT,
   data BYTEA
   );

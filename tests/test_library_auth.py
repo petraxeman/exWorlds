@@ -14,7 +14,7 @@ def app():
 
 @pytest.fixture()
 def db(app):
-    return app.extensions["psotgresdb"]
+    return app.extensions["postgresdb"]
 
 
 @pytest.fixture

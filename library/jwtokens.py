@@ -19,7 +19,7 @@ def token_required(fn):
                 return {"msg": "Token expired"}, 403
 
             #postgres = current_app.config["POSTGRES_INST"]
-            current_user = current_app.extensions["psotgresdb"].get_user_by_username(data["username"])
+            current_user = current_app.extensions["postgresdb"].get_user_by_username(data["username"])
             if not current_user:
                 return {"msg": "Undefined token"}, 403
 

@@ -38,7 +38,7 @@ class Postgres:
                 dbname=self.dbname,
                 cursor_factory=NamedTupleCursor
             )
-            app.extensions["psotgresdb"] = self
+            app.extensions["postgresdb"] = self
         except Exception as e:
             raise RuntimeError(f"Database initialization error: {e}")
 
