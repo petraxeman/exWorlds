@@ -19,7 +19,7 @@ def process_auth(db, username: str, password: str, password_salt: str) -> Union[
     
     if user["banned"]:
         if datetime.datetime.strptime(user["blocked"], "%d.%m.%Y") < datetime.now():
-            db.users.update_one({"username": username, "password-hash": password}, {"$set": {"blocked": ""}})
+            db.execute("UPDATE users SET banned = NULL WHERE uid = %s", (user["uid"],))
         else:
             return {"msg": "You have been banned"}, 200
     

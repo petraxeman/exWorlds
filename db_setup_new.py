@@ -52,8 +52,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS packs (
   name TEXT,
-  codename TEXT,
-  image TEXT,
+  image_name TEXT,
   path TEXT PRIMARY KEY,
   hidden BOOL DEFAULT false,
   freezed BOOL DEFAULT false,
@@ -61,7 +60,8 @@ CREATE TABLE IF NOT EXISTS packs (
   likes INT DEFAULT 0,
   favorites INT DEFAULT 0,
   owner TEXT,
-  readactors TEXT[] DEFAULT '{}'
+  readactors TEXT[] DEFAULT '{}',
+  hash TEXT
   );
 
 CREATE TABLE IF NOT EXISTS tables (

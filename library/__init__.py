@@ -19,6 +19,7 @@ db = Postgres()
 def create_app():
     app: Flask = Flask(__name__)
     app.config.from_mapping(dotenv_values())
+    app.config["version"] = "Active Beta"
     
     # MODULES INITIALS
     db.init_app(app)
