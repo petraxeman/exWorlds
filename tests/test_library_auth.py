@@ -111,3 +111,35 @@ def test_add_user_to_queue_unauthorized(client, create_user):
         headers = {"auth-token": token},
     )
     assert response.status_code == 401
+
+
+def test_banned_user(db, client, create_user):
+    import datetime
+    
+    _, _, token = create_user('test-user', 'test-passwd')
+    nextday = datetime.datetime.now() + datetime.timedelta(days = 1)
+    
+    db.execute("UPDATE users SET banned = %s WHERE username = %s", (nextday.isoformat(), 'test-user'))
+    
+    response = client.post(
+        "/api/login", json = {"username": "test-user", "password": "test-passwd"},
+    )
+    
+    assert response.status_code == 403
+    assert response.json['msg'] == "You have been banned."
+
+
+def test_ban_expired(db, client, create_user):
+    import datetime
+    
+    _, _, token = create_user('test-user', 'test-passwd')
+    nextday = datetime.datetime.now() - datetime.timedelta(days = 1)
+    
+    db.execute("UPDATE users SET banned = %s WHERE username = %s", (nextday.isoformat(), 'test-user'))
+    
+    response = client.post(
+        "/api/login", json = {"username": "test-user", "password": "test-passwd"},
+    )
+    
+    assert response.status_code == 200
+    assert "token" in response.json.keys()

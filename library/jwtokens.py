@@ -18,7 +18,6 @@ def token_required(fn):
             if expire_date < datetime.datetime.now():
                 return {"msg": "Token expired"}, 403
 
-            #postgres = current_app.config["POSTGRES_INST"]
             current_user = current_app.extensions["postgresdb"].get_user_by_username(data["username"])
             if not current_user:
                 return {"msg": "Undefined token"}, 403

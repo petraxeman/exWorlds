@@ -47,11 +47,14 @@ def run_after(db):
     yield
     db.execute("DELETE FROM users WHERE username = 'test-user'")
     db.execute("DELETE FROM users WHERE username = 'test-admin'")
-    db.execute("DELETE FROM users WHERE username = 'queueduser'")
+    db.execute("DELETE FROM users WHERE username = 'another-user'")
     
     db.execute("DELETE FROM packs WHERE path = %s", ("game-system://test-game-system",))
 
 
+#
+# upload.py
+#
 
 def test_pack_upload(client, create_user):
     _, _, token = create_user("test-user", "-")
@@ -62,12 +65,12 @@ def test_pack_upload(client, create_user):
         "path": "game-system://test-game-system",
         "image-name": "image",
         }
-    response = client.post("/api/pack/upload", headers = headers, json = body)
+    response = client.post("/api/packs/upload", headers = headers, json = body)
     
     assert response.status_code == 200
 
 
-def test_pack_update(client, create_user):
+def test_pack_update(db, client, create_user):
     _, _, token = create_user("test-user", "-")
     
     headers = {"auth-token": token}
@@ -76,9 +79,128 @@ def test_pack_update(client, create_user):
         "path": "game-system://test-game-system",
         "image-name": "image",
         }
-    response = client.post("/api/pack/upload", headers = headers, json = body)
+    response = client.post("/api/packs/upload", headers = headers, json = body)
     
     body["name"] = "Test game system 2"
-    response = client.post("/api/pack/upload", headers = headers, json = body)
+    response = client.post("/api/packs/upload", headers = headers, json = body)
+    
+    result_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", ("game-system://test-game-system",))
     
     assert response.status_code == 200
+    assert "hash" in response.json.keys()
+    assert result_pack["name"] == "Test game system 2"
+
+
+def test_pack_update_by_another_user(db, client, create_user):
+    _, _, token_1 = create_user("test-user", "-")
+    _, _, token_2 = create_user("another-user", "-")
+    
+    headers = {"auth-token": token_1}
+    body = {
+        "name": "Test game system",
+        "path": "game-system://test-game-system",
+        "image-name": "image",
+        }
+    response = client.post("/api/packs/upload", headers = headers, json = body)
+    
+    body["name"] = "Test game system 2"
+    headers["auth-token"] = token_2
+    response = client.post("/api/packs/upload", headers = headers, json = body)
+    
+    result_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", ("game-system://test-game-system",))
+    
+    assert response.status_code == 401
+    assert response.json["msg"] == "You can't do that."
+    assert result_pack["name"] == "Test game system"
+
+
+def test_pack_update_by_server_admin(db, client, create_user):
+    _, _, token_1 = create_user("test-user", "-")
+    _, _, token_2 = create_user("test-admin", "-", ["server-admin"])
+    
+    headers = {"auth-token": token_1}
+    body = {
+        "name": "Test game system",
+        "path": "game-system://test-game-system",
+        "image-name": "image",
+        }
+    response = client.post("/api/packs/upload", headers = headers, json = body)
+    
+    body["name"] = "Test game system 2"
+    headers["auth-token"] = token_2
+    response = client.post("/api/packs/upload", headers = headers, json = body)
+    
+    result_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", ("game-system://test-game-system",))
+    
+    assert response.status_code == 200
+    assert "hash" in response.json.keys()
+    assert result_pack["name"] == "Test game system 2"
+
+
+#
+# handlers.py
+#
+
+def test_toggle_hidden(db, client, create_user):
+    _, _, token_1 = create_user("test-user", "test-passwd")
+    
+    body = {
+        "name": "Test game system",
+        "path": "game-system://test-game-system",
+        "image-name": "image",
+        }
+    response = client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
+
+    response = client.post(
+        "/api/packs/toggle/hide",
+        headers = {"auth-token": token_1},
+        json = {"path": "game-system://test-game-system"}
+        )
+    
+    new_pack = db.fetchone("SELECT * FROM packs WHERE path = 'game-system://test-game-system'")
+
+    assert response.status_code == 200
+    assert new_pack["hidden"]
+    
+    _, _, token_2 = create_user("another-user", "test-passwd")
+    response = client.post(
+        "/api/packs/toggle/hide",
+        headers = {"auth-token": token_2},
+        json = {"path": "game-system://test-game-system"}
+        )
+
+    new_pack = db.fetchone("SELECT * FROM packs WHERE path = 'game-system://test-game-system'")
+    assert response.status_code == 401
+    assert new_pack["hidden"]
+
+
+def test_toggle_freezed(db, client, create_user):
+    _, _, token_1 = create_user("test-user", "test-passwd")
+    
+    body = {
+        "name": "Test game system",
+        "path": "game-system://test-game-system",
+        "image-name": "image",
+        }
+    response = client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
+    response = client.post(
+        "/api/packs/toggle/freeze",
+        headers = {"auth-token": token_1},
+        json = {"path": "game-system://test-game-system"}
+        )
+    
+    new_pack = db.fetchone("SELECT * FROM packs WHERE path = 'game-system://test-game-system'")
+
+    assert response.status_code == 200
+    assert new_pack["freezed"]
+    
+    _, _, token_2 = create_user("another-user", "test-passwd")
+    response = client.post(
+        "/api/packs/toggle/freeze",
+        headers = {"auth-token": token_2},
+        json = {"path": "game-system://test-game-system"}
+        )
+
+    new_pack = db.fetchone("SELECT * FROM packs WHERE path = 'game-system://test-game-system'")
+    assert response.status_code == 401
+    assert new_pack["freezed"]

@@ -57,7 +57,7 @@ def download_image():
 
     if image is None:
         return {"msg": "File does not exist"}, 401
-    image = image._asdict()
+
     return send_file(io.BytesIO(bytes(image['data'])), mimetype="image/webp", download_name = image["filename"]), 200
 
 
@@ -78,7 +78,6 @@ def delete_image():
 
     if image is None:
         return {"msg": "File does not exist"}, 401
-    image = image._asdict()
     
     if current_user["uid"] != image["owner"] and (current_user["role"] not in ["admin", "server-admin"]):
         return {"msg": "You can't do that"}, 401

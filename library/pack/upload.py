@@ -32,7 +32,6 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (spath,))
 
     if pack:
-        pack = pack._asdict()
         return update_existed(db, data, pack, spath, sender)
     else:
         return upload_new(db, data, spath, sender)

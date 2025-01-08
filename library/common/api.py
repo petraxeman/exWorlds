@@ -14,9 +14,8 @@ bp = Blueprint("api-common", __name__)
 def get_server_info():
     db = current_app.extensions["postgresdb"]
     server_name = db.fetchone("SELECT data FROM settings WHERE key = 'server-name'")
+    
     if not server_name:
         server_name = "Exworlds server"
-    else:
-        server_name = server_name._asdict()["data"]["value"]
     
     return {"server_name": server_name, "server_version": current_app.config["version"]}, 200

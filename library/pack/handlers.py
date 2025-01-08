@@ -14,14 +14,13 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     packs = []
     for path in path_list:
         
-        pack = utils.get_by_path(db, path)
+        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path,))
         
         if pack:
             if pack.get("hidden", False):
                 if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
                     continue
             
-            del pack["_id"]
             packs.append(pack)
 
     if not packs:
@@ -40,14 +39,13 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     hashes = []
     for path in path_list:
 
-        pack = utils.get_by_path(db, path)
+        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path,))
         
         if pack:
             if pack.get("hidden", False):
                 if sender["username"] not in [pack["owner"], *pack["readactors"]] or not existed_rigths:
                     continue
 
-            del pack["_id"]
             hashes.append(pack.get("hash"))
         
     if not hashes:
@@ -57,25 +55,30 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
 
 
 def toggle(db, data: dict, sender: dict, arg: str):
-    pack = utils.get_by_path(db, data.get("path", ""))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (data.get("path", "://"),))
 
-    if sender["username"] != pack["owner"] and "server-admin" not in sender["rights"]:
+    if not pack:
+        return {"msg": "Wrong path."}
+    
+    if sender["uid"] != pack["owner"] and "server-admin" not in sender["rights"]:
         return {"msg": "You can't do that."}, 401
     
-    if pack.get(arg, False):
-        db.packs.update_one(pack, {"$set": {arg: False}})
-    else:
-        db.packs.update_one(pack, {"$set": {arg: True}})
+    db.execute(f"UPDATE packs SET {arg} = %s WHERE path = %s", (not pack[arg], pack["path"]))
     
     return {"msg": "Toggle succefull"}, 200
 
 
 def toggle_list(db, data: dict, sender: dict, arg: str):
-    if not data.get("path", ""):
-        return {"msg": "Path not found"}, 401
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (data.get("path", "://"),))
     
-    if data in sender["lists"][arg]:
-        db.users.update_one(sender, {"$pull": {"lists." + arg: data.get("path")}})
+    if not pack:
+        return {"msg": "Wrong path."}
+    
+    if data["path"] in sender["lists"][arg]:
+        sender["lists"][arg].pop(data["path"])
     else:
-        db.users.update_one(sender, {"$push": {"lists." + arg: data.get("path")}})
+        sender["lists"][arg].append(data["path"])
+    
+    db.execute("UPDATE users SET lists = %s", (sender["lists"]))
+    
     return {"msg": "Done"}, 200

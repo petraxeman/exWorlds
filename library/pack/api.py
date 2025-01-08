@@ -11,21 +11,21 @@ bp = Blueprint("api-pack", __name__)
 
 
 
-@bp.route("/api/pack/upload", methods = ["POST"])
+@bp.route("/api/packs/upload", methods = ["POST"])
 @token_required
 def pack_upload():
     db = current_app.extensions["postgresdb"]
     return upload.process(db, request.json, request.current_user)
 
 
-@bp.route("/pack/get", methods = ["POST"])
+@bp.route("/api/packs/get", methods = ["POST"])
 @token_required
 def get_system():
     db = current_app.extensions["postgresdb"]
     return handlers.process_pack_get(db, request.json, request.current_user)
 
 
-@bp.route("/pack/get-hash", methods = ["POST"])
+@bp.route("/api/packs/get-hash", methods = ["POST"])
 @token_required
 def get_system_hash():
     db = current_app.extensions["postgresdb"]
@@ -58,27 +58,27 @@ def delete_system():
     return delete.process(db, request.json, request.current_user)
 
 
-@bp.route("/pack/toggle/hide", methods = ["POST"])
+@bp.route("/api/packs/toggle/hide", methods = ["POST"])
 @token_required
 def toggle_hiden():
     db = current_app.extensions["postgresdb"]
     return handlers.toggle(db, request.json, request.current_user, "hidden")
 
 
-@bp.route("/pack/toggle/freeze", methods = ["POST"])
+@bp.route("/api/packs/toggle/freeze", methods = ["POST"])
 @token_required
 def toggle_freeze():
     db = current_app.extensions["postgresdb"]
     return handlers.toggle(db, request.json, request.current_user, "freezed")
 
 
-@bp.route("/pack/toggle/favorite", methods = ["POST"])
+@bp.route("/api/packs/toggle/favorite", methods = ["POST"])
 @token_required
 def toggle_favorite():
-    return handlers.toggle_list(current_app.config["MONGODB_INST"], request.json, request.current_user, "favorites")
+    return handlers.toggle_list(current_app.extensions["postgresdb"], request.json, request.current_user, "favorites")
 
 
-@bp.route("/pack/toggle/like", methods = ["POST"])
+@bp.route("/api/packs/toggle/like", methods = ["POST"])
 @token_required
 def toggle_like():
-    return handlers.toggle_list(current_app.config["MONGODB_INST"], request.json, request.current_user, "likes")
+    return handlers.toggle_list(current_app.extensions["postgresdb"], request.json, request.current_user, "likes")

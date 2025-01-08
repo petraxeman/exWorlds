@@ -67,7 +67,11 @@ class Postgres:
             with self._get_connection() as conn:
                 with conn.cursor() as cur:
                     cur.execute(query, args)
-                    return cur.fetchall()
+                    response = cur.fetchall()
+                    if response:
+                        return tuple(map(lambda x: x._asdict(), response))
+                    else:
+                        return None
         except Exception as e:
             raise RuntimeError(f"Fetch all error: {e}")
     
@@ -77,7 +81,11 @@ class Postgres:
             with self._get_connection() as conn:
                 with conn.cursor() as cur:
                     cur.execute(query, args)
-                    return cur.fetchone()
+                    response = cur.fetchone()
+                    if response:
+                        return response._asdict()
+                    else:
+                        return None
         except Exception as e:
             raise RuntimeError(f"Fetch all error: {e}")
     
@@ -95,6 +103,6 @@ class Postgres:
         query = "SELECT * FROM users WHERE username = %s"
         result = self.fetchone(query, (username,))
         if result:
-            return result._asdict()
+            return result
         else:
             return None

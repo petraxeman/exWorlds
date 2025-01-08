@@ -15,13 +15,11 @@ def process_auth(db, username: str, password: str, password_salt: str) -> Union[
     if not user:
         return {"msg": "Wrong login or password"}, 401
     
-    user = user._asdict()
-    
     if user["banned"]:
-        if datetime.datetime.strptime(user["blocked"], "%d.%m.%Y") < datetime.now():
+        if user["banned"] < datetime.datetime.now():
             db.execute("UPDATE users SET banned = NULL WHERE uid = %s", (user["uid"],))
         else:
-            return {"msg": "You have been banned"}, 200
+            return {"msg": "You have been banned."}, 403
     
     expire_data = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%d-%m-%Y")
     token = jwt.encode({"username": username, "expire_date": expire_data}, key = current_app.config["JWT_SECRET"], algorithm="HS256")
@@ -37,7 +35,6 @@ def process_registration(db, username: str, password: str, password_salt: str) -
     finded_user = db.fetchone('SELECT * FROM users WHERE username = %s', (username,))
     
     if finded_user:
-        finded_user = finded_user._asdict()
         if finded_user["waiting"]["registration"] == True:
             db.execute("""UPDATE users SET waiting = waiting || '{"registration": false}', password_hash = %s WHERE username = %s""", (password_hash, username,))
             return {"msg": "Registration success"}, 200
