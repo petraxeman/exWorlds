@@ -32,7 +32,7 @@ def get_system_hash():
     return handlers.process_pack_get_hash(db, request.json, request.current_user)
 
 
-@bp.route("/pack/get-by-page", methods = ["POST"])
+@bp.route("/api/pack/get-by-page", methods = ["POST"])
 @token_required
 def get_systems():
     db = current_app.extensions["postgresdb"]

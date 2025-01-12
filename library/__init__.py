@@ -1,5 +1,6 @@
 import os
 import library.utils
+import psycopg2.extras
 
 from flask import Flask
 
@@ -13,6 +14,10 @@ from library.image.api import bp as api_image
 from library.table.api import bp as api_table
 
 load_dotenv()
+psycopg2.extras.register_uuid()
+psycopg2.extensions.register_adapter(dict, psycopg2.extras.Json)
+
+
 
 db = Postgres()
 

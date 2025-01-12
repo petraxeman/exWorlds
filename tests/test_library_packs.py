@@ -51,6 +51,8 @@ def run_after(db):
     
     db.execute("DELETE FROM packs WHERE path = %s", ("game-system://test-game-system",))
 
+    for i in range(10):
+        db.execute("DELETE FROM packs WHERE path = %s", (f"game-system://test-game-system-{i}",))
 
 #
 # upload.py
@@ -151,11 +153,7 @@ def test_toggle_hidden(db, client, create_user):
         }
     response = client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
 
-    response = client.post(
-        "/api/packs/toggle/hide",
-        headers = {"auth-token": token_1},
-        json = {"path": "game-system://test-game-system"}
-        )
+    response = client.post("/api/packs/toggle/hide", headers = {"auth-token": token_1}, json = {"path": "game-system://test-game-system"})
     
     new_pack = db.fetchone("SELECT * FROM packs WHERE path = 'game-system://test-game-system'")
 
@@ -204,3 +202,96 @@ def test_toggle_freezed(db, client, create_user):
     new_pack = db.fetchone("SELECT * FROM packs WHERE path = 'game-system://test-game-system'")
     assert response.status_code == 401
     assert new_pack["freezed"]
+
+
+def test_get_pack(client, create_user):
+    _, _, token_1 = create_user("test-user", "test-passwd")
+    
+    body = {
+        "name": "Test game system",
+        "path": "game-system://test-game-system",
+        "image-name": "image",
+        }
+    response = client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
+    response = client.post("/api/packs/toggle/hide", headers = {"auth-token": token_1}, json = {"path": "game-system://test-game-system"})
+    response = client.post("/api/packs/get", headers = {"auth-token": token_1}, json = {"path-list": ["game-system://test-game-system"]})
+    
+    assert response.status_code == 200
+    assert len(response.json["packs"]) == 1
+    
+    _, _, token_2 = create_user("another-user", "test-passwd")
+    response = client.post("/api/packs/get", headers = {"auth-token": token_2}, json = {"path-list": ["game-system://test-game-system"]})
+    
+    assert response.status_code == 401
+
+
+def test_get_pack_hash(client, create_user):
+    _, _, token_1 = create_user("test-user", "test-passwd")
+    
+    body = {
+        "name": "Test game system",
+        "path": "game-system://test-game-system",
+        "image-name": "image",
+        }
+    response = client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
+    response = client.post("/api/packs/toggle/hide", headers = {"auth-token": token_1}, json = {"path": "game-system://test-game-system"})
+    response = client.post("/api/packs/get-hash", headers = {"auth-token": token_1}, json = {"path-list": ["game-system://test-game-system"]})
+    
+    assert response.status_code == 200
+    assert len(response.json["hashes"]) == 1
+    
+    _, _, token_2 = create_user("another-user", "test-passwd")
+    response = client.post("/api/packs/get-hash", headers = {"auth-token": token_2}, json = {"path-list": ["game-system://test-game-system"]})
+    
+    assert response.status_code == 401
+
+
+#
+# get_by_page.py
+#
+
+def test_get_by_page(db, client, create_user):
+    _, _, token_1 = create_user("test-user", "test-passwd")
+    
+    for i in range(10):
+        body = {
+            "name": f"Test game system at number {i}",
+            "path": f"game-system://test-game-system-{i}",
+            "image-name": "image",
+        }
+        client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
+    
+    for i in [1, 4, 8]:
+        client.post(
+            "/api/packs/toggle/favorite",
+            headers = {"auth-token": token_1},
+            json = {"path": f"game-system://test-game-system-{i}"}
+            )
+
+    for i in [2, 9, 3]:
+        client.post(
+            "/api/packs/toggle/like",
+            headers = {"auth-token": token_1},
+            json = {"path": f"game-system://test-game-system-{i}"}
+            )
+
+    client.post(
+            "/api/packs/toggle/hide",
+            headers = {"auth-token": token_1},
+            json = {"path": f"game-system://test-game-system-0"}
+            )
+    
+    response = client.post("/api/pack/get-by-page", headers = {"auth-token": token_1}, json = {"page": 1})
+    print(len(response.json['paths']))
+    for p in response.json['paths']:
+        print(p)
+    
+    print("\n\n\n")
+    _, _, token_2 = create_user("another-user", "test-passwd")
+    
+    response = client.post("/api/pack/get-by-page", headers = {"auth-token": token_2}, json = {"page": 1})
+    print(len(response.json['paths']))
+    for p in response.json['paths']:
+        print(p)
+        
+    assert True

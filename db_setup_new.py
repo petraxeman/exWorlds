@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS settings CASCADE;
 
 cur.execute("""
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 
 CREATE TABLE IF NOT EXISTS users (
@@ -53,14 +54,15 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS packs (
   name TEXT,
   image_name TEXT,
+  search_field TEXT,
   path TEXT PRIMARY KEY,
   hidden BOOL DEFAULT false,
   freezed BOOL DEFAULT false,
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   likes INT DEFAULT 0,
   favorites INT DEFAULT 0,
-  owner TEXT,
-  readactors TEXT[] DEFAULT '{}',
+  owner UUID,
+  redactors UUID[] DEFAULT '{}',
   hash TEXT
   );
 
@@ -117,21 +119,34 @@ CREATE OR REPLACE FUNCTION add_user(
   END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION sync_last_update()
+CREATE OR REPLACE FUNCTION settings_last_update()
   RETURNS TRIGGER AS $$
   BEGIN
     NEW.last_update = now();
     RETURN NEW;
   END;
-$$ language plpgsql;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_packs_search_field()
+  RETURNS TRIGGER AS $$
+  BEGIN
+    NEW.search_field = NEW.name;
+    RETURN NEW;
+  END;
+$$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE TRIGGER settings_update
-    BEFORE UPDATE
-    ON
-        settings
-    FOR EACH ROW
-EXECUTE PROCEDURE sync_last_update();
+CREATE OR REPLACE TRIGGER update_packs_search_field_trigger
+  BEFORE UPDATE
+  ON packs
+  FOR EACH ROW
+EXECUTE PROCEDURE update_packs_search_field();
+
+CREATE OR REPLACE TRIGGER settings_last_update_trigger
+  BEFORE UPDATE
+  ON settings
+  FOR EACH ROW
+EXECUTE PROCEDURE settings_last_update();
 
 
 CREATE OR REPLACE VIEW banned_users AS
@@ -142,6 +157,10 @@ CREATE OR REPLACE VIEW users_waiting_aprove AS
 
 CREATE OR REPLACE VIEW users_waiting_register AS
   SELECT * FROM users WHERE (waiting->>'registration')::bool = true;
+
+
+CREATE INDEX IF NOT EXISTS trgm_packs_idx ON packs USING GIN (search_field gin_trgm_ops);
+
 
 INSERT INTO settings (key, data) VALUES ('server-name', '{"value": "Exworlds server"}');
 INSERT INTO settings (key, data) VALUES ('default-rights', '{"value": ["any-create"]}');

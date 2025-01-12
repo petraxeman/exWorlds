@@ -1,6 +1,6 @@
 import psycopg2 as pgs
 from psycopg2 import pool
-from psycopg2.extras import DictRow, NamedTupleCursor
+from psycopg2.extras import DictRow, NamedTupleCursor, DictCursor, RealDictCursor
 from psycopg2.extras import execute_values
 from contextlib import contextmanager
 from typing import List, Tuple, Any
@@ -61,8 +61,7 @@ class Postgres:
         except Exception as e:
             raise RuntimeError(f"Query execution error: {e}")
 
-    def fetchall(self, query: str, args: Tuple = None) -> List[Tuple[Any]]:
-        "Выполнение запроса с возвратом всех результатов."
+    def fetchall(self, query: str, args: Tuple | dict = None) -> List[Tuple[Any]]:
         try:
             with self._get_connection() as conn:
                 with conn.cursor() as cur:
