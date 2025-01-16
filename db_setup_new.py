@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS images (
   filename TEXT,
   codename TEXT,
   path TEXT DEFAULT '/',
-  owner TEXT,
+  owner UUID,
   data BYTEA
   );
 
@@ -137,7 +137,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE TRIGGER update_packs_search_field_trigger
-  BEFORE UPDATE
+  BEFORE UPDATE OR INSERT
   ON packs
   FOR EACH ROW
 EXECUTE PROCEDURE update_packs_search_field();

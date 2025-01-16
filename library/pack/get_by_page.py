@@ -1,5 +1,5 @@
 from typing import Union
-
+from library import search_utils
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
@@ -53,10 +53,10 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
             filtered_packs.likes DESC
         LIMIT %(limit)s OFFSET %(offset)s;
         """
-        
-    path_list = db.fetchall(query, {"user_uid": sender["uid"], "limit": 10, "offset": 10 * (page - 1), "text_query": search_query, "startswith": startswith})
+    
+    path_list = db.fetchall(query, {"user_uid": sender["uid"], "limit": 10, "offset": 10 * (page - 1), "search_query": search_query, "startswith": startswith})
 
     if not path_list:
-
+        return {"msg": "Undefined packs"}
     
     return {"paths": path_list}, 200

@@ -261,14 +261,14 @@ def test_get_by_page(db, client, create_user):
         }
         client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
     
-    for i in [1, 4, 8]:
+    for i in [7, 8, 9]:
         client.post(
             "/api/packs/toggle/favorite",
             headers = {"auth-token": token_1},
             json = {"path": f"game-system://test-game-system-{i}"}
             )
 
-    for i in [2, 9, 3]:
+    for i in [4, 5, 6]:
         client.post(
             "/api/packs/toggle/like",
             headers = {"auth-token": token_1},
@@ -278,20 +278,19 @@ def test_get_by_page(db, client, create_user):
     client.post(
             "/api/packs/toggle/hide",
             headers = {"auth-token": token_1},
-            json = {"path": f"game-system://test-game-system-0"}
+            json = {"path": f"game-system://test-game-system-3"}
             )
     
     response = client.post("/api/pack/get-by-page", headers = {"auth-token": token_1}, json = {"page": 1})
-    print(len(response.json['paths']))
-    for p in response.json['paths']:
-        print(p)
     
-    print("\n\n\n")
+    assert len(response.json["paths"]) == 10
+    assert response.json["paths"][0]["path"] in ["game-system://test-game-system-7", "game-system://test-game-system-8", "game-system://test-game-system-9"]
+    assert response.json["paths"][3]["path"] in ["game-system://test-game-system-4", "game-system://test-game-system-5", "game-system://test-game-system-6"]
+
+    
     _, _, token_2 = create_user("another-user", "test-passwd")
     
-    response = client.post("/api/pack/get-by-page", headers = {"auth-token": token_2}, json = {"page": 1})
-    print(len(response.json['paths']))
-    for p in response.json['paths']:
-        print(p)
+    response = client.post("/api/pack/get-by-page", headers = {"auth-token": token_2}, json = {"page": 1, "search": "1"})
         
-    assert True
+    assert len(response.json["paths"]) == 9
+    assert response.json["paths"][0]["path"] == "game-system://test-game-system-1"
