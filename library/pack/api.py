@@ -39,16 +39,16 @@ def get_systems():
     return get_by_page.process(db, request.json, request.current_user)
 
 
-@bp.route("/pack/get-count", methods = ["POST"])
+@bp.route("/api/packs/get-count", methods = ["POST"])
 @token_required
 def get_systems_count():
     db = current_app.extensions["postgresdb"]
     
-    if not request.json.get("type", ""):
+    if not request.json.get("startswith", ""):
         return {"msg": "Undefined pack"}, 401
-
-    count = db.packs.count_documents({"type": request.json.get("type", "")})
-    return {"count": count}
+    
+    result = db.fetchone("SELECT count(*) FROM packs WHERE starts_with(path, %s)", (request.json["startswith"],))
+    return {"count": result["count"]}
 
 
 @bp.route("/pack/delete", methods = ["POST"])
