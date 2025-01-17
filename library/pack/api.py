@@ -51,7 +51,7 @@ def get_systems_count():
     return {"count": result["count"]}
 
 
-@bp.route("/pack/delete", methods = ["POST"])
+@bp.route("/api/packs/delete", methods = ["POST"])
 @token_required
 def delete_system():
     db = current_app.extensions["postgresdb"]

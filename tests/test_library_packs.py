@@ -294,3 +294,30 @@ def test_get_by_page(db, client, create_user):
         
     assert len(response.json["paths"]) == 9
     assert response.json["paths"][0]["path"] == "game-system://test-game-system-1"
+
+
+#
+# delete.py
+#
+
+def test_delete(db, client, create_user):
+    _, _, token_1 = create_user("test-user", "test-passwd")
+    _, _, token_2 = create_user("another-user", "test-passwd")
+    
+    body = {
+            "name": "Test game system",
+            "path": "game-system://test-game-system",
+            "image-name": "image",
+        }
+    client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
+    
+    assert db.fetchone("SELECT * FROM packs")
+    
+    client.post("/api/packs/delete", headers = {"auth-token": token_2}, json = {"path": "game-system://test-game-system"})
+
+    assert db.fetchone("SELECT * FROM packs")["name"]
+    
+    client.post("/api/packs/delete", headers = {"auth-token": token_1}, json = {"path": "game-system://test-game-system"})
+
+    assert not db.fetchone("SELECT * FROM packs")
+    
