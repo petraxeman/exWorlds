@@ -23,18 +23,6 @@ def dpath_to_spath(dpath: dict) -> str:
     return dpath["exp"] + "://" + "/".join(dpath.points)
 
 
-def get_by_path(db, spath: str) -> dict:
-    if not validate_path(spath):
-        return {}
-    
-    exp, _ = spath.strip().split("://")
-    match exp:
-        case "pack":
-            return db.packs.find_one({"path": spath})
-        case "table":
-            return db.tables.find_one({"path": spath})
-
-
 def table_to_pack(spath: str):
     exp, points = spath.split("://")
     points = points.split("/")
@@ -44,6 +32,20 @@ def table_to_pack(spath: str):
             return "addon://" + "/".join(points[:2])
         case _:
             return "game-system://" + "/".join(points[:1])
+
+
+def get_by_path(db, spath: str) -> dict:
+    exp, points = spath.split("://")
+    match exp:
+        case "game-system":
+            return db.fetchone("SELECT * FROM packs WHERE path = %s", (spath,))
+        case "addon":
+            return db.fetchone("SELECT * FROM packs WHERE path = %s", (spath,))
+        case "table":
+            return db.fetchone("SELECT * FROM tables WHERE path = %s", (spath,))
+        case "note":
+            pass
+    return {}
 
 
 def validate_path(spath: str) -> bool:

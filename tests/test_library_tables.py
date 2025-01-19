@@ -51,8 +51,34 @@ def run_after(db):
     
     db.execute("DELETE FROM packs WHERE path = %s", ("game-system://test-game-system",))
 
-    for i in range(10):
-        db.execute("DELETE FROM packs WHERE path = %s", (f"game-system://test-game-system-{i}",))
+    db.execute("DELETE FROM tables WHERE path = 'table://test-game-system/test-table'")
+
+
+def insert_table(db, username):
+    user = db.fetchone("SELECT * FROM users WHERE username = %s", (username,))
+    table = {
+        "name": "Test table",
+        "owner": user["uid"],
+        "path": "table://test-game-system/test-table",
+        "common": {
+            "search-fields": ["name"],
+            "short-view": ["name"],
+            "table-icon": "opened-book",
+            "table-display": "list",
+        },
+        "data": {
+            "properties": {},
+            "macros": {},
+            "schema": [{"codename": "codename"}, {"codename": "name"}],
+            "fields": {
+                "codename": {"type": "text", "name": "Codename"},
+                "name": {"type": "text", "name": "Name"}
+            }
+        },
+        "hash": "xxx"
+    }
+    db.execute("INSERT INTO tables (name, path, owner, common, data, hash) VALUES (%(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", table)
+
 
 
 def test_table_upload(client, create_user):
@@ -81,6 +107,57 @@ def test_table_upload(client, create_user):
             }
     }
     response = client.post("/api/tables/upload", headers = {"auth-token": token}, json = body)
+    
+    assert response.status_code == 200
+
+
+def test_table_get(db, client, create_user):
+    username, _, token = create_user("test-user", "test-passwd")
+    
+    body = {
+        "name": f"Test game system",
+        "path": f"game-system://test-game-system",
+        "image-name": "image",
+    }
+    client.post("/api/packs/upload", headers = {"auth-token": token}, json = body)
+    
+    insert_table(db, username)
+    
+    response = client.post("/api/tables/get", headers = {"auth-token": token}, json = {"path-list": ["table://test-game-system/test-table"]})
+    
+    assert response.status_code == 200
+
+
+def test_table_get_hash(db, client, create_user):
+    username, _, token = create_user("test-user", "test-passwd")
+    
+    body = {
+        "name": f"Test game system",
+        "path": f"game-system://test-game-system",
+        "image-name": "image",
+    }
+    client.post("/api/packs/upload", headers = {"auth-token": token}, json = body)
+    
+    insert_table(db, username)
+    
+    response = client.post("/api/tables/get-hash", headers = {"auth-token": token}, json = {"path-list": ["table://test-game-system/test-table"]})
+    
+    assert response.status_code == 200
+
+
+def test_table_get_by_pack(db, client, create_user):
+    username, _, token = create_user("test-user", "test-passwd")
+    
+    body = {
+        "name": f"Test game system",
+        "path": f"game-system://test-game-system",
+        "image-name": "image",
+    }
+    client.post("/api/packs/upload", headers = {"auth-token": token}, json = body)
+    
+    insert_table(db, username)
+    
+    response = client.post("/api/tables/get-by-pack", headers = {"auth-token": token}, json = {"path": "game-system://test-game-system"})
     
     print(response.json)
     assert response.status_code == 200

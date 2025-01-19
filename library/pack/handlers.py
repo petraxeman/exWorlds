@@ -55,7 +55,7 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     return {"hashes": hashes}, 200
 
 
-def toggle(db, data: dict, sender: dict, arg: str):
+def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (data.get("path", "://"),))
 
     if not pack:
@@ -69,7 +69,7 @@ def toggle(db, data: dict, sender: dict, arg: str):
     return {"msg": "Toggle succefull"}, 200
 
 
-def toggle_list(db, data: dict, sender: dict, arg: str):
+def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (data.get("path", "://"),))
     
     if not pack:
