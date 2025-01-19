@@ -68,10 +68,11 @@ CREATE TABLE IF NOT EXISTS packs (
 
 CREATE TABLE IF NOT EXISTS tables (
   name TEXT,
-  codename TEXT,
-  upath TEXT PRIMARY KEY,
+  path TEXT PRIMARY KEY,
+  owner UUID,
   common JSONB,
-  data JSONB
+  data JSONB,
+  hash TEXT
   );
 
 CREATE TABLE IF NOT EXISTS images (

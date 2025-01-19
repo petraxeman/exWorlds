@@ -10,30 +10,30 @@ bp = Blueprint("api-table", __name__)
 
 
 
-@bp.route("/table/upload", methods = ["POST"])
+@bp.route("/api/tables/upload", methods = ["POST"])
 @token_required
 def talbe_upload():
-    db = current_app.config["MONGODB_INST"]
-    return handlers.process_table_creation(db, request.json, request.current_user)
+    db = current_app.extensions["postgresdb"]
+    return handlers.process_table_upload(db, request.json, request.current_user)
 
 
-@bp.route("/table/get", methods = ["POST"])
+@bp.route("/api/tables/get", methods = ["POST"])
 @token_required
 def get_table():
-    db = current_app.config["MONGODB_INST"]
+    db = current_app.extensions["postgresdb"]
     return handlers.process_table_get(db, request.json)
 
 
-@bp.route("/table/get-hash", methods = ["POST"])
+@bp.route("/api/tables/get-hash", methods = ["POST"])
 @token_required
 def get_table_hash():
-    db = current_app.config["MONGODB_INST"]
+    db = current_app.extensions["postgresdb"]
     return handlers.process_table_get_hash(db, request.json)
     
 
-@bp.route("/table/delete", methods = ["POST"])
+@bp.route("/api/tables/delete", methods = ["POST"])
 @token_required
 def delete_table():
-    db = current_app.config["MONGODB_INST"]
+    db = current_app.extensions["postgresdb"]
     return handlers.proccess_table_deletion(db, request.json, request.current_user)
     

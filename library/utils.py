@@ -35,25 +35,15 @@ def get_by_path(db, spath: str) -> dict:
             return db.tables.find_one({"path": spath})
 
 
-def path_forward(spath: str, next: str) -> str:
-    prefixes = ["pack", "table", "card"]
-    exp, points = spath.strip().split("://")
-    orig_prefix_index = prefixes.index(exp)
-    
-    if orig_prefix_index == 1:
-        return spath
-    return prefixes[orig_prefix_index + 1] + "://" + points + "/" + next
-
-
-def path_back(spath: str) -> str:
-    prefixes = ["pack", "table", "card"]
-    exp, points = spath.strip().split("://")
+def table_to_pack(spath: str):
+    exp, points = spath.split("://")
     points = points.split("/")
-    orig_prefix_index = prefixes.index(exp)
     
-    if orig_prefix_index == 0:
-        return spath
-    return prefixes[orig_prefix_index + 1] + "://" + "/".join(points[:-1])
+    match len(points):
+        case 3:
+            return "addon://" + "/".join(points[:2])
+        case _:
+            return "game-system://" + "/".join(points[:1])
 
 
 def validate_path(spath: str) -> bool:

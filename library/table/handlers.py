@@ -3,33 +3,29 @@ from typing import Union
 
 
 
-def process_table_creation(db, data: dict, sender: dict) -> Union[dict, int]:
-    if not data.get("reference", "") or not data.get("codename", ""):
-        return {"msg": "Undefined path"}, 401
+def process_table_upload(db, data: dict, sender: dict) -> Union[dict, int]:
+    if not data.get("path"):
+        return {"msg": "Undefind operation"}, 401
     
-    path = utils.path_forward(data["reference"], data["codename"])
-    origin_table = utils.get_by_path(path) or {}
-    pack = utils.get_by_path(data["reference"])
-    new_table = build_table(data, origin_table)
-
-    if not pack:
-        return {"msg": "Reference undefined."}, 401
+    parent_pack_path = utils.table_to_pack(data["path"])
+    parent_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (parent_pack_path,))
     
-    sender_can_redact = sender["username"] in [pack["owner"], *pack["redactors"]]
-    if origin_table:
-        if "server-admin" not in sender["rights"] and not sender_can_redact:
-            return {"msg": "You can't do that."}, 401
-        db.tables.update_one(origin_table, new_table)
+    if not parent_pack:
+        return {"msg": "Wrong path"}, 401
+    
+    if sender["uid"] not in [parent_pack["owner"], *parent_pack["redactors"]] and "server-admin" not in sender["rights"]:
+        return {"msg": "You can't do that"}, 401
+    
+    data["owner"] = sender["uid"]
+    if origin := db.fetchone("SELECT * FROM tables WHERE path = %s", (data["path"],)):
+        table = build_table(data, origin)
+        db.execute("UPDATE tables SET name = %(name)s, common = %(common)s, data = %(data)s, hash = %(hash)s WHERE path = %(path)s", table)
+        return {"msg": "Updating table success", "hash": table["hash"]}
     else:
-        existed_rights = {"create-table", "any-create", "server-admin"}.intersection(sender["rights"])
-        if not existed_rights or not sender_can_redact:
-            return {"msg": "You can't do that."}, 401
-        if not new_table.get("path"):
-            new_table["path"] = path
-        
-        db.tables.insert_one(new_table)
-    
-    return {"hash": new_table["hash"], "path": new_table["path"]}
+        table = build_table(data)
+        db.execute("INSERT INTO tables (name, path, owner, common, data, hash) VALUES (%(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", table)
+        return {"msg": "Creating table success", "hash": table["hash"]}
+    return {"msg": "Somthing went wrong"}, 401
 
 
 def process_table_get(db, data: dict) -> Union[dict, int]:
@@ -100,12 +96,10 @@ def proccess_table_deletion(db, data: dict, sender: dict) -> bool:
 def build_table(new: dict, origin: dict = {}) -> dict:
     table = {
         "name": new.get("name") or origin.get("name"),
-        "codename": origin.get("codename") or new.get("codename"),
-        "owner": origin.get("owner"),
-        "reference": origin.get("path") or new.get("reference"),
-        "path": origin.get("path"),
+        "owner": origin.get("owner") or new.get("owner"),
+        "path": origin.get("path") or new.get("path"),
         "common": {
-            "search-fields": new.get("search-fields", []) or origin.get("search-fields"),
+            "search-fields": new.get("search-fields", []) or origin.get("search-fields", ["name"]),
             "short-view": new.get("short-view") or origin.get("short-view", ["name"]),
             "table-icon": new.get("table-icon") or origin.get("table-icon", "opened-book"),
             "table-display": new.get("search-display") or origin.get("search-display", "list"),
@@ -117,6 +111,6 @@ def build_table(new: dict, origin: dict = {}) -> dict:
             "fields": new.get("fields") or origin.get("fields", {})
         }
     }
-    table["hash"] = utils.get_hash(str(table))
     
+    table["hash"] = utils.get_hash(str(table))
     return table
