@@ -23,15 +23,22 @@ def dpath_to_spath(dpath: dict) -> str:
     return dpath["exp"] + "://" + "/".join(dpath.points)
 
 
-def table_to_pack(spath: str):
+def spath_back(spath: str, direction: int = "pack") -> str:
+    lengths = ["table", "note"]
     exp, points = spath.split("://")
     points = points.split("/")
-    
-    match len(points):
-        case 3:
-            return "addon://" + "/".join(points[:2])
-        case _:
-            return "game-system://" + "/".join(points[:1])
+    if direction == "game-system":
+        return exp + "://" + points[0]
+    elif direction == "pack":
+        if len(points) == 1 + (lengths.index(exp) + 1):
+            return exp + "://" + points[0]
+        elif len(points) == 2 + (lengths.index(exp) + 1):
+            return exp + "://" + points[:2]
+    elif direction == "table":
+        if len(points) == 1 + (lengths.index(exp) + 1):
+            return exp + "://" + points[:2]
+        elif len(points) == 2 + (lengths.index(exp) + 1):
+            return exp + "://" + points[:3]
 
 
 def get_by_path(db, spath: str) -> dict:

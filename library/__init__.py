@@ -12,6 +12,7 @@ from library.common.api import bp as api_common_bp
 from library.pack.api import bp as api_pack_bp
 from library.image.api import bp as api_image
 from library.table.api import bp as api_table
+from library.note.api import bp as api_note
 
 load_dotenv()
 psycopg2.extras.register_uuid()
@@ -35,6 +36,7 @@ def create_app():
         app.register_blueprint(api_pack_bp)
         app.register_blueprint(api_image)
         app.register_blueprint(api_table)
+        app.register_blueprint(api_note)
     return app
 
 

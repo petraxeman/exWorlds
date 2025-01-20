@@ -75,6 +75,14 @@ CREATE TABLE IF NOT EXISTS tables (
   hash TEXT
   );
 
+CREATE TABLE IF NOT EXISTS notes (
+  owner UUID,
+  path TEXT PRIMARY KEY,
+  fields JSONB,
+  schema JSONB,
+  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+
 CREATE TABLE IF NOT EXISTS images (
   filename TEXT,
   codename TEXT,
@@ -87,7 +95,7 @@ CREATE TABLE IF NOT EXISTS settings (
   key VARCHAR(60) NOT NULL UNIQUE,
   data JSONB NOT NULL,
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+  );
 
 
 CREATE OR REPLACE FUNCTION add_user(
@@ -128,6 +136,14 @@ CREATE OR REPLACE FUNCTION settings_last_update()
   END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION notes_last_update()
+  RETURNS TRIGGER AS $$
+  BEGIN
+    NEW.last_update = now();
+    RETURN NEW;
+  END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION update_packs_search_field()
   RETURNS TRIGGER AS $$
   BEGIN
@@ -148,6 +164,12 @@ CREATE OR REPLACE TRIGGER settings_last_update_trigger
   ON settings
   FOR EACH ROW
 EXECUTE PROCEDURE settings_last_update();
+
+CREATE OR REPLACE TRIGGER notes_last_update_trigger
+  BEFORE UPDATE
+  ON notes
+  FOR EACH ROW
+EXECUTE PROCEDURE notes_last_update();
 
 
 CREATE OR REPLACE VIEW banned_users AS

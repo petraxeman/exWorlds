@@ -61,7 +61,7 @@ def hash(db, data: dict, sender: dict) -> Union[dict, int]:
 
 
 def get_specific_table(db, spath: str, sender: dict) -> dict:
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (utils.table_to_pack(spath),))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (utils.path_back(spath),))
     table = db.fetchone("SELECT * FROM tables WHERE path = %s", (spath,))
     
     if not table:

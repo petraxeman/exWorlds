@@ -7,7 +7,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("path"):
         return {"msg": "Undefind operation"}, 401
     
-    parent_pack_path = utils.table_to_pack(data["path"])
+    parent_pack_path = utils.spath_back(data["path"])
     parent_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (parent_pack_path,))
     
     if not parent_pack:
