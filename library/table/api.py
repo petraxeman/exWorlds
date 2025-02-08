@@ -1,4 +1,4 @@
-from library.table import handlers, upload, get_tables, delete_table
+from library.table import upload, get_tables, delete_table
 from library.jwtokens import token_required
 from flask import (
     Blueprint,

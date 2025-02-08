@@ -1,5 +1,5 @@
 from typing import Union
-
+from library import contpath
 
 
 def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
@@ -12,8 +12,12 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     packs = []
     
     for path in path_list:
+        try:
+            path = contpath.ContentPath(path)
+        except contpath.ParsePathException:
+            continue
         
-        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path,))
+        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
         
         if pack:
             if pack.get("hidden", False):
@@ -37,8 +41,12 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     existed_rigths = {"server-admin"}.intersection(sender["rights"])
     hashes = []
     for path in path_list:
-
-        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path,))
+        try:
+            path = contpath.ContentPath(path)
+        except contpath.ParsePathException:
+            continue
+        
+        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
         
         if pack:
             if pack.get("hidden", False):
@@ -54,7 +62,12 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
 
 
 def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (data.get("path", "://"),))
+    try:
+        path = contpath.ContentPath(data.get("path", ""))
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401
+    
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
 
     if not pack:
         return {"msg": "Wrong path."}
@@ -68,7 +81,12 @@ def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
 
 
 def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (data.get("path", "://"),))
+    try:
+        path = contpath.ContentPath(data.get("path", ""))
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401
+
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
     
     if not pack:
         return {"msg": "Wrong path."}

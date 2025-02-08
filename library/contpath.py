@@ -25,15 +25,13 @@ class ContentPath:
         self.table_exists = True if self.table else False
         self.note_exists = True if self.note else False
     
-    @property
-    def str_path(self):
+    def to_str(self):
         points = [self.fpack, self.table, self.note]
         points = [p for p in points if p != None]
         return ".".join(points)
     
     def __repr__(self):
-        
-        return f"<CPath {self.str_path}>"
+        return f"<CPath {self.to_str()}>"
     
     @staticmethod
     def verify(path: str):

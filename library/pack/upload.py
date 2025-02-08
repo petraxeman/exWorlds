@@ -1,13 +1,13 @@
 import hashlib
 from library.search_utils import make_ngram
-from library import utils
+from library import utils, contpath
 from typing import Union
 
 """
 Default pack upload request looks like:
 {
     "name": "Human readeable name",
-    "path": "path://to/pack",
+    "path": "gsystem-name:addon-name",
     "imaga-name": "Name of image what be showed as poster",
     "hidden": True,
     "freezed": True,
@@ -23,38 +23,37 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("path") or not data.get("image-name"):
         return {"msg": "Undefined pack or undefined poster."}, 401
     
-    spath = data.get("path")
-    dpath = utils.spath_to_dpath(data.get("path"))
+    try:
+        path = contpath.ContentPath(data.get("path", ""))
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401
     
-    if dpath["exp"] not in ("game-system", "addon", "resource", "adventure", "world", "game"):
-        return {"msg": "Wrong type."}, 401
-    
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (spath,))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
 
     if pack:
-        return update_existed(db, data, pack, spath, sender)
+        return update_existed(db, data, pack, path.to_str(), sender)
     else:
-        return upload_new(db, data, spath, sender)
+        return upload_new(db, data, path.to_str(), sender)
 
 
-def update_existed(db, data, pack, spath, sender):
+def update_existed(db, data, pack, str_path, sender):
     if "server-admin" not in sender["rights"] and pack["owner"] != sender["uid"]:
         return {"msg": "You can't do that."}, 401
     
     new_pack = build_pack(data, pack)
     db.execute("UPDATE packs SET name = %s, image_name = %s, hash = %s WHERE path = %s",
-                (new_pack["name"], new_pack["image-name"], new_pack["hash"], spath))
+                (new_pack["name"], new_pack["image-name"], new_pack["hash"], str_path))
     return {"hash": new_pack["hash"]}, 200
 
 
-def upload_new(db, data, spath, sender):
+def upload_new(db, data, str_path, sender):
     existed_rights = {"create-pack", "any-create", "server-admin"}.intersection(sender["rights"])
     if not existed_rights:
         return {"msg": "You can't do that."}, 401
     
     new_pack = build_pack(data, {})
     db.execute("INSERT INTO packs (name, image_name, path, owner, hash) VALUES (%s, %s, %s, %s, %s)",
-                (new_pack["name"], new_pack["image-name"], spath, sender["uid"], new_pack["hash"]))
+                (new_pack["name"], new_pack["image-name"], str_path, sender["uid"], new_pack["hash"]))
     
     return {"hash": new_pack["hash"]}, 200
 

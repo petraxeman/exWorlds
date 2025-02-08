@@ -5,7 +5,6 @@ from typing import Union
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
     page = int(data.get("page", 1))
     search_query = str(data.get("search", ""))
-    startswith = str(data.get("startswith", "game-system://"))
     
     if page < 1:
         return {"msg": "Wrong page range"}, 401
@@ -22,15 +21,13 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         FROM packs
         WHERE
         (
-            starts_with(path, %(startswith)s)
-        ) AND (
             NOT hidden OR
             owner = %(user_uid)s OR 
             %(user_uid)s = ANY(redactors) OR
             'server-admin' = ANY(ARRAY(SELECT rights FROM users WHERE uid = %(user_uid)s))
         )
     )"""
-    
+
     if search_query:
         query += """
         SELECT filtered_packs.*
@@ -54,9 +51,6 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         LIMIT %(limit)s OFFSET %(offset)s;
         """
     
-    path_list = db.fetchall(query, {"user_uid": sender["uid"], "limit": 10, "offset": 10 * (page - 1), "search_query": search_query, "startswith": startswith})
-
-    if not path_list:
-        return {"msg": "Undefined packs"}
+    path_list = db.fetchall(query, {"user_uid": sender["uid"], "limit": 10, "offset": 10 * (page - 1), "search_query": search_query})
     
     return {"paths": path_list}, 200

@@ -1,14 +1,17 @@
 from typing import Union
+from library import contpath
 
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
-    path = data.get("path", "")
-    options = data.get("options", {})
-    if not path:
-        return {"msg": "Path undefined."}, 401
+    try:
+        path = contpath.ContentPath(data.get("path", ""))
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401
     
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path,))
+    options = data.get("options", {})
+    
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
     if not pack:
         return {"msg": "Pack not found."}, 401
     
@@ -17,7 +20,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         return {"msg": "You can't do that."}, 401
     
     delete_pack(db, pack, options)    
-    return {"msg": f"System {path} deleted."}, 200
+    return {"msg": f"System {path.to_str()} deleted."}, 200
 
 
 
