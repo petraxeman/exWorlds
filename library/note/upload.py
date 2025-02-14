@@ -1,5 +1,5 @@
 from typing import Union
-from library import utils
+from library import utils, contpath
 
 
 
@@ -7,8 +7,13 @@ def process(db, data: dict, sender: dict) -> Union[tuple, int]:
     if not data.get("path"):
         return {"msg": "Wrong path"}, 401
     
-    db_note = db.fetchone("SELECT * FROM notes WHERE path = %s", (data["path"],))
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (utils.path_back(data["path"]),))
+    try:
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401
+    
+    db_note = db.fetchone("SELECT * FROM notes WHERE path = %s", (path.to_note,))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
     existed_rights = {"server-admin", "any-create"}.intersection(sender["rights"])
     if sender["uid"] not in [pack["owner"], *pack["redactors"]] and not existed_rights:

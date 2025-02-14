@@ -17,7 +17,7 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
         except contpath.ParsePathException:
             continue
         
-        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
+        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
         
         if pack:
             if pack.get("hidden", False):
@@ -46,7 +46,7 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
         except contpath.ParsePathException:
             continue
         
-        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
+        pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
         
         if pack:
             if pack.get("hidden", False):
@@ -67,7 +67,7 @@ def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401
     
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
 
     if not pack:
         return {"msg": "Wrong path."}
@@ -86,16 +86,16 @@ def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401
 
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
     if not pack:
         return {"msg": "Wrong path."}
     
-    if path.to_str() in sender["lists"][arg]:
-        sender["lists"][arg].pop(path.to_str())
+    if path.to_pack in sender["lists"][arg]:
+        sender["lists"][arg].pop(path.to_pack)
         pack[arg] -= 1
     else:
-        sender["lists"][arg].append(path.to_str())
+        sender["lists"][arg].append(path.to_pack)
         pack[arg] += 1
 
     db.execute("UPDATE users SET lists = %s WHERE uid = %s", (sender["lists"], sender['uid']))

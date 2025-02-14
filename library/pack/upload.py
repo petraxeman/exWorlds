@@ -3,20 +3,7 @@ from library.search_utils import make_ngram
 from library import utils, contpath
 from typing import Union
 
-"""
-Default pack upload request looks like:
-{
-    "name": "Human readeable name",
-    "path": "gsystem-name:addon-name",
-    "imaga-name": "Name of image what be showed as poster",
-    "hidden": True,
-    "freezed": True,
-    "likes": 0,
-    "last-update": 01.01.2001,
-    "owner": "User who create this pack",
-    "redactors": []
-}
-"""
+
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
@@ -28,12 +15,12 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401
     
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
 
     if pack:
-        return update_existed(db, data, pack, path.to_str(), sender)
+        return update_existed(db, data, pack, path.to_pack, sender)
     else:
-        return upload_new(db, data, path.to_str(), sender)
+        return upload_new(db, data, path.to_pack, sender)
 
 
 def update_existed(db, data, pack, str_path, sender):

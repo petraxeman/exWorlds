@@ -1,14 +1,16 @@
-from library import utils
+from library import utils, contpath
 from typing import Union
 
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
-    if not data.get("path"):
-        return {"msg": "Undefind operation"}, 401
+    try:
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
+        data["path"] = path.to_table
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401
     
-    parent_pack_path = utils.spath_back(data["path"])
-    parent_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (parent_pack_path,))
+    parent_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
     if not parent_pack:
         return {"msg": "Wrong path"}, 401
@@ -17,7 +19,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         return {"msg": "You can't do that"}, 401
     
     data["owner"] = sender["uid"]
-    if origin := db.fetchone("SELECT * FROM tables WHERE path = %s", (data["path"],)):
+    if origin := db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table,)):
         table = build_table(data, origin)
         db.execute("UPDATE tables SET name = %(name)s, common = %(common)s, data = %(data)s, hash = %(hash)s WHERE path = %(path)s", table)
         return {"msg": "Updating table success", "hash": table["hash"]}

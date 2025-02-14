@@ -1,4 +1,4 @@
-from library import utils
+from library import utils, contpath
 from typing import Union
 
 
@@ -7,9 +7,13 @@ def process(db, data: dict, sender: dict) -> bool:
     if not data.get("path"):
         return {"msg": "Wrong path."}, 401
     
-    table = utils.get_by_path(db, data)
-    pack_path = utils.path_back(data["path"])
-    pack = utils.get_by_path(db, pack_path)
+    try:
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401 
+    
+    table = db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table))
+    pack = db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_pack))
     
     if not pack or not table:
         return {"msg": "Table or pack not found."}, 401
