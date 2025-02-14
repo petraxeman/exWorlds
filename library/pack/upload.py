@@ -24,7 +24,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         return {"msg": "Undefined pack or undefined poster."}, 401
     
     try:
-        path = contpath.ContentPath(data.get("path", ""))
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401
     

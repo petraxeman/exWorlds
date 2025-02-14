@@ -8,7 +8,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     
     if page < 1:
         return {"msg": "Wrong page range"}, 401
-    
+
     query = """
     WITH user_favorites AS (
         SELECT
@@ -21,6 +21,8 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         FROM packs
         WHERE
         (
+            starts_with(path, 'gc:')
+        ) AND (
             NOT hidden OR
             owner = %(user_uid)s OR 
             %(user_uid)s = ANY(redactors) OR
@@ -52,5 +54,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         """
     
     path_list = db.fetchall(query, {"user_uid": sender["uid"], "limit": 10, "offset": 10 * (page - 1), "search_query": search_query})
-    
+
+    path_list = [pack["path"] for pack in path_list or []]
+
     return {"paths": path_list}, 200

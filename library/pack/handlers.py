@@ -13,7 +13,7 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     
     for path in path_list:
         try:
-            path = contpath.ContentPath(path)
+            path = contpath.ContentPath(path, "gc:")
         except contpath.ParsePathException:
             continue
         
@@ -42,7 +42,7 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     hashes = []
     for path in path_list:
         try:
-            path = contpath.ContentPath(path)
+            path = contpath.ContentPath(path, "gc:")
         except contpath.ParsePathException:
             continue
         
@@ -63,7 +63,7 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
 
 def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     try:
-        path = contpath.ContentPath(data.get("path", ""))
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401
     
@@ -82,7 +82,7 @@ def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
 
 def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     try:
-        path = contpath.ContentPath(data.get("path", ""))
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401
 
@@ -91,11 +91,11 @@ def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     if not pack:
         return {"msg": "Wrong path."}
     
-    if data["path"] in sender["lists"][arg]:
-        sender["lists"][arg].pop(data["path"])
+    if path.to_str() in sender["lists"][arg]:
+        sender["lists"][arg].pop(path.to_str())
         pack[arg] -= 1
     else:
-        sender["lists"][arg].append(data["path"])
+        sender["lists"][arg].append(path.to_str())
         pack[arg] += 1
 
     db.execute("UPDATE users SET lists = %s WHERE uid = %s", (sender["lists"], sender['uid']))

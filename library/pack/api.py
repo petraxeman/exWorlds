@@ -44,10 +44,7 @@ def get_systems():
 def get_systems_count():
     db = current_app.extensions["postgresdb"]
     
-    if not request.json.get("startswith", ""):
-        return {"msg": "Undefined pack"}, 401
-    
-    result = db.fetchone("SELECT count(*) FROM packs WHERE starts_with(path, %s)", (request.json["startswith"],))
+    result = db.fetchone("SELECT count(*) FROM packs WHERE starts_with(path, 'gc:')")
     return {"count": result["count"]}
 
 

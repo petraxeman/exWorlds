@@ -5,7 +5,7 @@ from library import contpath
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
     try:
-        path = contpath.ContentPath(data.get("path", ""))
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401
     

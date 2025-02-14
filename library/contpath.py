@@ -1,7 +1,7 @@
 import re
 
 point_re = re.compile(r"^([A-Za-z_][A-Za-z0-9_\-]*)")
-first_point_re = re.compile(r"^(?P<pack>[A-Za-z_][A-Za-z0-9_\-]*):?(?P<addon>[A-Za-z_][A-Za-z0-9_\-]*)?")
+first_point_re = re.compile(r"^[a-z]{2}:(?P<pack>[A-Za-z_][A-Za-z0-9_\-]*):?(?P<addon>[A-Za-z_][A-Za-z0-9_\-]*)?")
 
 class ParsePathException(Exception):
     pass
@@ -12,13 +12,13 @@ class VerifyPathException(Exception):
 
 
 class ContentPath:
-    def __init__(self, path: str):
-        self.pack, self.addon, self.table, self.note = ContentPath.parse(path)
+    def __init__(self, path: str, category: str = None):
+        self.category, self.pack, self.addon, self.table, self.note = ContentPath.parse(path, category)
         
         if self.addon:
-            self.fpack = self.pack + ":" + self.addon
+            self.fpack = self.category + self.pack + ":" + self.addon
         else:
-            self.fpack = self.pack
+            self.fpack = self.category + self.pack
         
         self.pack_exists = True if self.pack else False
         self.addon_exists = True if self.addon else False
@@ -34,25 +34,29 @@ class ContentPath:
         return f"<CPath {self.to_str()}>"
     
     @staticmethod
-    def verify(path: str):
-        for index, point in enumerate(path.split(".")):
-            if index == 0:
-                if not re.fullmatch(first_point_re, point):
-                    return VerifyPathException()
-            else:
-                if not re.fullmatch(point_re, point):
-                    return VerifyPathException()
-    
-    @staticmethod
-    def parse(path: str, verify: bool = True):
-        if verify:
-            ContentPath.verify(path)
+    def parse(path: str, spare_ctg: str = None):
+        available_categories = ["gc:", "ip:", "wo:", "ag:"]
+        if not path[:3] in available_categories and spare_ctg in available_categories:
+            path = spare_ctg + path
+        
+        if path[:3] in available_categories:
+            category = path[:3]
+            if spare_ctg and category != spare_ctg:
+                raise VerifyPathException(f"Expected {spare_ctg}, but got {path[:3]}")
+        else:
+            raise ParsePathException(f"Undefined path category. Possible {available_categories}, got {path[:3]}")
+        
         pack = ''
         addon = None
         table = None
         note = None
         for index, point in enumerate(path.split(".")):
+            if index != 0:
+                if not re.fullmatch(point_re, point):
+                    return VerifyPathException(f"Point have a wrong format {point}")
             if index == 0:
+                if not re.fullmatch(first_point_re, point):
+                    return VerifyPathException(f"First point have a wrong format {point}")
                 groups = re.match(first_point_re, point)
                 pack = groups["pack"]
                 addon = groups["addon"]
@@ -61,8 +65,8 @@ class ContentPath:
             elif index == 2:
                 note = point
             else:
-                return ParsePathException
-        return (pack, addon, table, note)
+                return ParsePathException(f"More points when expected. Expected 3 or less, given {len(path.solit('.'))}")
+        return (category, pack, addon, table, note)
 
 
 if __name__ == "__main__":
