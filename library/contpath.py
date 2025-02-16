@@ -30,6 +30,18 @@ class ContentPath:
         points = [p for p in points if p != None]
         return ".".join(points)
     
+    @property
+    def to_pack(self):
+        return self.fpack
+    
+    @property
+    def to_table(self):
+        return self.fpack + self.table
+    
+    @property
+    def to_note(self):
+        return self.fpack + self.table + self.note
+    
     def __repr__(self):
         return f"<CPath {self.to_str()}>"
     

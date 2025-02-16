@@ -1,12 +1,14 @@
-from library import utils
+from library import utils, contpath
 from typing import Union
 
 
 def by_pack(db, data: dict, sender: dict) -> Union[dict, int]:
-    if not data.get("path", None):
-        return {"msg": "Pack path not found"}, 401
+    try:
+        path = contpath.ContentPath(data.get("path", ""), "gc:")
+    except contpath.ParsePathException:
+        return {"msg": "Wrong path."}, 401
     
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (data["path"],))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
     if not pack:
         return {"msg": "Pack not found"}, 401
@@ -15,8 +17,7 @@ def by_pack(db, data: dict, sender: dict) -> Union[dict, int]:
         if (pack["owner"] != sender["uid"]) and ("server-admin" not in sender["rights"]) and (sender["uid"] not in pack["redactors"]):
             return {"msg": "Pack not found"}, 401
     
-    table_path = "table://" + data["path"].split("://")[1]
-    tables = db.fetchall("SELECT * FROM tables WHERE  starts_with(path, %s)", (table_path,))
+    tables = db.fetchall("SELECT * FROM tables WHERE starts_with(path, %s)", (path.to_pack,))
 
     match data.get("mode", "pathes"):
         case "full":
@@ -35,7 +36,12 @@ def specific(db, data: dict, sender: dict) -> Union[dict, int]:
 
     tables = []
     for path in data["path-list"]:
-        table = get_specific_table(db, path, sender)
+        try:
+            path = contpath.ContentPath(path, "gc:")
+        except contpath.ParsePathException:
+            continue
+        
+        table = get_specific_table(db, path.to_table, sender)
         
         if table:
             tables.append(table)
@@ -52,7 +58,12 @@ def hash(db, data: dict, sender: dict) -> Union[dict, int]:
     
     hashes = []
     for path in data.get("path-list", []):
-        table = get_specific_table(db, path, sender)
+        try:
+            path = contpath.ContentPath(path, "gc:")
+        except contpath.ParsePathException:
+            continue
+        
+        table = get_specific_table(db, path.to_table, sender)
         
         if table:
             hashes.append(table["hash"])

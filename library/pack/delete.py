@@ -11,7 +11,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     
     options = data.get("options", {})
     
-    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_str(),))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     if not pack:
         return {"msg": "Pack not found."}, 401
     
@@ -20,7 +20,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         return {"msg": "You can't do that."}, 401
     
     delete_pack(db, pack, options)    
-    return {"msg": f"System {path.to_str()} deleted."}, 200
+    return {"msg": f"System {path.to_pack} deleted."}, 200
 
 
 
