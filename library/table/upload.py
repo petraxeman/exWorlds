@@ -33,16 +33,16 @@ def build_table(new: dict, origin: dict = {}) -> dict:
         "owner": origin.get("owner") or new.get("owner"),
         "path": origin.get("path") or new.get("path"),
         "common": {
-            "search-fields": new.get("search-fields", []) or origin.get("search-fields", ["name"]),
-            "short-view": new.get("short-view") or origin.get("short-view", ["name"]),
-            "table-icon": new.get("table-icon") or origin.get("table-icon", "opened-book"),
-            "table-display": new.get("search-display") or origin.get("search-display", "list"),
+            "search-fields": new.get("common", {}).get("search-fields", []) or origin.get("common", {}).get("search-fields", ["name"]),
+            "short-view":    new.get("common", {}).get("short-view")        or origin.get("common", {}).get("short-view", ["name"]),
+            "table-icon":    new.get("common", {}).get("table-icon")        or origin.get("common", {}).get("table-icon", "opened-book"),
+            "table-display": new.get("common", {}).get("search-display")    or origin.get("common", {}).get("search-display", "list"),
         },
         "data": {
-            "properties": new.get("properties") or origin.get("properties", {}),
-            "macros": new.get("macros") or origin.get("macros", {}),
-            "schema": new.get("schema") or origin.get("schema", []),
-            "fields": new.get("fields") or origin.get("fields", {})
+            "properties": new.get("data", {}).get("properties") or origin.get("data", {}).get("properties", {}),
+            "macros":     new.get("data", {}).get("macros")     or origin.get("data", {}).get("macros", {}),
+            "schema":     new.get("data", {}).get("schema")     or origin.get("data", {}).get("schema", []),
+            "fields":     new.get("data", {}).get("fields")     or origin.get("data", {}).get("fields", {})
         }
     }
     

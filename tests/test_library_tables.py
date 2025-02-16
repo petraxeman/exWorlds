@@ -81,7 +81,7 @@ def insert_table(db, username):
 
 
 
-def test_table_upload(client, create_user):
+def test_table_upload(db, client, create_user):
     _, _, token = create_user("test-user", "test-passwd")
     
     body = {
@@ -89,26 +89,33 @@ def test_table_upload(client, create_user):
         "path": f"game-system://test-game-system",
         "image-name": "image",
     }
-    client.post("/api/packs/upload", headers = {"auth-token": token}, json = body)
-    
+        
     body = {
         "name": "Test table",
-        "path": "table://test-game-system/test-table",
-        "search-fields": ["name"],
-        "short-view": ["name"],
-        "table-icon": "opened-book",
-        "table-display": "list",
-        "properties": {},
-        "macros": {},
-        "schema": [{"codename": "codename"}, {"codename": "name"}],
-        "fields": {
-            "codename": {"type": "text", "name": "Codename"},
-            "name": {"type": "text", "name": "Name"}
+        "path": "test-game-system.test-table",
+        "common": {
+            "search-fields": ["name"],
+            "short-view": ["name"],
+            "table-icon": "opened-book",
+            "table-display": "list",
+        },
+        "data": {
+            "properties": {},
+            "macros": {},
+            "schema": [{"codename": "codename"}, {"codename": "name"}],
+            "fields": {
+                "codename": {"type": "text", "name": "Codename"},
+                "name": {"type": "text", "name": "Name"}
             }
+        }
     }
+    
     response = client.post("/api/tables/upload", headers = {"auth-token": token}, json = body)
     
+    table = db.fetchone("SELECT * FROM tables WHERE path = 'gc:test-game-system.test-table'")
+    
     assert response.status_code == 200
+    assert table
 
 
 def test_table_get(db, client, create_user):
