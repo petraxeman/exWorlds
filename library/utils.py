@@ -1,7 +1,14 @@
 import hashlib
 import os
-from typing import Any
+from typing import Any, Iterable
 
+
+
+def verify_access(user_uid: str, user_rights: Iterable, expected_rights: set, expected_uids: Iterable) -> bool:
+    existed_rights = expected_rights.intersection(user_rights)
+    if user_uid not in expected_uids and not existed_rights:
+        return False
+    return True
 
 
 def get_password_hash(password: str, salt: str) -> str:

@@ -4,24 +4,22 @@ from typing import Union
 
 
 def process(db, data: dict, sender: dict) -> bool:
-    if not data.get("path"):
-        return {"msg": "Wrong path."}, 401
-    
     try:
         path = contpath.ContentPath(data.get("path", ""), "gc:")
     except contpath.ParsePathException:
         return {"msg": "Wrong path."}, 401 
     
     table = db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table))
-    pack = db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_pack))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack))
     
     if not pack or not table:
         return {"msg": "Table or pack not found."}, 401
     
-    existed_rights = {"delete-table", "any-delete", "server-admin"}.intersection(sender["rights"])
-    if sender["uid"] not in [pack["owner"], *pack["redactors"]] and not existed_rights:
+    if not utils.verify_access(sender["uid"], sender["rights"], {"delete-table", "any-delete", "server-admin"}, (pack["owner"], *pack["redactors"])):
         return {"msg": "You can't do that."}, 401
 
-    db.execute("DELETE FROM tables WHERE path = %s", (table["path"],))
+    db.execute("DELETE FROM tables WHERE path = %s", (path.to_table,))
+    notes_count = db.fetchone("SELECT count(*) FROM notes WHERE starts_with(path, %s)", (path.to_table,))
+    db.execute("DELETE FROM notes WHERE starts_with(path, %s)", (path.to_table,))
     
-    return {"msg": "Table deletion complete"}, 200
+    return {"msg": f"Table {path.to_table} deletion complete. Also deleted {notes_count} notes."}, 200
