@@ -4,18 +4,16 @@ from typing import Union
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-        data["path"] = path.to_table
-    except contpath.ParsePathException:
+    path = contpath.ContentPath(data.get("path", ""), "gc:", "table")
+    if not path:
         return {"msg": "Wrong path."}, 401
     
-    parent_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
-    if not parent_pack:
+    if not pack:
         return {"msg": "Wrong path"}, 401
     
-    if sender["uid"] not in [parent_pack["owner"], *parent_pack["redactors"]] and "server-admin" not in sender["rights"]:
+    if not utils.verify_access(sender["uid"], sender["rights"], {"server-admin"}, (pack["owner"], *pack["redactors"],)):
         return {"msg": "You can't do that"}, 401
     
     data["owner"] = sender["uid"]
