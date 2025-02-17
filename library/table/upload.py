@@ -4,7 +4,7 @@ from typing import Union
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
-    path = contpath.ContentPath(data.get("path", ""), "gc:", "table")
+    path = contpath.ContentPath.safety(data.get("path", ""), "gc:", "table")
     if not path:
         return {"msg": "Wrong path."}, 401
     
@@ -16,6 +16,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     if not utils.verify_access(sender["uid"], sender["rights"], {"server-admin"}, (pack["owner"], *pack["redactors"],)):
         return {"msg": "You can't do that"}, 401
     
+    data["path"] = path.to_table
     data["owner"] = sender["uid"]
     if origin := db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table,)):
         table = build_table(data, origin)

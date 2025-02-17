@@ -14,8 +14,8 @@ class IntegrityPathException(Exception):
 
 
 class ContentPath:
-    def __init__(self, path: str, category: str = None):
-        self.category, self.pack, self.addon, self.table, self.note = ContentPath.parse(path, category)
+    def __init__(self, path: str, spare_ctg: str = None):
+        self.category, self.pack, self.addon, self.table, self.note = ContentPath.parse(path, spare_ctg)
         
         if self.addon:
             self.fpack = self.category + self.pack + ":" + self.addon
@@ -40,11 +40,11 @@ class ContentPath:
     
     @property
     def to_table(self):
-        return self.fpack + self.table
+        return self.fpack + "." + self.table
     
     @property
     def to_note(self):
-        return self.fpack + self.table + self.note
+        return self.fpack + "." + self.table + "." + self.note
     
     def __repr__(self):
         return f"<CPath {self.to_str()}>"
@@ -69,10 +69,10 @@ class ContentPath:
         for index, point in enumerate(path.split(".")):
             if index != 0:
                 if not re.fullmatch(point_re, point):
-                    return VerifyPathException(f"Point have a wrong format {point}")
+                    raise VerifyPathException(f"Point have a wrong format {point}")
             if index == 0:
                 if not re.fullmatch(first_point_re, point):
-                    return VerifyPathException(f"First point have a wrong format {point}")
+                    raise VerifyPathException(f"First point have a wrong format {point}")
                 groups = re.match(first_point_re, point)
                 pack = groups["pack"]
                 addon = groups["addon"]
@@ -81,7 +81,7 @@ class ContentPath:
             elif index == 2:
                 note = point
             else:
-                return ParsePathException(f"More points when expected. Expected 3 or less, given {len(path.solit('.'))}")
+                raise ParsePathException(f"More points when expected. Expected 3 or less, given {len(path.solit('.'))}")
         return (category, pack, addon, table, note)
 
     @classmethod

@@ -3,11 +3,11 @@ from typing import Union
 
 
 def by_pack(db, data: dict, sender: dict) -> Union[dict, int]:
-    path = contpath.ContentPath.safety(data.get("path", ""), "gc:", "table")
-    
+    print(data)
+    path = contpath.ContentPath.safety(data.get("path", ""), "gc:", "pack")
     if not path:
         return {"msg": "Wrong path."}, 401
-    
+
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
     if not pack:
@@ -34,7 +34,7 @@ def specific(db, data: dict, sender: dict) -> Union[dict, int]:
     if 0 >= pathes_count or pathes_count > 10:
         return {"msg": "Tables count is wrong."}, 401
 
-    tables = grab_tables(db, data["path_list"], "full")
+    tables = grab_tables(db, sender, data["path-list"], "full")
     
     if not tables:
         return {"msg": "No one table you send not found."}, 401
@@ -47,7 +47,7 @@ def hash(db, data: dict, sender: dict) -> Union[dict, int]:
     if 0 >= pathes_count or pathes_count > 50:
         return {"msg": "Count of path is wrong."}, 401
     
-    hashes = grab_tables(db, data["path_list"], "hash")
+    hashes = grab_tables(db, sender, data["path-list"], "hash")
     
     if not hashes:
         return {"msg": "No one table you send not found."}, 401
