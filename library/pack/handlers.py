@@ -12,7 +12,7 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     packs = []
     
     for path in path_list:
-        path = contpath.ContentPath.safety(data.get("path", ""))
+        path = contpath.ContentPath.safety(path)
         if not path:
             continue
         
@@ -40,7 +40,7 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     existed_rigths = {"server-admin"}.intersection(sender["rights"])
     hashes = []
     for path in path_list:
-        path = contpath.ContentPath.safety(data.get("path", ""))
+        path = contpath.ContentPath.safety(path)
         if not path:
             continue
         
