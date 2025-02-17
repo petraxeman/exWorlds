@@ -4,9 +4,8 @@ from library import contpath
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-    except contpath.ParsePathException:
+    path = contpath.ContentPath.safety(data.get("path", ""))
+    if not path:
         return {"msg": "Wrong path."}, 401
     
     options = data.get("options", {})

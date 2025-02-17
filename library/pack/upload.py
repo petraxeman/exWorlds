@@ -10,9 +10,8 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("path") or not data.get("image-name"):
         return {"msg": "Undefined pack or undefined poster."}, 401
     
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-    except contpath.ParsePathException:
+    path = contpath.ContentPath.safety(data.get("path", ""))
+    if not path:
         return {"msg": "Wrong path."}, 401
     
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
