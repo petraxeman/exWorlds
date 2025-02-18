@@ -3,7 +3,6 @@ from typing import Union
 
 
 def by_pack(db, data: dict, sender: dict) -> Union[dict, int]:
-    print(data)
     path = contpath.ContentPath.safety(data.get("path", ""), "gc:", "pack")
     if not path:
         return {"msg": "Wrong path."}, 401

@@ -87,7 +87,7 @@ def test_table_upload(db, client, create_user):
     
     body = {
         "name": "Test game system",
-        "path": "test-game-system",
+        "path": "gc:test-game-system",
         "image-name": "image",
     }
     client.post("/api/packs/upload", headers = {"auth-token": token}, json = body)
@@ -169,5 +169,4 @@ def test_table_get_by_pack(db, client, create_user):
     
     response = client.post("/api/tables/get-by-pack", headers = {"auth-token": token}, json = {"path": "gc:test-game-system"})
     
-    print(response.json)
     assert response.status_code == 200
