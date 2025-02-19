@@ -4,12 +4,15 @@ from typing import Union
 
 
 def process(db, data: dict, sender: dict) -> bool:
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-    except contpath.ParsePathException:
-        return {"msg": "Wrong path."}, 401 
+    path = contpath.ContentPath.safety(data.get("path", ""), "gc:", "pack")
+    if not path:
+        return {"msg": "Wrong path."}, 401
     
     table = db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table))
+    
+    if table["unchangable"]:
+        return {"msg": "You can't do that."}, 401
+    
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack))
     
     if not pack or not table:
