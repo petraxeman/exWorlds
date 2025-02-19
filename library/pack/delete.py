@@ -48,4 +48,6 @@ def delete_pack(db, pack: dict, options: dict) -> bool:
         ))
     """, {"path_to_remove": pack["path"]})
     
+    db.execute("DELETE FROM tables WHERE starts_with(path, %s)", (pack["path"]))
+    
     return True
