@@ -26,18 +26,15 @@ class ContentPath:
             "note": note or False,
         }
         
-        if self.addon:
-            self.points["fpack"] = self.category + self.pack + ":" + self.addon
+        if self.points["addon"]:
+            self.points["fpack"] = self.points["category"] + self.points["pack"] + ":" + self.points["addon"]
         else:
-            self.points["fpack"] = self.category + self.pack
+            self.points["fpack"] = self.points["category"] + self.points["pack"]
     
     def to_str(self):
-        points = [self.fpack, self.table, self.note]
-        points = [p for p in points if p != None]
+        points = [self.points["fpack"], self.points["table"], self.points["note"]]
+        points = [p for p in points if p]
         return ".".join(points)
-    
-    def set_point(self, point: str, value: str):
-        pass
     
     def duplicate(self):
         return copy.deepcopy(self)
@@ -96,7 +93,7 @@ class ContentPath:
     def safety(cls, path: str, spare_ctg: str = None, expected: str = None):
         try:
             path_object = cls(path, spare_ctg)
-            if expected and not path_object.availables[expected]:
+            if expected and not path_object.points[expected]:
                 raise IntegrityPathException("Expectend end point is not available.")
             return path_object
         except (ParsePathException, VerifyPathException, IntegrityPathException):

@@ -33,9 +33,9 @@ def update_existed(db, data, pack, str_path, sender):
 
 
 def upload_new(db, data: dict, path: contpath.ContentPath, sender: dict) -> Union[dict, int]:
-    if path.category == "gc:":
+    if path.points["category"] == "gc:":
         rules = utils.build_table({"name": "Rules", "path": path.to_pack + ".rules"})
-        macros = utils.build_table({"name": "Rules", "path": path.to_pack + ".rules"})
+        macros = utils.build_table({"name": "Macros", "path": path.to_pack + ".macros"})
         db.execute("INSERT INTO tables (unchangable, name, path, owner, common, data, hash) VALUES (true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", rules)
         db.execute("INSERT INTO tables (unchangable, name, path, owner, common, data, hash) VALUES (true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", macros)
         

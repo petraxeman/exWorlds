@@ -6,13 +6,13 @@ import datetime
 
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def app():
     app = library.create_app()
     yield app
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def db(app):
     return app.extensions["postgresdb"]
 
@@ -44,15 +44,34 @@ def create_user(db, app):
 
 @pytest.fixture(autouse=True)
 def run_after(db):
+    clear_db(db)
     yield
-    db.execute("DELETE FROM users WHERE username = 'test-user'")
-    db.execute("DELETE FROM users WHERE username = 'test-admin'")
-    db.execute("DELETE FROM users WHERE username = 'another-user'")
+    clear_db(db)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def run_after_all(db):
+    yield
+    clear_db(db)
+
+
+def clear_db(_db):
+    _db.execute("DELETE FROM users WHERE username = 'test-user'")
+    _db.execute("DELETE FROM users WHERE username = 'test-admin'")
+    _db.execute("DELETE FROM users WHERE username = 'another-user'")
     
-    db.execute("DELETE FROM packs WHERE path = %s", ("gc:test-game-system",))
-    db.execute("DELETE FROM packs WHERE path = %s", ("gc:game-system",))
+    _db.execute("DELETE FROM packs WHERE path = %s", ("gc:test-game-system",))
+    _db.execute("DELETE FROM tables WHERE path = %s", ("gc:test-game-system.rules",))
+    _db.execute("DELETE FROM tables WHERE path = %s", ("gc:test-game-system.macros",))
+    
+    _db.execute("DELETE FROM packs WHERE path = %s", ("gc:game-system",))
+    
     for i in range(10):
-        db.execute("DELETE FROM packs WHERE path = %s", (f"gc:test-game-system-{i}",))
+        _db.execute("DELETE FROM packs WHERE path = %s", (f"gc:test-game-system-{i}",))
+        _db.execute("DELETE FROM tables WHERE path = %s", (f"gc:test-game-system-{i}.rules",))
+        _db.execute("DELETE FROM tables WHERE path = %s", (f"gc:test-game-system-{i}.macros",))
+        
+
 
 #
 # upload.py
