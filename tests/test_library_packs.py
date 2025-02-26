@@ -320,7 +320,6 @@ def test_get_by_page(client, create_user):
 #
 
 def test_delete(db, client, create_user):
-    print("\n---")
     _, _, token_1 = create_user("test-user", "test-passwd")
     _, _, token_2 = create_user("another-user", "test-passwd")
     
@@ -330,7 +329,7 @@ def test_delete(db, client, create_user):
             "image-name": "image",
         }
     client.post("/api/packs/upload", headers = {"auth-token": token_1}, json = body)
-    
+
     assert db.fetchone("SELECT * FROM packs")
     
     client.post("/api/packs/delete", headers = {"auth-token": token_2}, json = {"path": "gc:test-game-system"})
@@ -340,4 +339,3 @@ def test_delete(db, client, create_user):
     client.post("/api/packs/delete", headers = {"auth-token": token_1}, json = {"path": "gc:test-game-system"})
 
     assert not db.fetchone("SELECT * FROM packs")
-    print("---")

@@ -28,7 +28,7 @@ def delete_pack(db, pack: dict, options: dict) -> bool:
         db.execute("DELETE FROM images WHERE codename = %s", (pack["image_name"],))
 
     db.execute("DELETE FROM packs WHERE path = %s", (pack["path"],))
-    
+
     db.execute("""
         UPDATE users
         SET lists = jsonb_set(
@@ -41,13 +41,15 @@ def delete_pack(db, pack: dict, options: dict) -> bool:
             '{likes}',
             (lists->'likes') - %(path_to_remove)s,
             true
-        ) WHERE %(path_to_remove)s = ANY(ARRAY(
-            SELECT jsonb_array_elements_text(lists->'favorites')
-            UNION
-            SELECT jsonb_array_elements_text(lists->'likes')
-        ))
-    """, {"path_to_remove": str(pack["path"])})
+        ) WHERE %(path_to_remove)s = ANY(
+            ARRAY(
+                SELECT jsonb_array_elements_text(lists->'favorites')
+                UNION
+                SELECT jsonb_array_elements_text(lists->'likes')
+            )
+        );
+    """, {"path_to_remove": pack["path"]})
     
-    db.execute("DELETE FROM tables WHERE starts_with(path, %s)", (pack["path"]))
+    db.execute("DELETE FROM tables WHERE starts_with(path, %s)", (pack["path"],))
     
     return True
