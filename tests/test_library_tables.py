@@ -52,7 +52,8 @@ def run_after(db):
     db.execute("DELETE FROM packs WHERE path = %s", ("gc:test-game-system",))
 
     db.execute("DELETE FROM tables WHERE path = 'gc:test-game-system.test-table'")
-    db.execute("DELETE FROM tables WHERE path = 'test-game-system.test-table'")
+    db.execute("DELETE FROM tables WHERE path = 'gc:test-game-system.rules'")
+    db.execute("DELETE FROM tables WHERE path = 'gc:test-game-system.macros'")
     
 
 def insert_table(db, username):

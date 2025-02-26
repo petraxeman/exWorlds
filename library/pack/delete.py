@@ -26,7 +26,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
 def delete_pack(db, pack: dict, options: dict) -> bool:
     if options.get("delete-poster", True):
         db.execute("DELETE FROM images WHERE codename = %s", (pack["image_name"],))
-    
+
     db.execute("DELETE FROM packs WHERE path = %s", (pack["path"],))
     
     db.execute("""
@@ -46,7 +46,7 @@ def delete_pack(db, pack: dict, options: dict) -> bool:
             UNION
             SELECT jsonb_array_elements_text(lists->'likes')
         ))
-    """, {"path_to_remove": pack["path"]})
+    """, {"path_to_remove": str(pack["path"])})
     
     db.execute("DELETE FROM tables WHERE starts_with(path, %s)", (pack["path"]))
     
