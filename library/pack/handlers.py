@@ -12,9 +12,8 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     packs = []
     
     for path in path_list:
-        try:
-            path = contpath.ContentPath(path, "gc:")
-        except contpath.ParsePathException:
+        path = contpath.ContentPath.safety(path)
+        if not path:
             continue
         
         pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
@@ -41,9 +40,8 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     existed_rigths = {"server-admin"}.intersection(sender["rights"])
     hashes = []
     for path in path_list:
-        try:
-            path = contpath.ContentPath(path, "gc:")
-        except contpath.ParsePathException:
+        path = contpath.ContentPath.safety(path)
+        if not path:
             continue
         
         pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
@@ -62,9 +60,8 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
 
 
 def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-    except contpath.ParsePathException:
+    path = contpath.ContentPath.safety(data.get("path", ""))
+    if not path:
         return {"msg": "Wrong path."}, 401
     
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
@@ -81,9 +78,8 @@ def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
 
 
 def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-    except contpath.ParsePathException:
+    path = contpath.ContentPath.safety(data.get("path", ""))
+    if not path:
         return {"msg": "Wrong path."}, 401
 
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))

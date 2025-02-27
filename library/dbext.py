@@ -5,7 +5,7 @@ from psycopg2.extras import execute_values
 from contextlib import contextmanager
 from typing import List, Tuple, Any
 
-
+from traceback import format_exc
 
 class Postgres:
     def __init__(self, app=None):
@@ -59,7 +59,7 @@ class Postgres:
                     cur.execute(query, args)
                     conn.commit()
         except Exception as e:
-            raise RuntimeError(f"Query execution error: {e}")
+            raise RuntimeError(f"Query execution error: {e}\nTraceback:\n{format_exc()}")
 
     def fetchall(self, query: str, args: Tuple | dict = None) -> List[Tuple[Any]]:
         try:

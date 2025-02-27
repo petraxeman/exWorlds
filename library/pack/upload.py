@@ -10,9 +10,8 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     if not data.get("path") or not data.get("image-name"):
         return {"msg": "Undefined pack or undefined poster."}, 401
     
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-    except contpath.ParsePathException:
+    path = contpath.ContentPath.safety(data.get("path", ""))
+    if not path:
         return {"msg": "Wrong path."}, 401
     
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
@@ -20,7 +19,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     if pack:
         return update_existed(db, data, pack, path.to_pack, sender)
     else:
-        return upload_new(db, data, path.to_pack, sender)
+        return upload_new(db, data, path, sender)
 
 
 def update_existed(db, data, pack, str_path, sender):
@@ -33,14 +32,20 @@ def update_existed(db, data, pack, str_path, sender):
     return {"hash": new_pack["hash"]}, 200
 
 
-def upload_new(db, data, str_path, sender):
+def upload_new(db, data: dict, path: contpath.ContentPath, sender: dict) -> Union[dict, int]:
+    if path.points["category"] == "gc:":
+        rules = utils.build_table({"name": "Rules", "path": path.to_pack + ".rules"})
+        macros = utils.build_table({"name": "Macros", "path": path.to_pack + ".macros"})
+        db.execute("INSERT INTO tables (unchangable, name, path, owner, common, data, hash) VALUES (true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", rules)
+        db.execute("INSERT INTO tables (unchangable, name, path, owner, common, data, hash) VALUES (true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", macros)
+        
     existed_rights = {"create-pack", "any-create", "server-admin"}.intersection(sender["rights"])
     if not existed_rights:
         return {"msg": "You can't do that."}, 401
     
     new_pack = build_pack(data, {})
     db.execute("INSERT INTO packs (name, image_name, path, owner, hash) VALUES (%s, %s, %s, %s, %s)",
-                (new_pack["name"], new_pack["image-name"], str_path, sender["uid"], new_pack["hash"]))
+                (new_pack["name"], new_pack["image-name"], path.to_pack, sender["uid"], new_pack["hash"]))
     
     return {"hash": new_pack["hash"]}, 200
 

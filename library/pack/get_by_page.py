@@ -5,6 +5,7 @@ from typing import Union
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
     page = int(data.get("page", 1))
     search_query = str(data.get("search", ""))
+    starts_with = str(data.get("starts-with", ""))
     
     if page < 1:
         return {"msg": "Wrong page range"}, 401
@@ -21,7 +22,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         FROM packs
         WHERE
         (
-            starts_with(path, 'gc:')
+            starts_with(path, %(starts_with)s)
         ) AND (
             NOT hidden OR
             owner = %(user_uid)s OR 
@@ -53,7 +54,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         LIMIT %(limit)s OFFSET %(offset)s;
         """
     
-    path_list = db.fetchall(query, {"user_uid": sender["uid"], "limit": 10, "offset": 10 * (page - 1), "search_query": search_query})
+    path_list = db.fetchall(query, {"user_uid": sender["uid"], "limit": 10, "offset": 10 * (page - 1), "search_query": search_query, "starts_with": starts_with})
 
     path_list = [pack["path"] for pack in path_list or []]
 

@@ -4,49 +4,27 @@ from typing import Union
 
 
 def process(db, data: dict, sender: dict) -> Union[dict, int]:
-    try:
-        path = contpath.ContentPath(data.get("path", ""), "gc:")
-        data["path"] = path.to_table
-    except contpath.ParsePathException:
+    path = contpath.ContentPath.safety(data.get("path", ""), "gc:", "table")
+    if not path:
         return {"msg": "Wrong path."}, 401
     
-    parent_pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
+    pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
-    if not parent_pack:
+    if not pack:
         return {"msg": "Wrong path"}, 401
     
-    if sender["uid"] not in [parent_pack["owner"], *parent_pack["redactors"]] and "server-admin" not in sender["rights"]:
+    if not utils.verify_access(sender["uid"], sender["rights"], {"server-admin"}, (pack["owner"], *pack["redactors"],)):
         return {"msg": "You can't do that"}, 401
     
+    data["path"] = path.to_table
     data["owner"] = sender["uid"]
     if origin := db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table,)):
-        table = build_table(data, origin)
+        if origin["unchangable"]:
+            return {"msg": "You can't do that"}, 401
+        table = utils.build_table(data, origin)
         db.execute("UPDATE tables SET name = %(name)s, common = %(common)s, data = %(data)s, hash = %(hash)s WHERE path = %(path)s", table)
         return {"msg": "Updating table success", "hash": table["hash"]}
     else:
-        table = build_table(data)
+        table = utils.build_table(data)
         db.execute("INSERT INTO tables (name, path, owner, common, data, hash) VALUES (%(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", table)
         return {"msg": "Creating table success", "hash": table["hash"]}
-
-
-def build_table(new: dict, origin: dict = {}) -> dict:
-    table = {
-        "name": new.get("name") or origin.get("name"),
-        "owner": origin.get("owner") or new.get("owner"),
-        "path": origin.get("path") or new.get("path"),
-        "common": {
-            "search-fields": new.get("search-fields", []) or origin.get("search-fields", ["name"]),
-            "short-view": new.get("short-view") or origin.get("short-view", ["name"]),
-            "table-icon": new.get("table-icon") or origin.get("table-icon", "opened-book"),
-            "table-display": new.get("search-display") or origin.get("search-display", "list"),
-        },
-        "data": {
-            "properties": new.get("properties") or origin.get("properties", {}),
-            "macros": new.get("macros") or origin.get("macros", {}),
-            "schema": new.get("schema") or origin.get("schema", []),
-            "fields": new.get("fields") or origin.get("fields", {})
-        }
-    }
-    
-    table["hash"] = utils.get_hash(str(table))
-    return table
