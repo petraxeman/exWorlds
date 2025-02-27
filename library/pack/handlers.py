@@ -1,5 +1,5 @@
 from typing import Union
-from library import contpath
+from library import utils, contpath
 
 
 def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
@@ -8,7 +8,6 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
     if 0 > len(path_list) > 30:
         return {"msg": "Undefined path list."}, 401
     
-    existed_rigths = {"server-admin"}.intersection(sender["rights"])
     packs = []
     
     for path in path_list:
@@ -20,7 +19,10 @@ def process_pack_get(db, data: dict, sender: dict) -> Union[dict, int]:
         
         if pack:
             if pack.get("hidden", False):
-                if sender["uid"] not in [pack["owner"], *pack["redactors"]] and not existed_rigths:
+                if not utils.verify_access(
+                    sender["uid"], sender["rights"],
+                    {"server-admin"}, (pack["owner"], *pack["redactors"])):
+                    
                     continue
             
             packs.append(pack)
@@ -37,8 +39,8 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
     if 0 > len(path_list) > 50:
         return {"msg": "Undefined path list."}, 401
     
-    existed_rigths = {"server-admin"}.intersection(sender["rights"])
     hashes = []
+
     for path in path_list:
         path = contpath.ContentPath.safety(path)
         if not path:
@@ -48,9 +50,12 @@ def process_pack_get_hash(db, data: dict, sender: dict) -> Union[dict, int]:
         
         if pack:
             if pack.get("hidden", False):
-                if sender["uid"] not in [pack["owner"], *pack["redactors"]] and not existed_rigths:
+                if not utils.verify_access(
+                    sender["uid"], sender["rights"],
+                    {"server-admin"}, (pack["owner"], *pack["redactors"])):
+                    
                     continue
-
+            
             hashes.append(pack.get("hash"))
         
     if not hashes:
@@ -66,10 +71,20 @@ def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
     
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
 
+    if pack("hidden", False):
+        if not utils.verify_access(
+            sender["uid"], sender["rights"],
+            {"server-admin"}, (pack["owner"], *pack["redactors"])):
+    
+            return {"msg": "Wrong path."}
+    
     if not pack:
         return {"msg": "Wrong path."}
     
-    if sender["uid"] != pack["owner"] and "server-admin" not in sender["rights"]:
+    if not utils.verify_access(
+        sender["uid"], sender["rights"],
+        {"server-admin"}, (pack["owner"],)):
+    
         return {"msg": "You can't do that."}, 401
     
     db.execute(f"UPDATE packs SET {arg} = %s WHERE path = %s", (not pack[arg], pack["path"]))
@@ -84,8 +99,12 @@ def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
 
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
-    if not pack:
-        return {"msg": "Wrong path."}
+    if pack("hidden", False):
+        if not utils.verify_access(
+            sender["uid"], sender["rights"],
+            {"server-admin"}, (pack["owner"], *pack["redactors"])):
+    
+            return {"msg": "Wrong path."}
     
     if path.to_pack in sender["lists"][arg]:
         sender["lists"][arg].pop(path.to_pack)
