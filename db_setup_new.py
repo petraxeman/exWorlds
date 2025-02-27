@@ -70,7 +70,8 @@ CREATE TABLE IF NOT EXISTS tables (
   name TEXT,
   path TEXT PRIMARY KEY,
   owner UUID,
-  unchangable BOOL DEFAULT false,
+  system_table BOOL DEFAULT false,
+  changeable_schema BOOL DEFAULT false,
   common JSONB,
   data JSONB,
   hash TEXT
