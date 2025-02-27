@@ -29,14 +29,14 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
             %(user_uid)s = ANY(redactors) OR
             'server-admin' = ANY(ARRAY(SELECT rights FROM users WHERE uid = %(user_uid)s))
         )
-    )"""
+    ) SELECT filtered_packs.*
+    FROM filtered_packs
+    LEFT JOIN user_favorites
+    ON filtered_packs.path = ANY(COALESCE(user_favorites.favorite_paths, ARRAY['']))
+    """
 
     if search_query:
         query += """
-        SELECT filtered_packs.*
-        FROM filtered_packs
-        LEFT JOIN user_favorites
-        ON filtered_packs.path = ANY(COALESCE(user_favorites.favorite_paths, ARRAY['']))
         ORDER BY
             filtered_packs.path = ANY(COALESCE(user_favorites.favorite_paths, ARRAY[''])) DESC,
             similarity(filtered_packs.search_field, %(search_query)s) DESC
@@ -44,10 +44,6 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
         """
     else:
         query += """
-        SELECT filtered_packs.*
-        FROM filtered_packs
-        LEFT JOIN user_favorites
-        ON filtered_packs.path = ANY(COALESCE(user_favorites.favorite_paths, ARRAY['']))
         ORDER BY
             filtered_packs.path = ANY(COALESCE(user_favorites.favorite_paths, ARRAY[''])) DESC,
             filtered_packs.likes DESC
