@@ -1,5 +1,5 @@
 from typing import Union
-from library import contpath
+from library import utils, contpath
 
 
 
@@ -14,8 +14,11 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     if not pack:
         return {"msg": "Pack not found."}, 401
     
-    existed_rights = {"delete-pack", "any-delete", "server-admin"}.intersection(sender["rights"])
-    if sender["uid"] != pack["owner"] and (not existed_rights):
+    if not utils.verify_access(
+        sender["uid"], sender["rights"],
+        {"delete-pack", "any-delete", "server-admin"},
+        (pack["owner"],)
+        ):
         return {"msg": "You can't do that."}, 401
     
     delete_pack(db, pack, options)    
@@ -51,5 +54,6 @@ def delete_pack(db, pack: dict, options: dict) -> bool:
     """, {"path_to_remove": pack["path"]})
     
     db.execute("DELETE FROM tables WHERE starts_with(path, %s)", (pack["path"],))
-    
+    db.execute("DELETE FROM notes WHERE starts_with(path, %s)", (pack["path"],))
+
     return True
