@@ -70,16 +70,9 @@ def toggle(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
         return {"msg": "Wrong path."}, 401
     
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
-
-    if pack("hidden", False):
-        if not utils.verify_access(
-            sender["uid"], sender["rights"],
-            {"server-admin"}, (pack["owner"], *pack["redactors"])):
-    
-            return {"msg": "Wrong path."}
     
     if not pack:
-        return {"msg": "Wrong path."}
+        return {"msg": "Wrong path."}, 401
     
     if not utils.verify_access(
         sender["uid"], sender["rights"],
@@ -99,12 +92,11 @@ def toggle_list(db, data: dict, sender: dict, arg: str) -> Union[dict, int]:
 
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack,))
     
-    if pack("hidden", False):
-        if not utils.verify_access(
-            sender["uid"], sender["rights"],
-            {"server-admin"}, (pack["owner"], *pack["redactors"])):
+    if not utils.verify_access(
+        sender["uid"], sender["rights"],
+        {"server-admin"}, (pack["owner"],)):
     
-            return {"msg": "Wrong path."}
+        return {"msg": "You can't do that."}, 401
     
     if path.to_pack in sender["lists"][arg]:
         sender["lists"][arg].pop(path.to_pack)
