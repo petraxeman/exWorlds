@@ -1,5 +1,5 @@
 from typing import Union
-from library import utils, contpath
+from library import utils, contpath, search_utils
 
 
 
@@ -23,8 +23,8 @@ def process(db, data: dict, sender: dict) -> Union[tuple, int]:
                    (note["fields"], note["schema"], path.to_pack))
     else:
         note = build_note(data)
-        db.execute("INSERT INTO notes (owner, path, fields, schema) VALUES (%s, %s, %s, %s)",
-                   (sender["uid"]), path.to_note, note["fields"], note["schema"])
+        db.execute("INSERT INTO notes (owner, path, fields, schema, hash) VALUES (%s, %s, %s, %s, %s)",
+                   (sender["uid"]), path.to_note, note["fields"], note["schema"], note["hash"])
     return {"msg": "Note upload success"}
 
 
@@ -36,4 +36,11 @@ def build_note(new: dict, origin: dict = {}):
         "schema": new.get("schema") or origin.get("schema"),
     }
     new_note["hash"] = utils.get_hash(str(new_note["fields"]) + " " + str(new_note["schema"]))
+    
+    new_note["search_field"] = ""
+    for field in new_note["fields"]:
+        if new_note[field]["type"] in ("string", "text",):
+            new_note += new_note[field]["value"]
+    new_note["search_field"] = search_utils.make_ngram(new_note["search_field"], 3, 4)
+    
     return new_note

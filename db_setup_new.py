@@ -80,8 +80,10 @@ CREATE TABLE IF NOT EXISTS tables (
 CREATE TABLE IF NOT EXISTS notes (
   owner UUID,
   path TEXT PRIMARY KEY,
+  search_field TEXT,
   fields JSONB,
   schema JSONB,
+  hash TEXT,
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 
