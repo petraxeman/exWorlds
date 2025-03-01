@@ -59,6 +59,8 @@ class Postgres:
                     cur.execute(query, args)
                     conn.commit()
         except Exception as e:
+            print(query)
+            print(args)
             raise RuntimeError(f"Query execution error: {e}\nTraceback:\n{format_exc()}")
 
     def fetchall(self, query: str, args: Tuple | dict = None) -> List[Tuple[Any]]:
@@ -72,7 +74,9 @@ class Postgres:
                     else:
                         return None
         except Exception as e:
-            raise RuntimeError(f"Fetch all error: {e}")
+            print(query)
+            print(args)
+            raise RuntimeError(f"Fetch all error: {e}\nTraceback:\n{format_exc()}")
     
     def fetchone(self, query: str, args: Tuple = None) -> List[Tuple[Any]]:
         "Выполнение запроса с возвратом одного результатов."
@@ -86,7 +90,9 @@ class Postgres:
                     else:
                         return None
         except Exception as e:
-            raise RuntimeError(f"Fetch all error: {e}")
+            print(query)
+            print(args)
+            raise RuntimeError(f"Fetch one error: {e}\nTraceback:\n{format_exc()}")
     
     def batch_insert(self, query: str, values: List[Tuple]) -> None:
         "Быстрая вставка нескольких записей."
@@ -96,7 +102,9 @@ class Postgres:
                     execute_values(cur, query, values)
                     conn.commit()
         except Exception as e:
-            raise RuntimeError(f"Batch insert error: {e}")
+            print(query)
+            print(values)
+            raise RuntimeError(f"Batch insert error: {e}\nTraceback:\n{format_exc()}")
     
     def get_user_by_username(self, username: str):
         query = "SELECT * FROM users WHERE username = %s"
@@ -105,3 +113,16 @@ class Postgres:
             return result
         else:
             return None
+
+    def mogrify(self, query: str, args: Tuple = None) -> None:
+        "Выполнение запроса без возврата данных."
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cur:
+                    response = cur.mogrify(query, args)
+                    print(response)
+                    return response
+        except Exception as e:
+            print(query)
+            print(args)
+            raise RuntimeError(f"Mogrigy execution error: {e}\nTraceback:\n{format_exc()}")

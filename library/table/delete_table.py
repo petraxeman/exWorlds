@@ -10,7 +10,7 @@ def process(db, data: dict, sender: dict) -> bool:
     
     table = db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table))
     
-    if table["unchangable"]:
+    if table["system_table"]:
         return {"msg": "You can't do that."}, 401
     
     pack = db.fetchone("SELECT * FROM packs WHERE path = %s", (path.to_pack))

@@ -19,7 +19,7 @@ def process(db, data: dict, sender: dict) -> Union[dict, int]:
     data["path"] = path.to_table
     data["owner"] = sender["uid"]
     if origin := db.fetchone("SELECT * FROM tables WHERE path = %s", (path.to_table,)):
-        if origin["unchangable"]:
+        if origin["system_table"]:
             return {"msg": "You can't do that"}, 401
         table = utils.build_table(data, origin)
         db.execute("UPDATE tables SET name = %(name)s, common = %(common)s, data = %(data)s, hash = %(hash)s WHERE path = %(path)s", table)
