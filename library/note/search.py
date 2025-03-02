@@ -80,8 +80,11 @@ def by_query(db, data: dict, sender: dict) -> Union[tuple, int]:
     
     comparisons_queries = []
     comparisons_args = {}
+    full_text_search = ""
+    
     for index, filter in enumerate(filters):
         if filter["codename"] in ("~full_text_search",):
+            full_text_search = filter["value"]
             continue
         
         comparisons_args[f"f{index}_codename"] = filter["codename"]
@@ -103,6 +106,11 @@ def by_query(db, data: dict, sender: dict) -> Union[tuple, int]:
 
     query += " AND ".join(comparisons_queries)
     args.update(comparisons_args)
+    
+    if full_text_search:
+        query += " ORDER BY similarity(search_field, %(full_text_search)s) DESC"
+        args["full_text_search"] = full_text_search
+    
     query += " LIMIT %(limit)s OFFSET %(offset)s;"
     
     notes = db.fetchall(query, args)

@@ -21,14 +21,14 @@ def process(db, data: dict, sender: dict) -> Union[tuple, int]:
     
     if db_note := db.fetchone("SELECT * FROM notes WHERE path = %s", (path.to_note,)):
         note = build_note(data, db_note)
-        note["fields"] = verify_fields(note["fields"], table)
-        db.execute("UPDATE notes SET fields = %s, schema = %s WHERE path = %s", 
-                   (note["fields"], note["schema"], path.to_pack))
+        search_field, note["fields"] = verify_fields(note["fields"], table)
+        db.execute("UPDATE notes SET search_field = %s fields = %s, schema = %s WHERE path = %s", 
+                   (search_field, note["fields"], note["schema"], path.to_pack))
     else:
         note = build_note(data)
-        note["fields"] = verify_fields(note["fields"], table)
+        search_field, note["fields"] = verify_fields(note["fields"], table)
         db.execute("INSERT INTO notes (owner, path, search_field, fields, schema, hash) VALUES (%s, %s, %s, %s, %s, %s)",
-                   (sender["uid"], path.to_note, note["search_field"], note["fields"], note["schema"], note["hash"],))
+                   (sender["uid"], path.to_note, search_field, note["fields"], note["schema"], note["hash"],))
     
     return {"msg": "Note upload success"}
 
@@ -40,34 +40,39 @@ def build_note(new: dict, origin: dict = {}):
     }
     new_note["hash"] = utils.get_hash(str(new_note["fields"]) + " " + str(new_note["schema"]))
     
-    new_note["search_field"] = ""
-    #for field in new_note["fields"]:
-    #    if new_note[field]["type"] in ("string", "text",):
-    #        new_note += new_note[field]["value"]
-    #new_note["search_field"] = search_utils.make_ngram(new_note["search_field"], 3, 4)
-    
     return new_note
 
 
 def verify_fields(fields: dict, table: dict) -> dict:
     nfields = fields.copy()
-
+    search_field = ""
+    
     for key in nfields:
         finfo = table["data"]["fields"][key]
-        match finfo["type"]:
-            case "dice":
-                if not isinstance(nfields[key], str):
-                    continue
-                minv, avgv, maxv = parse_dice(nfields[key])
-                nfields[key] = {"min": minv, "avg": avgv, "max": maxv, "rec": nfields[key]}
-            case "integer":
-                value = numexpr.evaluate(str(nfields[key]))
-                nfields[key] = {"min": int(value), "avg": int(value), "max": int(value), "rec": nfields[key]}
-            case "float":
-                value = numexpr.evaluate(str(nfields[key]))
-                nfields[key] = {"min": float(value), "avg": float(value), "max": float(value), "rec": nfields[key]}
-                
-    return nfields
+        if not isinstance(nfields[key], dict):
+            match finfo["type"]:
+                case "dice":
+                    if not isinstance(nfields[key], str):
+                        continue
+                    minv, avgv, maxv = parse_dice(nfields[key])
+                    nfields[key] = {"min": minv, "avg": avgv, "max": maxv, "rec": nfields[key]}
+                case "integer":
+                    value = numexpr.evaluate(str(nfields[key]))
+                    nfields[key] = {"min": int(value), "avg": int(value), "max": int(value), "rec": nfields[key]}
+                case "float":
+                    value = numexpr.evaluate(str(nfields[key]))
+                    nfields[key] = {"min": float(value), "avg": float(value), "max": float(value), "rec": nfields[key]}
+                case _:
+                    nfields[key] = {"value": nfields[key]}
+        else:
+            nfields[key] = {"value": nfields[key].get("value")}
+        
+        if key in table["common"]["search-fields"]:
+            search_field += " " + nfields[key]["value"]
+    
+    search_field = search_utils.make_ngram(search_field.strip(), 3, 4)
+
+    return search_field, nfields
 
 
 def parse_dice(dice_str: str):
@@ -82,8 +87,7 @@ def parse_dice(dice_str: str):
         elif re.fullmatch(r"\d+", str(el)):
             dice_min.append(el)
             dice_max.append(el)
-    print(" ".join(dice_min))
-    print(" ".join(dice_max))
+
     min_value = int(numexpr.evaluate(" ".join(dice_min)))
     max_value = int(numexpr.evaluate(" ".join(dice_max)))
     

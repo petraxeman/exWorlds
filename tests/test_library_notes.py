@@ -159,8 +159,21 @@ def test_note_get_by_query(db, client, create_user):
     data = {
         "path": "gc:test-game-system.test-table.test-note",
         "fields": {
-            "codename": "Heroine",
+            "codename": "heroine",
             "name": "Heroine in heroine",
+            "damage": 100, 
+            "is-work": True,
+            "damage-dices": "1d20"
+            }
+        }
+    
+    client.post("/api/notes/upload", headers = {"auth-token": token}, json = data)
+    
+    data = {
+        "path": "gc:test-game-system.test-table.test-note2",
+        "fields": {
+            "codename": "heroinexxx",
+            "name": "Woman in the shirt",
             "damage": 100, 
             "is-work": True,
             "damage-dices": "1d20"
@@ -175,10 +188,14 @@ def test_note_get_by_query(db, client, create_user):
             "source": "gc:test-game-system.test-table"
         },
         "filters": [
-            {"codename": "damage", "check": "avg", "min": 10, "max": 1000}
+            {"codename": "damage", "check": "avg", "min": 10, "max": 1000}, 
+            {"codename": "~full_text_search", "value": "Woman"}
         ]
     }
     
     response = client.post("/api/notes/search", headers = {"auth-token": token}, json = data)
 
+    print(db.fetchall("SELECT * FROM notes;"))
+    
+    print(response.json)
     assert response.status_code == 200
