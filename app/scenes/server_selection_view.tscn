@@ -1,0 +1,109 @@
+[gd_scene load_steps=3 format=3 uid="uid://cdlbo2fs377w8"]
+
+[ext_resource type="Script" path="res://scenes/server_selection_view.gd" id="1_k53bw"]
+[ext_resource type="Texture2D" uid="uid://b2jglcqynuqjv" path="res://assets/icons/play.png" id="2_86iju"]
+
+[node name="server_selection_view" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k53bw")
+
+[node name="background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+
+[node name="content" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="server_list" type="MarginContainer" parent="content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_right = 15
+
+[node name="panel" type="PanelContainer" parent="content/server_list"]
+layout_mode = 2
+
+[node name="maegin" type="MarginContainer" parent="content/server_list/panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="scroll" type="ScrollContainer" parent="content/server_list/panel/maegin"]
+layout_mode = 2
+
+[node name="server_list" type="VBoxContainer" parent="content/server_list/panel/maegin/scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="actions" type="MarginContainer" parent="content"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_right = 15
+
+[node name="panel" type="PanelContainer" parent="content/actions"]
+layout_mode = 2
+
+[node name="margin" type="MarginContainer" parent="content/actions/panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 25
+
+[node name="vbox" type="VBoxContainer" parent="content/actions/panel/margin"]
+layout_mode = 2
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="name" type="VBoxContainer" parent="content/actions/panel/margin/vbox"]
+layout_mode = 2
+
+[node name="title" type="Label" parent="content/actions/panel/margin/vbox/name"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "exWorlds"
+horizontal_alignment = 1
+
+[node name="version" type="Label" parent="content/actions/panel/margin/vbox/name"]
+layout_mode = 2
+text = "v0.0.0"
+horizontal_alignment = 1
+
+[node name="buttons" type="VBoxContainer" parent="content/actions/panel/margin/vbox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="enter" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
+layout_mode = 2
+icon = ExtResource("2_86iju")
+icon_alignment = 1
+
+[node name="delete" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
+layout_mode = 2
+text = "Delete"
+
+[node name="settings" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
+layout_mode = 2
+text = "Settings"
+
+[node name="exit" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
+layout_mode = 2
+text = "Exit"
