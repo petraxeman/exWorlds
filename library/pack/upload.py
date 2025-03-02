@@ -29,6 +29,7 @@ def update_existed(db, data, pack, str_path, sender):
     new_pack = build_pack(data, pack)
     db.execute("UPDATE packs SET name = %s, image_name = %s, hash = %s WHERE path = %s",
                 (new_pack["name"], new_pack["image-name"], new_pack["hash"], str_path))
+    
     return {"hash": new_pack["hash"]}, 200
 
 
@@ -36,8 +37,12 @@ def upload_new(db, data: dict, path: contpath.ContentPath, sender: dict) -> Unio
     if path.points["category"] == "gc:":
         rules = utils.build_table({"name": "Rules", "path": path.to_pack + ".rules"})
         macros = utils.build_table({"name": "Macros", "path": path.to_pack + ".macros"})
-        db.execute("INSERT INTO tables (unchangable, name, path, owner, common, data, hash) VALUES (true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", rules)
-        db.execute("INSERT INTO tables (unchangable, name, path, owner, common, data, hash) VALUES (true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", macros)
+        
+        db.execute("INSERT INTO tables (system_table, changeable_schema, name, path, owner, common, data, hash) VALUES \
+            (true, true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", rules)
+        
+        db.execute("INSERT INTO tables (system_table, name, path, owner, common, data, hash) VALUES \
+            (true, %(name)s, %(path)s, %(owner)s, %(common)s, %(data)s, %(hash)s)", macros)
         
     existed_rights = {"create-pack", "any-create", "server-admin"}.intersection(sender["rights"])
     if not existed_rights:

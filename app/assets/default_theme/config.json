@@ -1,0 +1,14 @@
+{
+	"codename": "default_theme",
+	"resources": {
+		"paper.jpg": {"action": "load_image", "value": "theme://images/paper.jpg"},
+		"lpaper...": {"action": "load_image", "value": "theme://images/lpaper.jpg"},
+		"test-grad": {"action": "load_gradient", "from": [0, 0], "to": [1, 1], "offsets": [0, 0.5, 1], "colors": [[0.5, 0, 0], [0, 0.5, 0], [0, 0, 0.5]]},
+		"test-plain-color": {"action": "load_plain_color", "color": [0.5, 0, 0]}
+	},
+	"zones": {
+		"server-selection": {
+			"background": "lpaper...",
+		}
+	}
+}
