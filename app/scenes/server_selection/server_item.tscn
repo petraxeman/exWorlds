@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3 uid="uid://cwyeoc3xp4fo5"]
+
+[ext_resource type="Texture2D" uid="uid://bfoilqtli83hh" path="res://assets/icons/sphere.png" id="1_8a146"]
+[ext_resource type="Script" path="res://scenes/server_selection/server_item.gd" id="1_edxlv"]
+
+[node name="server_item" type="PanelContainer"]
+script = ExtResource("1_edxlv")
+
+[node name="margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="hbox" type="HBoxContainer" parent="margin"]
+layout_mode = 2
+
+[node name="base_info" type="VBoxContainer" parent="margin/hbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="title" type="HBoxContainer" parent="margin/hbox/base_info"]
+layout_mode = 2
+
+[node name="server_name" type="Label" parent="margin/hbox/base_info/title"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "ptsrex Server"
+
+[node name="server_orig" type="Label" parent="margin/hbox/base_info/title"]
+layout_mode = 2
+text = "(Pupi du pu)"
+
+[node name="server_addr" type="Label" parent="margin/hbox/base_info"]
+layout_mode = 2
+text = "87.64.34.33:5555"
+
+[node name="status" type="VBoxContainer" parent="margin/hbox"]
+layout_mode = 2
+alignment = 1
+
+[node name="status_light" type="TextureRect" parent="margin/hbox/status"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("1_8a146")
+expand_mode = 1
+stretch_mode = 5
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

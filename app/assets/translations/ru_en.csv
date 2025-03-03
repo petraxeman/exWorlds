@@ -1,6 +1,8 @@
-keys,Russian,English
+keys,ru,en
 EXWORLDS_TITLE,exWorlds,exWorlds
 SERVER_SELECTION_DELETE,Удалить,Delete
+SERVER_SELECTION_ADD_SERVER,Добавить сервер,Add server
+SERVER_SELECTION_THEME_EDITOR,Редактор тем,Theme editor
 SERVER_SELECTION_SETTINGS,Настройки,Settings
 SERVER_SELECTION_EXIT,Выход,Exit
 SERVER_SELECTION_NO_SERVERS,У вас нет серверов в данный момент.,You have no servers at this moment.
