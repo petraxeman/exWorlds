@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cdlbo2fs377w8"]
+[gd_scene load_steps=7 format=3 uid="uid://cdlbo2fs377w8"]
 
 [ext_resource type="Script" path="res://scenes/server_selection_view.gd" id="1_k53bw"]
 [ext_resource type="Texture2D" uid="uid://b2jglcqynuqjv" path="res://assets/icons/play.png" id="2_86iju"]
@@ -6,11 +6,20 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pdvi2"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l0gfb"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ah4v5"]
+bg_color = Color(0.962523, 0.404963, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+expand_margin_left = 2.0
+expand_margin_top = 40.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fh37d"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_et1mk"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5aw5k"]
+bg_color = Color(0.44959, 0.664125, 0.44382, 1)
+expand_margin_left = 22.0
 
 [node name="server_selection_view" type="Control"]
 layout_mode = 3
@@ -29,6 +38,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 expand_mode = 1
+metadata/extheme_class = "background"
 
 [node name="content" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -46,6 +56,7 @@ theme_override_constants/margin_right = 15
 
 [node name="panel" type="PanelContainer" parent="content/server_list"]
 layout_mode = 2
+metadata/extheme_class = "server_list"
 
 [node name="maegin" type="MarginContainer" parent="content/server_list/panel"]
 layout_mode = 2
@@ -72,6 +83,7 @@ theme_override_constants/margin_right = 15
 
 [node name="panel" type="PanelContainer" parent="content/actions"]
 layout_mode = 2
+metadata/extheme_class = "actions_list"
 
 [node name="margin" type="MarginContainer" parent="content/actions/panel"]
 layout_mode = 2
@@ -91,7 +103,7 @@ layout_mode = 2
 [node name="title" type="Label" parent="content/actions/panel/margin/vbox/name"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 25
-text = "exWorlds"
+text = "EXWORLDS_TITLE"
 horizontal_alignment = 1
 
 [node name="version" type="Label" parent="content/actions/panel/margin/vbox/name"]
@@ -108,31 +120,43 @@ layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_pdvi2")
 icon = ExtResource("2_86iju")
 icon_alignment = 1
+metadata/extheme_class = "play"
+metadata/can_apply_theme = false
 
 [node name="delete" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_l0gfb")
-text = "Delete"
+text = "SERVER_SELECTION_DELETE"
+metadata/extheme_class = ""
 
 [node name="add_server" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_l0gfb")
-text = "Add server"
+text = "SERVER_SELECTION_ADD_SERVER"
+metadata/can_apply_theme = false
+metadata/extheme_class = ""
 
 [node name="theme_editor" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_l0gfb")
 disabled = true
-text = "Theme editor"
+text = "SERVER_SELECTION_THEME_EDITOR"
+metadata/can_apply_theme = false
+metadata/extheme_class = ""
 
 [node name="settings" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_fh37d")
-text = "Settings"
+text = "SERVER_SELECTION_SETTINGS"
+metadata/can_apply_theme = false
+metadata/extheme_class = ""
 
 [node name="exit" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_et1mk")
-text = "Exit"
+text = "SERVER_SELECTION_EXIT"
+metadata/can_apply_theme = false
+metadata/extheme_class = ""
+
+[node name="Window" type="Window" parent="."]
+title = "SERVER_SELECTION_SERVER_EDIT"
+initial_position = 1
+theme_override_styles/embedded_border = SubResource("StyleBoxFlat_ah4v5")
+theme_override_styles/embedded_unfocused_border = SubResource("StyleBoxFlat_5aw5k")
 
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/exit" to="." method="_on_exit_pressed"]

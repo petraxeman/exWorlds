@@ -1,10 +1,12 @@
 extends Node
 class_name ExworldsTheme
 
+var codename: String = ""
 var path_to_theme: String = ""
+
+var active_zone: String = "default"
 var resources: Dictionary = {}
 var zones: Dictionary = {}
-var codename: String = ""
 
 
 

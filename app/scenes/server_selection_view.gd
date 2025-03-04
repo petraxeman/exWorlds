@@ -5,15 +5,8 @@ var server_item_scene: PackedScene = load("res://scenes/server_selection/server_
 
 
 func _ready():
-	_apply_theme()
-	
-	$content/actions/panel/margin/vbox/name/version.text = Globals.exworlds_version
-	$content/actions/panel/margin/vbox/name/title.text = tr("EXWORLDS_TITLE")
-	$content/actions/panel/margin/vbox/buttons/delete.text = tr("SERVER_SELECTION_DELETE")
-	$content/actions/panel/margin/vbox/buttons/add_server.text = tr("SERVER_SELECTION_ADD_SERVER")
-	$content/actions/panel/margin/vbox/buttons/theme_editor.text = tr("SERVER_SELECTION_THEME_EDITOR")
-	$content/actions/panel/margin/vbox/buttons/settings.text = tr("SERVER_SELECTION_SETTINGS")
-	$content/actions/panel/margin/vbox/buttons/exit.text = tr("SERVER_SELECTION_EXIT")
+	Globals.current_theme.active_zone = "server-selection"
+	EXUtils.apply_theme(self)
 	
 	render_server_list()
 
@@ -53,27 +46,9 @@ func select_server(uuid: String):
 
 
 func _apply_theme():
+	EXUtils.apply_theme(self)
+	return
 	$background.texture = Globals.current_theme.get_resource_for("server-selection", "background", "texture")
-	
-	for child in $content/actions/panel/margin/vbox/buttons.get_children():
-		if Globals.current_theme.is_resource_exsits("default", "button/normal"):
-			child.add_theme_stylebox_override("normal", Globals.current_theme.get_resource_for("default", "button/normal", "stylebox"))
-		if Globals.current_theme.is_resource_exsits("default", "button/hover"):
-			child.add_theme_stylebox_override("hover", Globals.current_theme.get_resource_for("default", "button/hover", "stylebox"))
-		if Globals.current_theme.is_resource_exsits("default", "button/pressed"):
-			child.add_theme_stylebox_override("pressed", Globals.current_theme.get_resource_for("default", "button/pressed", "stylebox"))
-		if Globals.current_theme.is_resource_exsits("default", "button/disabled"):
-			child.add_theme_stylebox_override("disabled", Globals.current_theme.get_resource_for("default", "button/disabled", "stylebox"))
-		
-	if Globals.current_theme.is_resource_exsits("server-selection", "play-button/normal"):
-		$content/actions/panel/margin/vbox/buttons/enter.add_theme_stylebox_override("normal", Globals.current_theme.get_resource_for("server-selection", "play-button/normal", "stylebox"))
-	if Globals.current_theme.is_resource_exsits("server-selection", "play-button/hover"):
-		$content/actions/panel/margin/vbox/buttons/enter.add_theme_stylebox_override("hover", Globals.current_theme.get_resource_for("server-selection", "play-button/hover", "stylebox"))
-	if Globals.current_theme.is_resource_exsits("server-selection", "play-button/pressed"):
-		$content/actions/panel/margin/vbox/buttons/enter.add_theme_stylebox_override("pressed", Globals.current_theme.get_resource_for("server-selection", "play-button/pressed", "stylebox"))
-	if Globals.current_theme.is_resource_exsits("server-selection", "play-button/disabled"):
-		$content/actions/panel/margin/vbox/buttons/enter.add_theme_stylebox_override("disabled", Globals.current_theme.get_resource_for("server-selection", "play-button/disabled", "stylebox"))
-
 
 func _on_exit_pressed() -> void:
 	get_tree().quit()
