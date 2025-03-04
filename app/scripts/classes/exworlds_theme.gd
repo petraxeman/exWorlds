@@ -83,6 +83,11 @@ func _parse_resources(res: Dictionary):
 				sb.border_width_right = border_width[2]
 				sb.border_width_bottom = border_width[3]
 				
+				var expand_margin = res[key].get("expand", [0, 0, 0, 0])
+				sb.expand_margin_left = expand_margin[0]
+				sb.expand_margin_top = expand_margin[1]
+				sb.expand_margin_right = expand_margin[2]
+				sb.expand_margin_bottom = expand_margin[3]
 				resources[key] = sb
 
 

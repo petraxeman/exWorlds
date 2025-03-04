@@ -1,25 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://cdlbo2fs377w8"]
+[gd_scene load_steps=5 format=3 uid="uid://cdlbo2fs377w8"]
 
 [ext_resource type="Script" path="res://scenes/server_selection_view.gd" id="1_k53bw"]
 [ext_resource type="Texture2D" uid="uid://b2jglcqynuqjv" path="res://assets/icons/play.png" id="2_86iju"]
 [ext_resource type="PackedScene" uid="uid://cwyeoc3xp4fo5" path="res://scenes/server_selection/server_item.tscn" id="2_gtskr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pdvi2"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ah4v5"]
-bg_color = Color(0.962523, 0.404963, 0, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-expand_margin_left = 2.0
-expand_margin_top = 40.0
-expand_margin_right = 2.0
-expand_margin_bottom = 2.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5aw5k"]
-bg_color = Color(0.44959, 0.664125, 0.44382, 1)
-expand_margin_left = 22.0
 
 [node name="server_selection_view" type="Control"]
 layout_mode = 3
@@ -153,10 +138,67 @@ text = "SERVER_SELECTION_EXIT"
 metadata/can_apply_theme = false
 metadata/extheme_class = ""
 
-[node name="Window" type="Window" parent="."]
+[node name="server_settings" type="Window" parent="."]
 title = "SERVER_SELECTION_SERVER_EDIT"
 initial_position = 1
-theme_override_styles/embedded_border = SubResource("StyleBoxFlat_ah4v5")
-theme_override_styles/embedded_unfocused_border = SubResource("StyleBoxFlat_5aw5k")
+size = Vector2i(300, 300)
+
+[node name="backgorund" type="TextureRect" parent="server_settings"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+expand_mode = 1
+metadata/extheme_class = "server_settings"
+
+[node name="settings" type="MarginContainer" parent="server_settings"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="vbox" type="VBoxContainer" parent="server_settings/settings"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="server_settings/settings/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="mark" type="HBoxContainer" parent="server_settings/settings/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="server_settings/settings/vbox/mark"]
+layout_mode = 2
+text = "Mark:"
+
+[node name="edit" type="LineEdit" parent="server_settings/settings/vbox/mark"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="addr" type="HBoxContainer" parent="server_settings/settings/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="server_settings/settings/vbox/addr"]
+layout_mode = 2
+text = "Server address:"
+
+[node name="edit" type="LineEdit" parent="server_settings/settings/vbox/addr"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/exit" to="." method="_on_exit_pressed"]
