@@ -5,5 +5,22 @@ SERVER_SELECTION_ADD_SERVER,Добавить сервер,Add server
 SERVER_SELECTION_THEME_EDITOR,Редактор тем,Theme editor
 SERVER_SELECTION_SETTINGS,Настройки,Settings
 SERVER_SELECTION_EXIT,Выход,Exit
+
+SERVER_SELECTION_ADD_SERVER_TITLE,Добавление сервера,Add server
+SERVER_SELECTION_CHANGE_SEVER_TITLE,Изменение сервера,Change server settings
+
+SERVER_SELECTION_MARK,Метка,Mark
+SERVER_SELECTION_ADDR,Адрес,Address
+SERVER_SELECTION_LOGIN,Логин,Login
+SERVER_SELECTION_PASSWORD,Пароль,Password
+
+SERVER_SELECTION_ADD_BUTTON,Добавить,Add
+SERVER_SELECTION_SAVE_BUTTON,Сохранить,Save
+SERVER_SELECTION_CANCEL_BUTTON,Отмена,Cancel
+
+SERVER_SELECTION_SERVER_DELETE_OK,Удалить,Delete
+SERVER_SELECTION_SERVER_DELETE_MSG,Вы действительно хотите удалить сервер:,Are you sure you want to delete the server:
+
 SERVER_SELECTION_NO_SERVERS,У вас нет серверов в данный момент.,You have no servers at this moment.
 SERVER_SELECTION_SERVER_EDIT,Изменение сервера,Edit server
+SETVER_SELECTION_ADD_SERVER,Добавление сервера,Add server

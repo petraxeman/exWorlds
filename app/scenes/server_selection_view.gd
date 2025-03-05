@@ -1,13 +1,17 @@
 extends Control
 
 var server_item_scene: PackedScene = load("res://scenes/server_selection/server_item.tscn")
-
+var selected_server: String = ""
 
 
 func _ready():
-	Globals.current_theme.active_zone = "server-selection"
+	Globals.current_theme.set_zone("server-selection")
 	EXUtils.apply_theme(self)
-	
+	_render_server_settings_subwin()
+	_render_server_deletion_subwin()
+	$server_settings/settings/vbox/actions/cancel.pressed.connect(_close_settings_subwindow)
+	$server_delete_confirm/margin/content/actions/Cancel.pressed.connect(func(): $server_delete_confirm.hide())
+	$server_delete_confirm/margin/content/actions/Ok.pressed.connect(_delete_selected_server)
 	render_server_list()
 
 
@@ -22,16 +26,18 @@ func render_server_list():
 		$content/server_list/panel/maegin/scroll/server_list.add_child(lbl)
 		$content/server_list/panel/maegin/scroll/server_list.alignment = BoxContainer.ALIGNMENT_CENTER
 	else:
-		for serv in Globals.server_list:
+		for serv_uuid in Globals.server_list:
+			var serv = Globals.server_list[serv_uuid]
 			var serv_item = server_item_scene.instantiate()
 			serv_item.setup(
 				serv.get("server-name", ""),
 				serv.get("mark", ""),
 				serv["addr"],
 				serv_item.CANT_CONNECT,
-				serv["uuid"]
+				serv_uuid
 				)
 			serv_item.selected.connect(select_server)
+			serv_item.doubleclick.connect(change_server)
 			$content/server_list/panel/maegin/scroll/server_list.add_child(serv_item)
 
 
@@ -42,13 +48,104 @@ func select_server(uuid: String):
 		else:
 			child.is_selected = false
 		child._apply_theme()
+	selected_server = uuid
 	print("uuid %s" % uuid)
 
+
+func change_server(uuid: String):
+	$server_settings/settings/vbox/label.text = tr("SERVER_SELECTION_CHANGE_SEVER_TITLE")
+	$server_settings/settings/vbox/actions/ok.text = tr("SERVER_SELECTION_SAVE_BUTTON")
+	
+	$server_settings/settings/vbox/mark/edit.text = Globals.server_list[uuid].get("mark", "")
+	$server_settings/settings/vbox/addr/edit.text = Globals.server_list[uuid].get("addr", "")
+	$server_settings/settings/vbox/login/edit.text = Globals.server_list[uuid].get("login", "")
+	$server_settings/settings/vbox/password/edit.text = Globals.server_list[uuid].get("password", "")
+	
+	EXUtils.disconnect_all_pressed($server_settings/settings/vbox/actions/ok)
+	$server_settings/settings/vbox/actions/ok.pressed.connect(_save_server_settings)
+	$server_settings.show()
+
+
+func _save_server_settings():
+	Globals.server_list[selected_server]["mark"] = $server_settings/settings/vbox/mark/edit.text
+	Globals.server_list[selected_server]["addr"] = $server_settings/settings/vbox/addr/edit.text
+	Globals.server_list[selected_server]["login"] = $server_settings/settings/vbox/login/edit.text
+	Globals.server_list[selected_server]["password"] = $server_settings/settings/vbox/password/edit.text
+	Globals._save_config()
+	render_server_list()
+	_close_settings_subwindow()
+
+
+func _on_add_server_pressed() -> void:
+	$server_settings/settings/vbox/label.text = tr("SERVER_SELECTION_ADD_SERVER_TITLE")
+	$server_settings/settings/vbox/actions/ok.text = tr("SERVER_SELECTION_SAVE_BUTTON")
+	EXUtils.disconnect_all_pressed($server_settings/settings/vbox/actions/ok)
+	$server_settings/settings/vbox/actions/ok.pressed.connect(_add_new_server)
+	$server_settings.show()
+
+
+func _add_new_server():
+	var uuid: String = uuid4.v4()
+	var new_server: Dictionary = {
+		"mark": $server_settings/settings/vbox/mark/edit.text,
+		"addr": $server_settings/settings/vbox/addr/edit.text,
+		"login": $server_settings/settings/vbox/login/edit.text,
+		"password": $server_settings/settings/vbox/password/edit.text
+	}
+	
+	Globals.server_list[uuid] = new_server
+	Globals._save_config()
+	render_server_list()
+	_close_settings_subwindow()
+
+
+func _close_settings_subwindow():
+	$server_settings.hide()
+	$server_settings/settings/vbox/mark/edit.text = ""
+	$server_settings/settings/vbox/addr/edit.text = ""
+	$server_settings/settings/vbox/login/edit.text = ""
+	$server_settings/settings/vbox/password/edit.text = ""
+
+
+func _render_server_settings_subwin():
+	$server_settings/settings/vbox/mark/label.text = tr("SERVER_SELECTION_MARK") + ": "
+	$server_settings/settings/vbox/addr/label.text = tr("SERVER_SELECTION_ADDR") + ": "
+	$server_settings/settings/vbox/login/label.text = tr("SERVER_SELECTION_LOGIN") + ": "
+	$server_settings/settings/vbox/password/label.text = tr("SERVER_SELECTION_PASSWORD") + ": "
+	$server_settings/settings/vbox/actions/cancel.text = tr("SERVER_SELECTION_CANCEL_BUTTON")
+
+
+func _render_server_deletion_subwin():
+	$server_delete_confirm/margin/content/actions/Ok.text = tr("SERVER_SELECTION_SERVER_DELETE_OK")
+	$server_delete_confirm/margin/content/actions/Cancel.text = tr("SERVER_SELECTION_CANCEL_BUTTON")
+
+
+func _delete_selected_server():
+	Globals.server_list.erase(selected_server)
+	render_server_list()
+	$server_delete_confirm.hide()
 
 func _apply_theme():
 	EXUtils.apply_theme(self)
 	return
 	$background.texture = Globals.current_theme.get_resource_for("server-selection", "background", "texture")
 
+
 func _on_exit_pressed() -> void:
 	get_tree().quit()
+
+
+func _on_delete_server_pressed() -> void:
+	if not selected_server:
+		return
+	var serv_name: String = ""
+	if Globals.server_list[selected_server].get("mark"):
+		serv_name = Globals.server_list[selected_server].get("mark")
+	elif Globals.server_list[selected_server].get("server-name"):
+		serv_name = Globals.server_list[selected_server].get("server-name")
+	elif Globals.server_list[selected_server].get("addr"):
+		serv_name = Globals.server_list[selected_server].get("addr")
+	else:
+		serv_name = "Undefined server"
+	$server_delete_confirm/margin/content/label.text = tr("SERVER_SELECTION_SERVER_DELETE_MSG") + " " + serv_name
+	$server_delete_confirm.show()

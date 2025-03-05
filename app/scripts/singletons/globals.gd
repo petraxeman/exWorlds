@@ -7,7 +7,7 @@ var current_theme_codename: String = "default_theme"
 var loaded_themes: Array = []
 var current_theme: ExworldsTheme
 
-var server_list: Array = []
+var server_list: Dictionary = {}
 var current_server: Dictionary
 
 

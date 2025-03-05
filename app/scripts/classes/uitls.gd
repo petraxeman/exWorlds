@@ -73,7 +73,7 @@ static func apply_theme(node: Node, specific_zone: String = ""):
 					var cls: String = theme_class[1]
 					if Globals.current_theme.is_resource_exsits(lzone, cls):
 						current_node.add_theme_stylebox_override("panel", Globals.current_theme.get_resource_for(lzone, cls, expected))
-			"Window":
+			"Window", "ConfirmationDialog":
 				print(1)
 				expected = "stylebox"
 				applying_themes = [["default", "subwindow-border"]]
@@ -86,3 +86,12 @@ static func apply_theme(node: Node, specific_zone: String = ""):
 					if Globals.current_theme.is_resource_exsits(lzone, cls):
 						current_node.add_theme_stylebox_override("embedded_border", Globals.current_theme.get_resource_for(lzone, cls, expected))
 						current_node.add_theme_stylebox_override("embedded_unfocused_border", Globals.current_theme.get_resource_for(lzone, cls, expected))
+
+
+static func disconnect_all(node: Node):
+	for conn in node.get_incoming_connections():
+		node.disconnect(conn["signal"], conn["callable"])
+
+static func disconnect_all_pressed(node: Button):
+	for conn in node.pressed.get_connections():
+		node.pressed.disconnect(conn["callable"])

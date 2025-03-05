@@ -5,6 +5,11 @@ var codename: String = ""
 var path_to_theme: String = ""
 
 var active_zone: String = "default"
+
+var raw_resources: Dictionary = {}
+var default_res_names: Array = []
+var specific_res_names: Array = []
+
 var resources: Dictionary = {}
 var zones: Dictionary = {}
 
@@ -12,10 +17,17 @@ var zones: Dictionary = {}
 
 func _init(path: String, config: Dictionary):
 	path_to_theme = path
-	_parse_resources(config.get("resources", {}))
+	raw_resources = config.get("resources", {})
 	codename = config["codename"]
 	zones = config["zones"]
+	_parse_res_names()
 
+
+func set_zone(zone: String):
+	active_zone = zone
+	_parse_res_names()
+	_load_resources()
+	
 
 func get_resource_for(zone: String, property: String, expect: String):
 	if not resources.get(zones.get(zone, {}).get(property)):
@@ -33,63 +45,91 @@ func is_resource_exsits(zone: String, property: String) -> bool:
 	return true
 
 
-func _parse_resources(res: Dictionary):
-	for key in res:
-		match res[key].get("action", "nothing"):
-			"load_image":
-				resources[key] = load(_adapt_path(res[key].get("value", "res://assets/images/placeholder.svg")))
-			"make_gradient":
-				var grt: GradientTexture2D = GradientTexture2D.new()
-				grt.fill_from = Vector2(res[key]["from"][0], res[key]["from"][1])
-				grt.fill_to = Vector2(res[key]["to"][0], res[key]["to"][1])
-				
-				var colors = []
-				for color in res[key]["colors"]:
-					var clr = Color(color[0], color[1], color[2])
-					colors.append(clr)
-				
-				grt.gradient = Gradient.new()
-				grt.gradient.offsets = PackedFloat32Array(res[key]["offsets"])
-				grt.gradient.colors = PackedColorArray(colors)
-				
-				resources[key] = grt
-			"make_plain_color":
-				var grt: GradientTexture1D = GradientTexture1D.new()
-				grt.gradient = Gradient.new()
-				grt.gradient.colors = PackedColorArray([Color(res[key]["color"][0], res[key]["color"][1], res[key]["color"][2])])
-				
-				resources[key] = grt
-			"make_stylebox":
-				var sb = StyleBoxFlat.new()
-				var corner_radius = res[key].get("corner", [0, 0, 0, 0])
-				sb.corner_radius_top_left = corner_radius[0]
-				sb.corner_radius_top_right = corner_radius[1]
-				sb.corner_radius_bottom_left = corner_radius[2]
-				sb.corner_radius_bottom_right = corner_radius[3]
-				
-				sb.bg_color = EXUtils.array_to_color(res[key].get("color"))
-				
-				var content_margin = res[key].get("cont_margins", [-1, -1, -1, -1])
-				sb.content_margin_left = content_margin[0]
-				sb.content_margin_top = content_margin[1]
-				sb.content_margin_right = content_margin[2]
-				sb.content_margin_bottom = content_margin[3]
-				
-				sb.border_color = EXUtils.array_to_color(res[key].get("bord_color", [0.8, 0.8, 0.8])) 
-				
-				var border_width = res[key].get("border_width", [0, 0, 0, 0])
-				sb.border_width_left = border_width[0]
-				sb.border_width_top = border_width[1]
-				sb.border_width_right = border_width[2]
-				sb.border_width_bottom = border_width[3]
-				
-				var expand_margin = res[key].get("expand", [0, 0, 0, 0])
-				sb.expand_margin_left = expand_margin[0]
-				sb.expand_margin_top = expand_margin[1]
-				sb.expand_margin_right = expand_margin[2]
-				sb.expand_margin_bottom = expand_margin[3]
-				resources[key] = sb
+func _parse_res_names():
+	if not default_res_names:
+		for key in zones["default"]:
+			default_res_names.append(zones["default"][key])
+	
+	if active_zone != "default":
+		for key in zones[active_zone]:
+			specific_res_names.append(zones[active_zone][key])
 
+
+func _load_resources():
+	var res_names = default_res_names + specific_res_names
+	for key in res_names:
+		var value: Dictionary = raw_resources[key]
+		match raw_resources[key].get("action", "nothing"):
+			"load_image":
+				resources[key] = load_image(_adapt_path(value.get("path", "res://assets/images/placeholder.svg")))
+			"make_gradient":
+				resources[key] = make_gradient(value)
+			"make_plain_color":
+				resources[key] = make_plain_color(value)
+			"make_stylebox":
+				resources[key] = make_stylebox(value)
+
+
+func load_image(path: String):
+	return load(_adapt_path(path))
+
+
+func make_gradient(settings: Dictionary):
+	var texture: GradientTexture2D = GradientTexture2D.new()
+	texture.fill_from = Vector2(settings["from"][0], settings["from"][1])
+	texture.fill_to = Vector2(settings["to"][0], settings["to"][1])
+	
+	var colors = []
+	for color in settings["colors"]:
+		var clr = EXUtils.array_to_color(color)
+		colors.append(clr)
+	
+	texture.gradient = Gradient.new()
+	texture.gradient.offsets = PackedFloat32Array(settings["offsets"])
+	texture.gradient.colors = PackedColorArray(colors)
+	
+	return texture
+
+
+func make_plain_color(settings: Dictionary):
+	var texture: GradientTexture1D = GradientTexture1D.new()
+	texture.gradient = Gradient.new()
+	texture.gradient.colors = PackedColorArray([EXUtils.array_to_color(settings["color"])])
+	
+	return texture
+
+
+func make_stylebox(settings: Dictionary):
+	var stylebox = StyleBoxFlat.new()
+	var corner_radius = settings.get("corner", [0, 0, 0, 0])
+	stylebox.corner_radius_top_left = corner_radius[0]
+	stylebox.corner_radius_top_right = corner_radius[1]
+	stylebox.corner_radius_bottom_left = corner_radius[2]
+	stylebox.corner_radius_bottom_right = corner_radius[3]
+	
+	stylebox.bg_color = EXUtils.array_to_color(settings.get("color"))
+	
+	var content_margin = settings.get("cont_margins", [-1, -1, -1, -1])
+	stylebox.content_margin_left = content_margin[0]
+	stylebox.content_margin_top = content_margin[1]
+	stylebox.content_margin_right = content_margin[2]
+	stylebox.content_margin_bottom = content_margin[3]
+	
+	stylebox.border_color = EXUtils.array_to_color(settings.get("bord_color", [0.8, 0.8, 0.8])) 
+	
+	var border_width = settings.get("border_width", [0, 0, 0, 0])
+	stylebox.border_width_left = border_width[0]
+	stylebox.border_width_top = border_width[1]
+	stylebox.border_width_right = border_width[2]
+	stylebox.border_width_bottom = border_width[3]
+	
+	var expand_margin = settings.get("expand", [0, 0, 0, 0])
+	stylebox.expand_margin_left = expand_margin[0]
+	stylebox.expand_margin_top = expand_margin[1]
+	stylebox.expand_margin_right = expand_margin[2]
+	stylebox.expand_margin_bottom = expand_margin[3]
+	
+	return stylebox
 
 func _adapt_path(raw_path: String):
 	var points = raw_path.split("://")

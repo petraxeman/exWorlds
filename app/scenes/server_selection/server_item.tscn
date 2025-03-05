@@ -26,15 +26,12 @@ layout_mode = 2
 [node name="server_name" type="Label" parent="margin/hbox/base_info/title"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 25
-text = "ptsrex Server"
 
 [node name="server_orig" type="Label" parent="margin/hbox/base_info/title"]
 layout_mode = 2
-text = "(Pupi du pu)"
 
 [node name="server_addr" type="Label" parent="margin/hbox/base_info"]
 layout_mode = 2
-text = "87.64.34.33:5555"
 
 [node name="status" type="VBoxContainer" parent="margin/hbox"]
 layout_mode = 2
