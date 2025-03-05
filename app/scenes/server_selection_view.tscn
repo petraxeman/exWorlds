@@ -1,8 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://cdlbo2fs377w8"]
+[gd_scene load_steps=6 format=3 uid="uid://cdlbo2fs377w8"]
 
 [ext_resource type="Script" path="res://scenes/server_selection_view.gd" id="1_k53bw"]
 [ext_resource type="Texture2D" uid="uid://b2jglcqynuqjv" path="res://assets/icons/play.png" id="2_86iju"]
-[ext_resource type="PackedScene" uid="uid://cwyeoc3xp4fo5" path="res://scenes/server_selection/server_item.tscn" id="2_gtskr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pdvi2"]
 
@@ -62,9 +61,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="server_item" parent="content/server_list/panel/maegin/scroll/server_list" instance=ExtResource("2_gtskr")]
-layout_mode = 2
-
 [node name="actions" type="MarginContainer" parent="content"]
 layout_mode = 2
 theme_override_constants/margin_left = 15
@@ -94,11 +90,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 25
 text = "EXWORLDS_TITLE"
 horizontal_alignment = 1
+metadata/extheme_class = "exworlds-title"
 
 [node name="version" type="Label" parent="content/actions/panel/margin/vbox/name"]
 layout_mode = 2
 text = "v0.0.0"
 horizontal_alignment = 1
+metadata/extheme_class = "exworlds-version"
 
 [node name="buttons" type="VBoxContainer" parent="content/actions/panel/margin/vbox"]
 layout_mode = 2

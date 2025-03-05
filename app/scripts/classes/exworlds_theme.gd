@@ -36,6 +36,10 @@ func get_resource_for(zone: String, property: String, expect: String):
 				return GradientTexture1D.new()
 			"stylebox":
 				return StyleBoxFlat.new()
+			"color":
+				return Color(1, 1, 1)
+			"font":
+				return FontFile.new()
 	return resources[zones[zone][property]]
 
 
@@ -68,10 +72,22 @@ func _load_resources():
 				resources[key] = make_plain_color(value)
 			"make_stylebox":
 				resources[key] = make_stylebox(value)
+			"load_font":
+				resources[key] = load_font(_adapt_path(value.get("path", "res://assets/images/placeholder.svg")))
+			"make_color":
+				resources[key] = make_color(value.get("color", [1, 1, 1]))
 
 
 func load_image(path: String):
-	return load(_adapt_path(path))
+	return load(path)
+
+
+func load_font(path: String):
+	return load(path)
+
+
+func make_color(color: Array):
+	return EXUtils.array_to_color(color)
 
 
 func make_gradient(settings: Dictionary):

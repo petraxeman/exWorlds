@@ -74,7 +74,6 @@ static func apply_theme(node: Node, specific_zone: String = ""):
 					if Globals.current_theme.is_resource_exsits(lzone, cls):
 						current_node.add_theme_stylebox_override("panel", Globals.current_theme.get_resource_for(lzone, cls, expected))
 			"Window", "ConfirmationDialog":
-				print(1)
 				expected = "stylebox"
 				applying_themes = [["default", "subwindow-border"]]
 				if current_node.has_meta("extheme_class"):
@@ -86,8 +85,31 @@ static func apply_theme(node: Node, specific_zone: String = ""):
 					if Globals.current_theme.is_resource_exsits(lzone, cls):
 						current_node.add_theme_stylebox_override("embedded_border", Globals.current_theme.get_resource_for(lzone, cls, expected))
 						current_node.add_theme_stylebox_override("embedded_unfocused_border", Globals.current_theme.get_resource_for(lzone, cls, expected))
-
-
+			"Label":
+				expected = "color"
+				applying_themes = [["default", "label/font-color"]]
+				if current_node.has_meta("extheme_class"):
+					applying_themes += [[zone, "%s/font-color" % current_node.get_meta("extheme_class")]]
+				
+				for theme_class in applying_themes:
+					var lzone: String = theme_class[0]
+					var cls: String = theme_class[1]
+					
+					if Globals.current_theme.is_resource_exsits(lzone, cls):
+						current_node.add_theme_color_override("font_color", Globals.current_theme.get_resource_for(lzone, cls, "font-color"))
+				
+				expected = "font"
+				applying_themes = [["default", "label/font"]]
+				if current_node.has_meta("extheme_class"):
+					applying_themes += [[zone, "%s/font" % current_node.get_meta("extheme_class")]]
+				
+				for theme_class in applying_themes:
+					var lzone: String = theme_class[0]
+					var cls: String = theme_class[1]
+					
+					if Globals.current_theme.is_resource_exsits(lzone, cls):
+						current_node.add_theme_font_override("font", Globals.current_theme.get_resource_for(lzone, cls, "font"))
+				
 static func disconnect_all(node: Node):
 	for conn in node.get_incoming_connections():
 		node.disconnect(conn["signal"], conn["callable"])

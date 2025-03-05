@@ -26,6 +26,7 @@ func render_server_list():
 		$content/server_list/panel/maegin/scroll/server_list.add_child(lbl)
 		$content/server_list/panel/maegin/scroll/server_list.alignment = BoxContainer.ALIGNMENT_CENTER
 	else:
+		$content/server_list/panel/maegin/scroll/server_list.alignment = BoxContainer.ALIGNMENT_BEGIN
 		for serv_uuid in Globals.server_list:
 			var serv = Globals.server_list[serv_uuid]
 			var serv_item = server_item_scene.instantiate()
