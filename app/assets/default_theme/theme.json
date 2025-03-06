@@ -1,0 +1,51 @@
+{
+	"codename": "petraxeman.exworlds.default",
+	"resources": {
+		"paper_bg": {"action": "load_image", "path": "theme://images/paper.jpg"},
+		"lpaper...": {"action": "load_image", "path": "theme://images/lpaper.jpg"},
+		"test-grad": {"action": "make_gradient", "from": [0, 0], "to": [1, 1], "offsets": [0, 0.5, 1], "colors": [[0.5, 0, 0], [0, 0.5, 0], [0, 0, 0.5]]},
+		"test-plain-color": {"action": "make_plain_color", "color": [0.5, 0, 0]},
+
+		"button-normal-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.123, 0.179, 0.205], "cont-margin": [5, 5, 5, 5]},
+		"button-hover-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
+		"button-pressed-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.329, 0.502, 0.569], "cont-margin": [5, 5, 5, 5]},
+		"button-disabled-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.388, 0.431, 0.451], "cont-margin": [5, 5, 5, 5]},
+		
+		"lineedit-normal-stylebox": {"action": "make_stylebox", "color": [0.369, 0.502, 0.467]},
+		"lineedit-focus-stylebox": {"action": "make_stylebox", "color": [0.2, 0.439, 0.38]},
+
+		"default-panel": {"action": "make_stylebox", "corner": [0, 0, 0, 0], "color": [0.123, 0.179, 0.205, 0.4], "cont-margin": [5, 5, 5, 5]},
+
+		"default-subwin-border": {"action": "make_stylebox", "corner": [0, 0, 0, 0], "expand": [5, 35, 5, 5], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
+		
+		"pacifico-font": {"action": "make_font", "path": "theme://fonts/PacificoRegular.ttf"},
+
+		"warning-font-settings": {"action": "make_font", "font-color": [1, 1, 1], "shadow-color": [1, 1, 1], "outline-color": [1, 1, 1],
+									"shadow-offset": [1, 1], "outline-size": 1, "shadow-outline-size": 1, "font": "theme://fonts/PacificoRegular.ttf"},
+
+		"test-lbl": {"action": "make_font", "font-color": [0.7, 0.2, 0.7], "path": "theme://fonts/PacificoRegular.ttf"}
+	},
+	"zones": {
+		"default": {
+			"subwindow/border": "default-subwin-border",
+			"background/texture": "paper_bg",
+			"content/panel": "default-panel",
+			"button/normal": "button-normal-stylebox",
+			"button/hover": "button-hover-stylebox",
+			"button/pressed": "button-pressed-stylebox",
+			"button/disabled": "button-disabled-stylebox",
+			"label/font": "test-lbl",
+
+			"lineedit/normal": "lineedit-normal-stylebox",
+			"lineedit/focus": "lineedit-focus-stylebox"
+		},
+		"server-selection": {
+			"server-item/normal": "button-normal-stylebox",
+			"server-item/hover": "button-hover-stylebox",
+			"server-item/selected": "button-pressed-stylebox",
+			"server_settings/panel": "test-grad",
+
+			"exworlds-title/font": "pacifico-font"
+		}
+	}
+}

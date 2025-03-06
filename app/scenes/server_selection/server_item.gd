@@ -72,6 +72,7 @@ func _on_mouse_exited() -> void:
 
 
 func _apply_theme():
+	ExworldsTheme.apply_theme($margin/hbox)
 	if is_selected:
 		if Globals.current_theme.is_resource_exsits("server-selection", "server-item/selected"):
 			add_theme_stylebox_override("panel", Globals.current_theme.get_resource_for("server-selection", "server-item/selected", "stylebox"))

@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://cdlbo2fs377w8"]
+[gd_scene load_steps=7 format=3 uid="uid://cdlbo2fs377w8"]
 
 [ext_resource type="Script" path="res://scenes/server_selection_view.gd" id="1_k53bw"]
 [ext_resource type="Texture2D" uid="uid://b2jglcqynuqjv" path="res://assets/icons/play.png" id="2_86iju"]
+[ext_resource type="PackedScene" uid="uid://cwyeoc3xp4fo5" path="res://scenes/server_selection/server_item.tscn" id="2_gtskr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pdvi2"]
 
@@ -26,7 +27,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 expand_mode = 1
-metadata/extheme_class = "background"
+metadata/extheme_class = "main-view-background"
 
 [node name="content" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -44,7 +45,7 @@ theme_override_constants/margin_right = 15
 
 [node name="panel" type="PanelContainer" parent="content/server_list"]
 layout_mode = 2
-metadata/extheme_class = "server_list"
+metadata/extheme_class = "server-list-panel"
 
 [node name="maegin" type="MarginContainer" parent="content/server_list/panel"]
 layout_mode = 2
@@ -61,6 +62,9 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="server_item" parent="content/server_list/panel/maegin/scroll/server_list" instance=ExtResource("2_gtskr")]
+layout_mode = 2
+
 [node name="actions" type="MarginContainer" parent="content"]
 layout_mode = 2
 theme_override_constants/margin_left = 15
@@ -68,7 +72,7 @@ theme_override_constants/margin_right = 15
 
 [node name="panel" type="PanelContainer" parent="content/actions"]
 layout_mode = 2
-metadata/extheme_class = "actions_list"
+metadata/extheme_class = "server-actions-list"
 
 [node name="margin" type="MarginContainer" parent="content/actions/panel"]
 layout_mode = 2
@@ -90,13 +94,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 25
 text = "EXWORLDS_TITLE"
 horizontal_alignment = 1
-metadata/extheme_class = "exworlds-title"
+metadata/extheme_class = "exworlds-main-title"
 
 [node name="version" type="Label" parent="content/actions/panel/margin/vbox/name"]
 layout_mode = 2
 text = "v0.0.0"
 horizontal_alignment = 1
-metadata/extheme_class = "exworlds-version"
+metadata/extheme_class = "exworlds-main-version"
 
 [node name="buttons" type="VBoxContainer" parent="content/actions/panel/margin/vbox"]
 layout_mode = 2
@@ -107,50 +111,50 @@ layout_mode = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_pdvi2")
 icon = ExtResource("2_86iju")
 icon_alignment = 1
-metadata/extheme_class = "play"
+metadata/extheme_class = "button-play"
 metadata/can_apply_theme = false
 
 [node name="delete" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
 text = "SERVER_SELECTION_DELETE"
-metadata/extheme_class = ""
+metadata/extheme_class = "button-delete-server"
 
 [node name="add_server" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
 text = "SERVER_SELECTION_ADD_SERVER"
 metadata/can_apply_theme = false
-metadata/extheme_class = ""
+metadata/extheme_class = "button-add-server"
 
 [node name="theme_editor" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
 disabled = true
 text = "SERVER_SELECTION_THEME_EDITOR"
 metadata/can_apply_theme = false
-metadata/extheme_class = ""
+metadata/extheme_class = "button-theme-editor"
 
 [node name="settings" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
 text = "SERVER_SELECTION_SETTINGS"
 metadata/can_apply_theme = false
-metadata/extheme_class = ""
+metadata/extheme_class = "button-open-settings"
 
 [node name="exit" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
 text = "SERVER_SELECTION_EXIT"
 metadata/can_apply_theme = false
-metadata/extheme_class = ""
+metadata/extheme_class = "button-exit"
 
 [node name="server_settings" type="Window" parent="."]
 transparent_bg = true
 initial_position = 1
 size = Vector2i(618, 341)
-visible = false
 wrap_controls = true
 transient = true
 exclusive = true
 transparent = true
 content_scale_mode = 1
 theme_override_icons/close = SubResource("CompressedTexture2D_eq4gm")
+metadata/extheme_class = "server-settings-subwindow"
 
 [node name="backgorund" type="TextureRect" parent="server_settings"]
 anchors_preset = 15
@@ -161,7 +165,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 expand_mode = 1
-metadata/extheme_class = "server_settings"
+metadata/extheme_class = "server-settings-background"
 
 [node name="settings" type="MarginContainer" parent="server_settings"]
 anchors_preset = 15
@@ -188,6 +192,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 25
 text = "Settings"
 horizontal_alignment = 1
+metadata/extheme_class = "server-settings-title"
 
 [node name="mark" type="HBoxContainer" parent="server_settings/settings/vbox"]
 layout_mode = 2
@@ -195,10 +200,12 @@ layout_mode = 2
 [node name="label" type="Label" parent="server_settings/settings/vbox/mark"]
 layout_mode = 2
 text = "SERVER_SELECTION_MARK:"
+metadata/extheme_class = "server-settings-mark-lbl"
 
 [node name="edit" type="LineEdit" parent="server_settings/settings/vbox/mark"]
 layout_mode = 2
 size_flags_horizontal = 3
+metadata/extheme_class = "server-settings-nark-edit"
 
 [node name="addr" type="HBoxContainer" parent="server_settings/settings/vbox"]
 layout_mode = 2
@@ -206,10 +213,12 @@ layout_mode = 2
 [node name="label" type="Label" parent="server_settings/settings/vbox/addr"]
 layout_mode = 2
 text = "SERVER_SELECTION_ADDR:"
+metadata/extheme_class = "server-settings-addr-lbl"
 
 [node name="edit" type="LineEdit" parent="server_settings/settings/vbox/addr"]
 layout_mode = 2
 size_flags_horizontal = 3
+metadata/extheme_class = "server-settings-addr-edit"
 
 [node name="login" type="HBoxContainer" parent="server_settings/settings/vbox"]
 layout_mode = 2
@@ -217,10 +226,12 @@ layout_mode = 2
 [node name="label" type="Label" parent="server_settings/settings/vbox/login"]
 layout_mode = 2
 text = "SERVER_SELECTION_LOGIN:"
+metadata/extheme_class = "server-settings-login-lbl"
 
 [node name="edit" type="LineEdit" parent="server_settings/settings/vbox/login"]
 layout_mode = 2
 size_flags_horizontal = 3
+metadata/extheme_class = "server-settings-login-edit"
 
 [node name="password" type="HBoxContainer" parent="server_settings/settings/vbox"]
 layout_mode = 2
@@ -228,11 +239,13 @@ layout_mode = 2
 [node name="label" type="Label" parent="server_settings/settings/vbox/password"]
 layout_mode = 2
 text = "SERVER_SELECTION_PASSWORD:"
+metadata/extheme_class = "server-settings-passwd-lbl"
 
 [node name="edit" type="LineEdit" parent="server_settings/settings/vbox/password"]
 layout_mode = 2
 size_flags_horizontal = 3
 secret = true
+metadata/extheme_class = "server-settings-passwd-edit"
 
 [node name="actions" type="HBoxContainer" parent="server_settings/settings/vbox"]
 layout_mode = 2
@@ -241,15 +254,18 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SERVER_SELECTION_SAVE_BUTTON"
+metadata/extheme_class = "server-settings-ok-button"
 
 [node name="cancel" type="Button" parent="server_settings/settings/vbox/actions"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "SERVER_SELECTION_CANCEL_BUTTON"
+metadata/extheme_class = "server-settings-cancel-button"
 
 [node name="server_delete_confirm" type="Window" parent="."]
 transparent_bg = true
 initial_position = 1
+size = Vector2i(114, 100)
 visible = false
 wrap_controls = true
 transient = true

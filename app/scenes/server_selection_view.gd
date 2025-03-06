@@ -6,7 +6,7 @@ var selected_server: String = ""
 
 func _ready():
 	Globals.current_theme.set_zone("server-selection")
-	EXUtils.apply_theme(self)
+	ExworldsTheme.apply_theme(self)
 	_render_server_settings_subwin()
 	_render_server_deletion_subwin()
 	$server_settings/settings/vbox/actions/cancel.pressed.connect(_close_settings_subwindow)
@@ -127,7 +127,7 @@ func _delete_selected_server():
 	$server_delete_confirm.hide()
 
 func _apply_theme():
-	EXUtils.apply_theme(self)
+	ExworldsTheme.apply_theme(self)
 	return
 	$background.texture = Globals.current_theme.get_resource_for("server-selection", "background", "texture")
 

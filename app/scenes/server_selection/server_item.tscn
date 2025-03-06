@@ -5,6 +5,7 @@
 
 [node name="server_item" type="PanelContainer"]
 script = ExtResource("1_edxlv")
+metadata/can_apply_theme = true
 
 [node name="margin" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -26,12 +27,15 @@ layout_mode = 2
 [node name="server_name" type="Label" parent="margin/hbox/base_info/title"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 25
+metadata/extheme_class = "server-item-server-name"
 
 [node name="server_orig" type="Label" parent="margin/hbox/base_info/title"]
 layout_mode = 2
+metadata/extheme_class = "server-item-server-orig"
 
 [node name="server_addr" type="Label" parent="margin/hbox/base_info"]
 layout_mode = 2
+metadata/extheme_class = "server-item-server-addr"
 
 [node name="status" type="VBoxContainer" parent="margin/hbox"]
 layout_mode = 2
@@ -44,6 +48,7 @@ size_flags_vertical = 3
 texture = ExtResource("1_8a146")
 expand_mode = 1
 stretch_mode = 5
+metadata/extheme_skip = true
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

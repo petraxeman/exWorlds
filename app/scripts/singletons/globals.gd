@@ -2,7 +2,7 @@ extends Node
 
 const exworlds_version: String = "v0.0.1"
 
-var current_theme_codename: String = "default_theme"
+var current_theme_codename: String = "petraxeman.exworlds.default"
 
 var loaded_themes: Array = []
 var current_theme: ExworldsTheme
