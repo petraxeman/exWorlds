@@ -166,3 +166,14 @@ server-selection
 - server-settings-passwd-edit   : stylebox : /normal, /focus
 - server-settings-ok-button     : stylebox : /normal, /hover, /disabled, /pressed
 - server-settings-cancel-button : stylebox : /normal, /hover, /disabled, /pressed
+
+- server-delete-confirm-subwin  : stylebox : /border
+- server-delete-conf-background : texture  : /texture
+- server-delete-conf-text       : font     : /font
+- server-delete-conf-accept     : stylebox : /normal, /hover, /disabled, /pressed
+- server-delete-conf-cancel     : stylebox : /normal, /hover, /disabled, /pressed
+
+---
+
+- settings-view-background      : texture  : /texture
+

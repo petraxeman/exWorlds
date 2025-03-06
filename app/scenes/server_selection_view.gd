@@ -1,6 +1,7 @@
 extends Control
 
 var server_item_scene: PackedScene = load("res://scenes/server_selection/server_item.tscn")
+var settings_view: PackedScene = load("res://scenes/settings_view.tscn")
 var selected_server: String = ""
 
 
@@ -150,3 +151,10 @@ func _on_delete_server_pressed() -> void:
 		serv_name = "Undefined server"
 	$server_delete_confirm/margin/content/label.text = tr("SERVER_SELECTION_SERVER_DELETE_MSG") + " " + serv_name
 	$server_delete_confirm.show()
+
+
+func _on_settings_pressed():
+	var settings_view_instance = settings_view.instantiate()
+	settings_view_instance.previous_view = self
+	get_tree().root.add_child(settings_view_instance)
+	get_tree().root.remove_child(self)

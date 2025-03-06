@@ -55,6 +55,7 @@ func _parse_res_names():
 		for key in zones["default"]:
 			default_res_names.append(zones["default"][key])
 	
+	specific_res_names = []
 	if active_zone != "default":
 		for key in zones[active_zone]:
 			specific_res_names.append(zones[active_zone][key])
@@ -62,7 +63,11 @@ func _parse_res_names():
 
 func _load_resources():
 	var res_names = default_res_names + specific_res_names
+	resources = {}
 	for key in res_names:
+		if not key in raw_resources:
+			raw_resources[key] = null
+			continue
 		var value: Dictionary = raw_resources[key]
 		match raw_resources[key].get("action", "nothing"):
 			"load_image":
@@ -154,8 +159,8 @@ func make_stylebox(settings: Dictionary):
 
 func make_font(settings: Dictionary):
 	var new_settings: Dictionary = {}
-	if settings.get("path"):
-		new_settings["font"] = load(_adapt_path(settings.get("path")))
+	if settings.get("font"):
+		new_settings["font"] = load(_adapt_path(settings.get("font")))
 	if settings.get("font-color"):
 		new_settings["font-color"] = EXUtils.array_to_color(settings.get("font-color"))
 	if settings.get("shadow-color"):
@@ -267,7 +272,7 @@ static func apply_theme(node: Node, specific_zone: String = ""):
 				expected = "stylebox"
 				applying_classes = [["default", "lineedit/normal", "normal"], ["default", "lineedit/focus", "focus"]]
 				if extheme_class:
-					applying_classes = [[zone, extheme_class + "/normal", "normal"], [zone, extheme_class + "/focus", "focus"]]
+					applying_classes += [[zone, extheme_class + "/normal", "normal"], [zone, extheme_class + "/focus", "focus"]]
 				for theme_class in applying_classes:
 					var lzone: String = theme_class[0]; var cls: String = theme_class[1]; var mode: String = theme_class[2]
 					if Globals.current_theme.is_resource_exsits(lzone, cls):
