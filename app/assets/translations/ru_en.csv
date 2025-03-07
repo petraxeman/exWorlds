@@ -24,3 +24,11 @@ SERVER_SELECTION_SERVER_DELETE_MSG,Вы действительно хотите 
 SERVER_SELECTION_NO_SERVERS,У вас нет серверов в данный момент.,You have no servers at this moment.
 SERVER_SELECTION_SERVER_EDIT,Изменение сервера,Edit server
 SETVER_SELECTION_ADD_SERVER,Добавление сервера,Add server
+
+
+SETTINGS_VIEW_SETTINGS_TITLE,Настройки приложения,App settings
+SETTINGS_VIEW_BASE_SETTING_TITLE,Базовые настройки,Base settings
+SETTINGS_VIEW_LOCALIZATION_LBL,Локализация,Locale
+SETTINGS_VIEW_THEME_LBL,Тема,Theme
+SETTINGS_VIEW_SAVE_AND_EXIT,Сохранить и выйти,Save and exit
+SETTINGS_VIEW_CANCEL,Отменить,Cancel

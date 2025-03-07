@@ -24,7 +24,9 @@ func setup(sname: String, mark: String, addr: String, sts: int = CANT_CONNECT, e
 
 
 func set_names(sname: String, mark: String):
-	if sname and mark:
+	if mark:
+		if not sname:
+			sname = "Undefined server"
 		$margin/hbox/base_info/title/server_name.text = mark
 		$margin/hbox/base_info/title/server_orig.text = "(%s)" % sname
 	elif sname:

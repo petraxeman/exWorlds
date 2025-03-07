@@ -1,5 +1,6 @@
 {
 	"codename": "petraxeman.exworlds.default",
+	"visible-name": "Default theme by pt",
 	"resources": {
 		"paper_bg": {"action": "load_image", "path": "theme://images/paper.jpg"},
 
@@ -46,6 +47,8 @@
 
 			"server-delete-conf-text/font": "black-font"
 		},
-		"settings-view": {}
+		"settings-view": {
+			"settings-view-title/font": "pacifico-font"
+		}
 	}
 }

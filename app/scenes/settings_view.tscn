@@ -19,3 +19,106 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 metadata/extheme_class = "settings-view-background"
+
+[node name="settings" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="vbox" type="VBoxContainer" parent="settings"]
+layout_mode = 2
+
+[node name="margin" type="MarginContainer" parent="settings/vbox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_bottom = 5
+
+[node name="scroll" type="ScrollContainer" parent="settings/vbox/margin"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="vbox" type="VBoxContainer" parent="settings/vbox/margin/scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 25
+
+[node name="title" type="PanelContainer" parent="settings/vbox/margin/scroll/vbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="margin" type="MarginContainer" parent="settings/vbox/margin/scroll/vbox/title"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="Label" type="Label" parent="settings/vbox/margin/scroll/vbox/title/margin"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "SETTINGS_VIEW_SETTINGS_TITLE"
+horizontal_alignment = 1
+metadata/extheme_class = "settings-view-title"
+
+[node name="base_settings" type="PanelContainer" parent="settings/vbox/margin/scroll/vbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="margin" type="MarginContainer" parent="settings/vbox/margin/scroll/vbox/base_settings"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="vbox" type="VBoxContainer" parent="settings/vbox/margin/scroll/vbox/base_settings/margin"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="label" type="Label" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "SETTINGS_VIEW_BASE_SETTING_TITLE"
+
+[node name="localization" type="HBoxContainer" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/localization"]
+layout_mode = 2
+text = "SETTINGS_VIEW_LOCALIZATION_LBL"
+
+[node name="option" type="OptionButton" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/localization"]
+layout_mode = 2
+
+[node name="theme" type="HBoxContainer" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox"]
+layout_mode = 2
+
+[node name="label" type="Label" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/theme"]
+layout_mode = 2
+text = "SETTINGS_VIEW_THEME_LBL"
+
+[node name="option" type="OptionButton" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/theme"]
+layout_mode = 2
+
+[node name="actions" type="HBoxContainer" parent="settings/vbox"]
+layout_mode = 2
+
+[node name="save" type="Button" parent="settings/vbox/actions"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "SETTINGS_VIEW_SAVE_AND_EXIT"
+
+[node name="cancel" type="Button" parent="settings/vbox/actions"]
+layout_mode = 2
+text = "SETTINGS_VIEW_CANCEL"
+
+[connection signal="pressed" from="settings/vbox/actions/save" to="." method="_on_save_and_exit_pressed"]
+[connection signal="pressed" from="settings/vbox/actions/cancel" to="." method="_on_cancel_and_exit_pressed"]

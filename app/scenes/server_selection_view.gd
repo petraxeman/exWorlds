@@ -7,16 +7,18 @@ var selected_server: String = ""
 
 func _ready():
 	Globals.current_theme.set_zone("server-selection")
+	_render()
+	$server_delete_confirm/margin/content/actions/Cancel.pressed.connect(func(): $server_delete_confirm.hide())
+
+
+func _render():
 	ExworldsTheme.apply_theme(self)
 	_render_server_settings_subwin()
 	_render_server_deletion_subwin()
-	$server_settings/settings/vbox/actions/cancel.pressed.connect(_close_settings_subwindow)
-	$server_delete_confirm/margin/content/actions/Cancel.pressed.connect(func(): $server_delete_confirm.hide())
-	$server_delete_confirm/margin/content/actions/Ok.pressed.connect(_delete_selected_server)
-	render_server_list()
+	_render_server_list()
 
 
-func render_server_list():
+func _render_server_list():
 	for child in $content/server_list/panel/maegin/scroll/server_list.get_children():
 		child.queue_free()
 	
@@ -74,7 +76,7 @@ func _save_server_settings():
 	Globals.server_list[selected_server]["login"] = $server_settings/settings/vbox/login/edit.text
 	Globals.server_list[selected_server]["password"] = $server_settings/settings/vbox/password/edit.text
 	Globals._save_config()
-	render_server_list()
+	_render_server_list()
 	_close_settings_subwindow()
 
 
@@ -97,7 +99,7 @@ func _add_new_server():
 	
 	Globals.server_list[uuid] = new_server
 	Globals._save_config()
-	render_server_list()
+	_render_server_list()
 	_close_settings_subwindow()
 
 
@@ -124,7 +126,7 @@ func _render_server_deletion_subwin():
 
 func _delete_selected_server():
 	Globals.server_list.erase(selected_server)
-	render_server_list()
+	_render_server_list()
 	$server_delete_confirm.hide()
 
 func _apply_theme():

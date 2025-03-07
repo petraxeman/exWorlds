@@ -91,7 +91,7 @@ layout_mode = 2
 
 [node name="title" type="Label" parent="content/actions/panel/margin/vbox/name"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 25
+theme_override_font_sizes/font_size = 30
 text = "EXWORLDS_TITLE"
 horizontal_alignment = 1
 metadata/extheme_class = "exworlds-main-title"
@@ -325,3 +325,5 @@ metadata/extheme_class = "server-delete-conf-cancel"
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/add_server" to="." method="_on_add_server_pressed"]
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/exit" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="server_settings/settings/vbox/actions/cancel" to="." method="_close_settings_subwindow"]
+[connection signal="pressed" from="server_delete_confirm/margin/content/actions/Ok" to="." method="_delete_selected_server"]

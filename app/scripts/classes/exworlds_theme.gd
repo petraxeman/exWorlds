@@ -2,6 +2,7 @@ extends Node
 class_name ExworldsTheme
 
 var codename: String = ""
+var visible_name: String = ""
 var path_to_theme: String = ""
 
 var active_zone: String = "default"
@@ -17,10 +18,14 @@ var zones: Dictionary = {}
 
 func _init(path: String, config: Dictionary):
 	path_to_theme = path
+	
 	raw_resources = config.get("resources", {})
 	_compile_resources()
+	
+	visible_name = config.get("visible-name", "Undefined name")
 	codename = config["codename"]
-	zones = config["zones"]
+	zones = config.get("zones", {})
+	
 	_parse_res_names()
 
 

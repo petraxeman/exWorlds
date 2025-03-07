@@ -3,12 +3,16 @@ extends Node
 const exworlds_version: String = "v0.0.1"
 
 var current_theme_codename: String = "petraxeman.exworlds.default"
-
 var loaded_themes: Array = []
 var current_theme: ExworldsTheme
 
 var server_list: Dictionary = {}
 var current_server: Dictionary
+
+var locale: String = "ru" :
+	set (value):
+		TranslationServer.set_locale(value)
+		locale = value
 
 
 func _ready():
@@ -35,6 +39,9 @@ func _load_config():
 	
 	current_theme_codename = config_dict["current_theme_codename"]
 	server_list = config_dict["server_list"]
+	locale = config_dict.get("locale", "ru")
+	
+	
 
 
 func _save_config():
@@ -42,7 +49,8 @@ func _save_config():
 	config_file.store_string(JSON.stringify(
 		{
 			"current_theme_codename": current_theme_codename,
-			"server_list": server_list
+			"server_list": server_list,
+			"locale": locale
 		}
 	))
 
