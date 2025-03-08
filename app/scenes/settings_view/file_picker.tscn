@@ -25,3 +25,17 @@ layout_mode = 2
 texture = ExtResource("1_jxs2t")
 stretch_mode = 5
 metadata/extheme_skip = true
+
+[node name="select_folders" type="FileDialog" parent="."]
+title = "SETTINGS_VIEW_LOAD_THEME_LBL"
+initial_position = 1
+size = Vector2i(322, 180)
+ok_button_text = "Open"
+file_mode = 1
+access = 2
+filters = PackedStringArray("*.zip")
+use_native_dialog = true
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+
+[connection signal="files_selected" from="select_folders" to="." method="_files_dropped"]

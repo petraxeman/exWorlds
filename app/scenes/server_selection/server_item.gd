@@ -14,7 +14,7 @@ enum {ALL_GOOD, CANT_CONNECT, SOMTHING_WRONG}
 
 
 func _ready() -> void:
-	Globals.current_theme.apply_theme(apply_theme_from)
+	ThemeHandler.current_theme.apply_theme(apply_theme_from)
 	_apply_theme()
 
 
@@ -78,14 +78,14 @@ func _on_mouse_exited() -> void:
 
 func _apply_theme():
 	if is_selected:
-		if Globals.current_theme.is_resource_exist("server-item/selected"):
-			add_theme_stylebox_override("panel", Globals.current_theme.get_resource("server-item/selected")["data"])
+		if ThemeHandler.current_theme.is_resource_exist("server-item/selected"):
+			add_theme_stylebox_override("panel", ThemeHandler.current_theme.get_resource("server-item/selected")["data"])
 		return
 	elif mouse_in:
-		if Globals.current_theme.is_resource_exist("server-item/hover"):
-			add_theme_stylebox_override("panel", Globals.current_theme.get_resource("server-item/hover")["data"])
+		if ThemeHandler.current_theme.is_resource_exist("server-item/hover"):
+			add_theme_stylebox_override("panel", ThemeHandler.current_theme.get_resource("server-item/hover")["data"])
 		return
 	else:
-		if Globals.current_theme.is_resource_exist("server-item/normal"):
-			add_theme_stylebox_override("panel", Globals.current_theme.get_resource("server-item/normal")["data"])
+		if ThemeHandler.current_theme.is_resource_exist("server-item/normal"):
+			add_theme_stylebox_override("panel", ThemeHandler.current_theme.get_resource("server-item/normal")["data"])
 	

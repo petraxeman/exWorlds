@@ -1,6 +1,4 @@
 {
-	"codename": "petraxeman.exworlds.default",
-	"visible-name": "Default theme by pt",
 	"resources": {
 		"paper_bg": {"type": "image", "path": "theme://images/paper.jpg"},
 

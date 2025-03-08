@@ -14,7 +14,7 @@ func _ready():
 	get_viewport().files_dropped.connect(_files_dropped)
 	_apply_theme()
 
-func _process(delta):
+func _process(_delta):
 	mouse_in = _is_mouse_in_zone()
 
 
@@ -29,7 +29,7 @@ func _input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed and mouse_in:
 				emit_signal("pressed")
-				print("gggg")
+				$select_folders.show()
 				_apply_theme()
 
 
@@ -37,7 +37,6 @@ func _files_dropped(files: Array):
 	if not mouse_in:
 		return
 	
-	print(files)
 	for filepath in files:
 		emit_signal("file_selected", filepath)
 		EXUtils.process_uploaded_file(filepath)
@@ -46,8 +45,8 @@ func _files_dropped(files: Array):
 
 func _apply_theme():
 	if mouse_in:
-		if Globals.current_theme.is_resource_exist("file-picker/hover"):
-			$panel.add_theme_stylebox_override("panel", Globals.current_theme.get_resource("file-picker/hover")["data"])
+		if ThemeHandler.current_theme.is_resource_exist("file-picker/hover"):
+			$panel.add_theme_stylebox_override("panel", ThemeHandler.current_theme.get_resource("file-picker/hover")["data"])
 	else:
-		if Globals.current_theme.is_resource_exist("file-picker/normal"):
-			$panel.add_theme_stylebox_override("panel", Globals.current_theme.get_resource("file-picker/normal")["data"])
+		if ThemeHandler.current_theme.is_resource_exist("file-picker/normal"):
+			$panel.add_theme_stylebox_override("panel", ThemeHandler.current_theme.get_resource("file-picker/normal")["data"])

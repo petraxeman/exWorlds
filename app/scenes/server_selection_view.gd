@@ -11,8 +11,8 @@ func _ready():
 
 
 func _render():
-	Globals.current_theme.set_zone("server-selection")
-	Globals.current_theme.apply_theme(self)
+	ThemeHandler.current_theme.set_zone("server-selection")
+	ThemeHandler.current_theme.apply_theme(self)
 	_render_server_settings_subwin()
 	_render_server_deletion_subwin()
 	_render_server_list()

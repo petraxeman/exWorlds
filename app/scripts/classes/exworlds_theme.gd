@@ -1,30 +1,40 @@
-extends Node
+extends Resource
 class_name ExworldsTheme
 
-var codename: String = ""
-var visible_name: String = ""
-var path_to_theme: String = ""
+const possible_keys = {
+	"image": ["path"],
+	"gradient": ["from", "to", "colors", "offsets"],
+	"color-texture": ["color"],
+	"stylebox": ["corner", "color", "cont-margin", "border-color", "border-width", "expand"],
+	"label-font": ["font", "font-color", "shadow-color", "outline-color", "shadow-offset", "outline-size", "shadow-outline-size", "font-size"],
+	"button-font": ["font", "font-color", "pressed-color", "hover-color", "disabled-color", "outline-color", "font-size", "outline-size"],
+	"popup-font": ["font", "font-color", ]
+}
+
+@export var codename: String = ""
+@export var visible_name: String = ""
+@export var path_to_theme: String = ""
 
 var active_zone: String = "default"
 
-var raw_resources: Dictionary = {}
-var default_res_names: Array = []
-var specific_res_names: Array = []
+@export var raw_resources: Dictionary = {}
+@export var default_res_names: Array = []
+@export var specific_res_names: Array = []
 
-var resources: Dictionary = {}
-var zones: Dictionary = {}
+@export var resources: Dictionary = {}
+@export var zones: Dictionary = {}
 
 
 
-func _init(path: String, config: Dictionary):
+func _setup(path: String, config: Dictionary, manifest: Dictionary):
 	path_to_theme = path
 	
 	raw_resources = config.get("resources", {})
 	_compile_resources()
-	
-	visible_name = config.get("visible-name", "Undefined name")
-	codename = config["codename"]
 	zones = config.get("zones", {})
+	
+	visible_name = manifest.get("visible-name", "Undefined name")
+	codename = manifest["codename"]
 	
 	_parse_res_names()
 
@@ -34,10 +44,20 @@ func _compile_resources():
 		if raw_resources[key].has("inherit"):
 			var child: Dictionary = raw_resources[key]
 			var parent: Dictionary = raw_resources.get(child["inherit"]).duplicate()
+			
 			if not parent:
 				continue
-			child.erase("action"); child.erase("inherit")
+			
+			child.erase("inherit")
 			parent.merge(child, true)
+			
+			if not parent.has("type"):
+				continue
+			
+			for k in parent:
+				if k not in possible_keys[parent["type"]] and k != "type":
+					parent.erase(key)
+			
 			raw_resources[key] = parent
 
 
@@ -59,11 +79,12 @@ func _load_resources():
 		if not key in raw_resources:
 			raw_resources[key] = null
 			continue
+		
 		var value: Dictionary = raw_resources[key]
 		
 		match raw_resources[key].get("type", "nothing"):
 			"image":
-				resources[key] = _build_image(value.get("path", "res://assets/images/placeholder.svg"))
+				resources[key] = _build_image(value)
 			"gradient":
 				resources[key] = _build_gradient(value)
 			"color-texture":
@@ -76,8 +97,8 @@ func _load_resources():
 				resources[key] = _build_button_font(value)
 
 
-func _build_image(path: String):
-	return {"data": load(_adapt_path(path)), "to": "texture"}
+func _build_image(value: Dictionary):
+	return {"data": load(_adapt_path(value.get("path", "res://assets/images/placeholder.svg"))), "to": "texture"}
 
 
 func _build_gradient(settings: Dictionary):
@@ -121,7 +142,7 @@ func _build_stylebox(settings: Dictionary):
 	stylebox.content_margin_right = content_margin[2]
 	stylebox.content_margin_bottom = content_margin[3]
 	
-	stylebox.border_color = EXUtils.array_to_color(settings.get("bord-color", [0.8, 0.8, 0.8])) 
+	stylebox.border_color = EXUtils.array_to_color(settings.get("border-color", [0.8, 0.8, 0.8])) 
 	
 	var border_width = settings.get("border-width", [0, 0, 0, 0])
 	stylebox.border_width_left = border_width[0]
@@ -157,6 +178,8 @@ func _build_label_font(settings: Dictionary):
 				new_settings.append({"data": settings[key], "mode": "outline_size", "to": "constant"})
 			"shadow-outline-size":
 				new_settings.append({"data": settings[key], "mode": "shadow_outline_size", "to": "constant"})
+			"font-size":
+				new_settings.append({"data": settings[key], "mode": "font_size", "to": "font-size"})
 	return new_settings
 
 
@@ -224,7 +247,7 @@ func apply_theme(node: Node):
 			current_node._apply_theme()
 		
 		var theme_classes: Dictionary = {}
-		var zone: String = Globals.current_theme.active_zone
+		var zone: String = ThemeHandler.current_theme.active_zone
 		var extheme_class: String = current_node.get_meta("extheme_class", "")
 		match current_node.get_class():
 			"Button":
@@ -344,10 +367,25 @@ func apply_theme(node: Node):
 
 
 static func load_from_dir(path: String) -> ExworldsTheme:
-	if not FileAccess.file_exists(path + "/theme.json"):
+	if not FileAccess.file_exists(path + "/theme.json") or not FileAccess.file_exists(path + "/manifest.json") :
 		return
+	
+	var comp_datetime = FileAccess.get_modified_time(path + "/comp.res")
+	var manifesto_relevant = FileAccess.get_modified_time(path + "/theme.json") <= comp_datetime
+	var schema_relevant = FileAccess.get_modified_time(path + "/manifest.json") <= comp_datetime
+	if FileAccess.file_exists(path + "/comp.res") and (manifesto_relevant and schema_relevant):
+		var x: ExworldsTheme = load(path + "/comp.res")
+		return x
 	
 	var config_file: FileAccess = FileAccess.open(path + "/theme.json", FileAccess.READ)
 	var config_dict: Dictionary = JSON.parse_string(config_file.get_as_text())
+
+	var manifest_file: FileAccess = FileAccess.open(path + "/manifest.json", FileAccess.READ)
+	var manifest_dict: Dictionary = JSON.parse_string(manifest_file.get_as_text())
 	
-	return ExworldsTheme.new(path, config_dict)
+	var theme_obj = ExworldsTheme.new()
+	theme_obj._setup(path, config_dict, manifest_dict)
+	
+	ResourceSaver.save(theme_obj, path + "/comp.res")
+
+	return theme_obj
