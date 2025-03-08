@@ -2,22 +2,22 @@
 	"codename": "petraxeman.exworlds.default",
 	"visible-name": "Default theme by pt",
 	"resources": {
-		"paper_bg": {"action": "load_image", "path": "theme://images/paper.jpg"},
+		"paper_bg": {"type": "image", "path": "theme://images/paper.jpg"},
 
-		"button-normal-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.123, 0.179, 0.205], "cont-margin": [5, 5, 5, 5]},
-		"button-hover-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
-		"button-pressed-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.329, 0.502, 0.569], "cont-margin": [5, 5, 5, 5]},
-		"button-disabled-stylebox": {"action": "make_stylebox", "corner": [25, 25, 25, 25], "color": [0.388, 0.431, 0.451], "cont-margin": [5, 5, 5, 5]},
+		"button-normal-stylebox": {"type": "stylebox", "corner": [25, 25, 25, 25], "color": [0.123, 0.179, 0.205], "cont-margin": [5, 5, 5, 5]},
+		"button-hover-stylebox": {"type": "stylebox", "corner": [25, 25, 25, 25], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
+		"button-pressed-stylebox": {"type": "stylebox", "corner": [25, 25, 25, 25], "color": [0.329, 0.502, 0.569], "cont-margin": [5, 5, 5, 5]},
+		"button-disabled-stylebox": {"type": "stylebox", "corner": [25, 25, 25, 25], "color": [0.388, 0.431, 0.451], "cont-margin": [5, 5, 5, 5]},
 		
-		"lineedit-normal-stylebox": {"action": "make_stylebox", "color": [0.369, 0.502, 0.467]},
-		"lineedit-focus-stylebox": {"action": "make_stylebox", "color": [0.2, 0.439, 0.38]},
+		"lineedit-normal-stylebox": {"type": "stylebox", "color": [0.369, 0.502, 0.467]},
+		"lineedit-focus-stylebox": {"type": "stylebox", "color": [0.2, 0.439, 0.38]},
 
-		"default-panel": {"action": "make_stylebox", "corner": [0, 0, 0, 0], "color": [0.123, 0.179, 0.205, 0.4], "cont-margin": [5, 5, 5, 5]},
+		"default-panel": {"type": "stylebox", "corner": [0, 0, 0, 0], "color": [0.123, 0.179, 0.205, 0.4], "cont-margin": [5, 5, 5, 5]},
 
-		"default-subwin-border": {"action": "make_stylebox", "corner": [0, 0, 0, 0], "expand": [5, 35, 5, 5], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
+		"default-subwin-border": {"type": "stylebox", "corner": [0, 0, 0, 0], "expand": [5, 35, 5, 5], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
 		
-		"pacifico-font": {"action": "make_font", "font": "theme://fonts/PacificoRegular.ttf"},
-		"black-font": {"action": "make_font", "font-color": [0, 0, 0]}
+		"pacifico-font": {"type": "label-font", "font": "theme://fonts/PacificoRegular.ttf"},
+		"black-font": {"inherit": "pacifico-font", "font-color": [0, 0, 0]}
 	},
 	"zones": {
 		"default": {
@@ -37,18 +37,18 @@
 			"server-item/hover": "button-hover-stylebox",
 			"server-item/selected": "button-pressed-stylebox",
 
-			"exworlds-main-title/font": "pacifico-font",
+			"exworlds-main-title/label-font": "pacifico-font",
 
-			"server-settings-title/font": "black-font",
-			"server-settings-mark-lbl/font": "black-font",
-			"server-settings-addr-lbl/font": "black-font",
-			"server-settings-login-lbl/font": "black-font",
-			"server-settings-passwd-lbl/font": "black-font",
+			"server-settings-title/label-font": "black-font",
+			"server-settings-mark-lbl/label-font": "black-font",
+			"server-settings-addr-lbl/label-font": "black-font",
+			"server-settings-login-lbl/label-font": "black-font",
+			"server-settings-passwd-lbl/label-font": "black-font",
 
-			"server-delete-conf-text/font": "black-font"
+			"server-delete-conf-text/label-font": "black-font"
 		},
 		"settings-view": {
-			"settings-view-title/font": "pacifico-font"
+			"settings-view-title/label-font": "pacifico-font"
 		}
 	}
 }

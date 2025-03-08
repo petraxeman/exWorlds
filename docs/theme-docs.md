@@ -119,6 +119,29 @@ A configuration builder for text. It includes not only font settings but also th
 }
 ```
 
+### make_button_font
+
+- **font** - Path to font file.
+- **font-color** – The main text color in 01-color format.
+- **font-hover-color** - The color of the font what shows when cursor over button
+- **font-pressed-color** - The color of the font what shows when button pressed
+- **font-disabled-color** - The color of the font what shows when button disabled
+- **font-outline-color** - Color of text outline
+- **outline-size** - Size of text outline
+
+```json
+{
+  "font-color": [1, 1, 1],
+  "font-hover-color": [1, 1, 1],
+  "font-pressed-color": [1, 1, 1],
+  "font-disabled-color": [1, 1, 1],
+  "font-outline-color": [1, 1, 1],
+  "outline-size": 1,
+  "font": "theme://fonts/font.ttf"
+}
+```
+
+
 
 ## Zones
 

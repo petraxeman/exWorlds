@@ -29,30 +29,16 @@ func _init(path: String, config: Dictionary):
 	_parse_res_names()
 
 
-func set_zone(zone: String):
-	active_zone = zone
-	_parse_res_names()
-	_load_resources()
-	
-
-func get_resource_for(zone: String, property: String, expect: String):
-	if not resources.get(zones.get(zone, {}).get(property)):
-		match expect:
-			"texture":
-				return GradientTexture1D.new()
-			"stylebox":
-				return StyleBoxFlat.new()
-			"color":
-				return Color(1, 1, 1)
-			"font":
-				return {"font": FontFile.new()}
-	return resources[zones[zone][property]]
-
-
-func is_resource_exsits(zone: String, property: String) -> bool:
-	if not resources.get(zones.get(zone, {}).get(property)):
-		return false
-	return true
+func _compile_resources():
+	for key in raw_resources:
+		if raw_resources[key].has("inherit"):
+			var child: Dictionary = raw_resources[key]
+			var parent: Dictionary = raw_resources.get(child["inherit"]).duplicate()
+			if not parent:
+				continue
+			child.erase("action"); child.erase("inherit")
+			parent.merge(child, true)
+			raw_resources[key] = parent
 
 
 func _parse_res_names():
@@ -74,37 +60,27 @@ func _load_resources():
 			raw_resources[key] = null
 			continue
 		var value: Dictionary = raw_resources[key]
-		match raw_resources[key].get("action", "nothing"):
-			"load_image":
-				resources[key] = load_image(_adapt_path(value.get("path", "res://assets/images/placeholder.svg")))
-			"make_gradient":
-				resources[key] = make_gradient(value)
-			"make_plain_color":
-				resources[key] = make_plain_color(value)
-			"make_stylebox":
-				resources[key] = make_stylebox(value)
-			"make_font":
-				resources[key] = make_font(value)
+		
+		match raw_resources[key].get("type", "nothing"):
+			"image":
+				resources[key] = _build_image(value.get("path", "res://assets/images/placeholder.svg"))
+			"gradient":
+				resources[key] = _build_gradient(value)
+			"color-texture":
+				resources[key] = _build_color_texture(value)
+			"stylebox":
+				resources[key] = _build_stylebox(value)
+			"label-font":
+				resources[key] = _build_label_font(value)
+			"button-font":
+				resources[key] = _build_button_font(value)
 
 
-func _compile_resources():
-	for key in raw_resources:
-		if raw_resources[key].has("inherit"):
-			var child: Dictionary = raw_resources[key]
-			var parent: Dictionary = raw_resources.get(child["inherit"]).duplicate()
-			print(parent)
-			if not parent:
-				continue
-			child.erase("action"); child.erase("inherit")
-			parent.merge(child, true)
-			raw_resources[key] = parent
+func _build_image(path: String):
+	return {"data": load(_adapt_path(path)), "to": "texture"}
 
 
-func load_image(path: String):
-	return load(path)
-
-
-func make_gradient(settings: Dictionary):
+func _build_gradient(settings: Dictionary):
 	var texture: GradientTexture2D = GradientTexture2D.new()
 	texture.fill_from = Vector2(settings["from"][0], settings["from"][1])
 	texture.fill_to = Vector2(settings["to"][0], settings["to"][1])
@@ -118,18 +94,18 @@ func make_gradient(settings: Dictionary):
 	texture.gradient.offsets = PackedFloat32Array(settings["offsets"])
 	texture.gradient.colors = PackedColorArray(colors)
 	
-	return texture
+	return {"data": texture, "to": "texture"}
 
 
-func make_plain_color(settings: Dictionary):
+func _build_color_texture(settings: Dictionary):
 	var texture: GradientTexture1D = GradientTexture1D.new()
 	texture.gradient = Gradient.new()
 	texture.gradient.colors = PackedColorArray([EXUtils.array_to_color(settings["color"])])
 	
-	return texture
+	return {"data": texture, "to": "texture"}
 
 
-func make_stylebox(settings: Dictionary):
+func _build_stylebox(settings: Dictionary):
 	var stylebox = StyleBoxFlat.new()
 	var corner_radius = settings.get("corner", [0, 0, 0, 0])
 	stylebox.corner_radius_top_left = corner_radius[0]
@@ -159,26 +135,51 @@ func make_stylebox(settings: Dictionary):
 	stylebox.expand_margin_right = expand_margin[2]
 	stylebox.expand_margin_bottom = expand_margin[3]
 	
-	return stylebox
+	return {"data": stylebox, "to": "stylebox"}
 
 
-func make_font(settings: Dictionary):
-	var new_settings: Dictionary = {}
-	if settings.get("font"):
-		new_settings["font"] = load(_adapt_path(settings.get("font")))
-	if settings.get("font-color"):
-		new_settings["font-color"] = EXUtils.array_to_color(settings.get("font-color"))
-	if settings.get("shadow-color"):
-		new_settings["shadow-color"] = EXUtils.array_to_color(settings.get("shadow-color"))
-	if settings.get("outline-color"):
-		new_settings["outline-color"] = EXUtils.array_to_color(settings.get("outline-color"))
-	if settings.get("shadow-offset"):
-		new_settings["shadow-offset-x"] = settings.get("shadow-offset")[0]
-		new_settings["shadow-offset-y"] = settings.get("shadow-offset")[1]
-	if settings.get("outline-size"):
-		new_settings["outline-size"] = settings.get("outline-size")
-	if settings.get("shadow-outline-size"):
-		new_settings["shadow-outline-size"] = settings.get("shadow-outline-size")
+func _build_label_font(settings: Dictionary):
+	var new_settings: Array = []
+	for key in settings:
+		match key:
+			"font":
+				new_settings.append({"data": load(_adapt_path(settings[key])), "mode": "font", "to": "font"})
+			"font-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_color", "to": "color"})
+			"shadow-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_shadow_color", "to": "color"})
+			"outline-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_outline_color", "to": "color"})
+			"shadow-offset":
+				new_settings.append({"data": settings[key][0], "mode": "shadow_offset_x", "to": "constant"})
+				new_settings.append({"data": settings[key][1], "mode": "shadow_offset_y", "to": "constant"})
+			"outline-size":
+				new_settings.append({"data": settings[key], "mode": "outline_size", "to": "constant"})
+			"shadow-outline-size":
+				new_settings.append({"data": settings[key], "mode": "shadow_outline_size", "to": "constant"})
+	return new_settings
+
+
+func _build_button_font(settings: Dictionary):
+	var new_settings: Array = []
+	for key in settings:
+		match key:
+			"font":
+				new_settings.append({"data": load(_adapt_path(settings[key])), "mode": "font", "to": "font"})
+			"font-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_color", "to": "color"})
+			"hover-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_hover_color", "to": "color"})
+			"pressed-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_pressed_color", "to": "color"})
+			"disabled-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_disabled_color", "to": "color"})
+			"outline-color":
+				new_settings.append({"data": EXUtils.array_to_color(settings[key]), "mode": "font_outline_color", "to": "color"})
+			"font-size":
+				new_settings.append({"data": settings[key], "mode": "font_size", "to": "font-size"})
+			"outline-size":
+				new_settings.append({"data": settings[key], "mode": "outline_size", "to": "constant"})
 	return new_settings
 
 
@@ -190,100 +191,158 @@ func _adapt_path(raw_path: String):
 	return raw_path
 
 
-static func apply_theme(node: Node, specific_zone: String = ""):
+func set_zone(zone: String):
+	active_zone = zone
+	_parse_res_names()
+	_load_resources()
+
+
+func is_resource_exist(codename: String, zone: String = ""):
+	if not zone:
+		zone = active_zone
+	return resources.has(zones.get(zone, {}).get(codename, ""))
+
+
+func get_resource(codename: String, zone: String = ""):
+	if not zone:
+		zone = active_zone
+	return resources[zones[zone][codename]]
+
+
+func apply_theme(node: Node):
 	var awaiting: Array = [node]
 	while awaiting:
 		var current_node = awaiting.pop_at(0)
-		if current_node.get_meta("extheme_skip", false):
-			continue
 		
 		if current_node.has_method("get_children"):
 			awaiting += current_node.get_children()
 		
-		if current_node.get_meta("can_apply_theme", false):
+		if current_node.get_meta("extheme_skip", false):
+			continue
+		
+		if current_node.has_method("_apply_theme"):
 			current_node._apply_theme()
 		
-		var applying_classes: Array = []
-		var expected: String = ""
-		var zone: String = specific_zone if specific_zone else Globals.current_theme.active_zone
+		var theme_classes: Dictionary = {}
+		var zone: String = Globals.current_theme.active_zone
 		var extheme_class: String = current_node.get_meta("extheme_class", "")
 		match current_node.get_class():
 			"Button":
-				expected = "stylebox"
-				applying_classes = [["default", "button/normal", "normal"], ["default", "button/hover", "hover"],
-									["default", "button/pressed", "pressed"], ["default", "button/desabled", "desabled"]]
-				if extheme_class:
-					applying_classes += [[zone, "%s/normal" % extheme_class, "normal"], [zone, "%s/hover" % extheme_class, "hover"],
-										[zone, "%s/pressed" % extheme_class, "pressed"], [zone, "%s/desabled" % extheme_class, "desabled"]]
-				for theme_class in applying_classes:
-					var lzone: String = theme_class[0]; var cls: String = theme_class[1]; var mode: String = theme_class[2]
-					if Globals.current_theme.is_resource_exsits(lzone, cls):
-						current_node.add_theme_stylebox_override(mode, Globals.current_theme.get_resource_for(lzone, cls, expected))
+				theme_classes = {
+					"default":[
+						{"loader": "standart", "data": ["default", "button/normal"], "mode": "normal", "to": "stylebox"}, 
+						{"loader": "standart", "data": ["default", "button/hover"], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "button/pressed"], "mode": "pressed", "to": "stylebox"}, 
+						{"loader": "standart", "data": ["default", "button/disabled"], "mode": "disabled", "to": "stylebox"},
+						{"loader": "unpack", "data": ["default", "button/font"]}
+						],
+					"specific": [
+						{"loader": "standart", "data": [zone, "%s/normal" % extheme_class], "mode": "normal", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/pressed" % extheme_class], "mode": "pressed", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/disabled" % extheme_class], "mode": "disabled", "to": "stylebox"},
+						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
+						]
+					}
+			"OptionButton":
+				theme_classes = {
+					"default":[
+						{"loader": "standart", "data": ["default", "option/normal"], "mode": "normal", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "option/hover"], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "option/pressed"], "mode": "pressed", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "option/disabled"], "mode": "disabled", "to": "stylebox"},
+						{"loader": "unpack", "data": ["default", "option/font"]}
+					],
+					"specific": [
+						{"loader": "standart", "data": [zone, "%s/normal" % extheme_class], "mode": "normal", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/pressed" % extheme_class], "mode": "pressed", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/disabled" % extheme_class], "mode": "disabled", "to": "stylebox"},
+						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
+					]
+				}
 			"TextureRect":
-				expected = "texture"
-				applying_classes = [["default", "texturerect/texture"]]
-				if extheme_class:
-					applying_classes += [[zone, extheme_class + "/texture"]]
-				
-				for theme_class in applying_classes:
-					var lzone: String = theme_class[0]; var cls: String = theme_class[1]
-					if Globals.current_theme.is_resource_exsits(lzone, cls):
-						current_node.texture = Globals.current_theme.get_resource_for(lzone, cls, expected)
+				theme_classes = {
+					"default": [{"loader": "standart", "data": ["default", "texturerect/texture"], "mode": "texture", "to": "texture"}],
+					"specific": [{"loader": "standart", "data": [zone, "%s/texture" % extheme_class], "mode": "texture", "to": "texture"}]
+					}
 			"PanelContainer":
-				expected = "stylebox"
-				applying_classes = [["default", "container/panel"]]
-				if extheme_class:
-					applying_classes += [[zone, extheme_class + "/panel"]]
-				
-				for theme_class in applying_classes:
-					var lzone: String = theme_class[0]; var cls: String = theme_class[1]
-					if Globals.current_theme.is_resource_exsits(lzone, cls):
-						current_node.add_theme_stylebox_override("panel", Globals.current_theme.get_resource_for(lzone, cls, expected))
+				theme_classes = {
+					"default": [{"loader": "standart", "data": ["default", "container/panel"], "mode": "panel", "to": "stylebox"}],
+					"specific": [{"loader": "standart", "data": [zone, "%s/panel" % extheme_class], "mode": "panel", "to": "stylebox"}]
+					}
 			"Window", "ConfirmationDialog":
-				expected = "stylebox"
-				applying_classes = [["default", "subwindow/border"]]
-				if extheme_class:
-					applying_classes += [[zone, extheme_class + "/border"]]
-				
-				for theme_class in applying_classes:
-					var lzone: String = theme_class[0]; var cls: String = theme_class[1]
-					if Globals.current_theme.is_resource_exsits(lzone, cls):
-						current_node.add_theme_stylebox_override("embedded_border", Globals.current_theme.get_resource_for(lzone, cls, expected))
-						current_node.add_theme_stylebox_override("embedded_unfocused_border", Globals.current_theme.get_resource_for(lzone, cls, expected))
+				theme_classes = {
+					"default": [{"loader": "standart", "data": ["default", "subwindow/border"], "mode": "embedded_border", "to": "stylebox"}],
+					"specific": [{"loader": "standart", "data": [zone, "%s/border" % extheme_class], "mode": "embedded_border", "to": "stylebox"}]
+					}
+			"PopupMenu":
+				theme_classes = {
+					"default": [
+						{"loader": "standart", "data": ["default", "popup/panel"], "mode": "panel", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "popup/hover"], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "popup/separator"], "mode": "separator", "to": "stylebox"},
+						],
+					"specific": [
+						{"loader": "standart", "data": [zone, "%s/panel" % extheme_class], "mode": "panel", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/separator" % extheme_class], "mode": "separator", "to": "stylebox"},
+						]
+					}
 			"Label":
-				expected = "font"
-				applying_classes = [["default", "label/font"]]
-				if extheme_class:
-					applying_classes = [[zone, extheme_class + "/font"]]
-				
-				for theme_class in applying_classes:
-					var lzone: String = theme_class[0]; var cls: String = theme_class[1]
-					if Globals.current_theme.is_resource_exsits(lzone, cls):
-						var font_settings: Dictionary = Globals.current_theme.get_resource_for(lzone, cls, expected)
-						var cn: Label = Label.new()
-						
-						current_node.add_theme_font_override("font", font_settings.get("font", current_node.get_theme_font("font")))
-						
-						current_node.add_theme_color_override("font_color", font_settings.get("font-color", current_node.get_theme_color("font_color")))
-						current_node.add_theme_color_override("font_outline_color", font_settings.get("outline-color", current_node.get_theme_color("font_outline_color")))
-						current_node.add_theme_color_override("font_shadow_color", font_settings.get("shadow-color", current_node.get_theme_color("font_shadow_color")))
-						
-						current_node.add_theme_constant_override("outline_size", font_settings.get("outline-size", current_node.get_theme_constant("outline_size")))
-						current_node.add_theme_constant_override("shadow_outline_size", font_settings.get("shadow-outline-size", current_node.get_theme_constant("shadow_outline_size")))
-						
-						current_node.add_theme_constant_override("shadow_offset_x", font_settings.get("shadow-offset-x", current_node.get_theme_constant("shadow_offset_x")))
-						current_node.add_theme_constant_override("shadow_offset_y", font_settings.get("shadow-offset-y", current_node.get_theme_constant("shadow_offset_y")))
+				theme_classes = {
+					"default": [{"loader": "unpack", "data": ["default", "label/font"]}],
+					"specific": [{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}]
+					}
 			"LineEdit":
-				expected = "stylebox"
-				applying_classes = [["default", "lineedit/normal", "normal"], ["default", "lineedit/focus", "focus"]]
-				if extheme_class:
-					applying_classes += [[zone, extheme_class + "/normal", "normal"], [zone, extheme_class + "/focus", "focus"]]
-				for theme_class in applying_classes:
-					var lzone: String = theme_class[0]; var cls: String = theme_class[1]; var mode: String = theme_class[2]
-					if Globals.current_theme.is_resource_exsits(lzone, cls):
-						current_node.add_theme_stylebox_override(mode, Globals.current_theme.get_resource_for(lzone, cls, expected))
-	
-	
+				theme_classes = {
+					"default": [
+						{"loader": "standart", "data": ["default", "lineedit/normal"], "mode": "normal", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "lineedit/focus"], "mode": "focus", "to": "stylebox"}
+						],
+					"specific": [
+						{"loader": "standart", "data": [zone, "%s/normal" % extheme_class], "mode": "normal", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/focus" % extheme_class], "mode": "focus", "to": "stylebox"}
+						]
+					}
+			_:
+				continue
+		
+		for i in theme_classes["specific"].size():
+			var resource: Dictionary
+			
+			if is_resource_exist(theme_classes["specific"][i]["data"][1], theme_classes["specific"][i]["data"][0]):
+				resource = theme_classes["specific"][i]
+				
+			elif is_resource_exist(theme_classes["default"][i]["data"][1], theme_classes["default"][i]["data"][0]):
+				resource = theme_classes["default"][i]
+			else:
+				continue
+			
+			var resources_to_apply: Array = []
+			match resource["loader"]:
+				"standart":
+					resource["data"] = get_resource(resource["data"][1], resource["data"][0])["data"]
+					resources_to_apply.append(resource)
+				"unpack":
+					resources_to_apply += get_resource(resource["data"][1], resource["data"][0])
+			
+			for res in resources_to_apply:
+				match res["to"]:
+					"stylebox":
+						current_node.add_theme_stylebox_override(res["mode"], res["data"])
+					"font":
+						current_node.add_theme_font_override(res["mode"], res["data"])
+					"font-size":
+						current_node.add_theme_font_size_override(res["mode"], res["data"])
+					"constant":
+						current_node.add_theme_constant_override(res["mode"], res["data"])
+					"color":
+						current_node.add_theme_color_override(res["mode"], res["data"])
+					"texture":
+						current_node.texture = res["data"]
+
+
 static func load_from_dir(path: String) -> ExworldsTheme:
 	if not FileAccess.file_exists(path + "/theme.json"):
 		return

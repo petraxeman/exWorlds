@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://ombrw2nltypv"]
+[gd_scene load_steps=3 format=3 uid="uid://ombrw2nltypv"]
 
 [ext_resource type="Script" path="res://scenes/settings_view.gd" id="1_tpqgw"]
+[ext_resource type="PackedScene" uid="uid://tcc062da8645" path="res://scenes/settings_view/file_picker.tscn" id="2_vfrim"]
 
 [node name="settings_view" type="Control"]
 layout_mode = 3
@@ -97,6 +98,7 @@ text = "SETTINGS_VIEW_LOCALIZATION_LBL"
 
 [node name="option" type="OptionButton" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/localization"]
 layout_mode = 2
+focus_mode = 0
 
 [node name="theme" type="HBoxContainer" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox"]
 layout_mode = 2
@@ -106,6 +108,10 @@ layout_mode = 2
 text = "SETTINGS_VIEW_THEME_LBL"
 
 [node name="option" type="OptionButton" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/theme"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="file_picker" parent="settings/vbox/margin/scroll/vbox/base_settings/margin/vbox" instance=ExtResource("2_vfrim")]
 layout_mode = 2
 
 [node name="actions" type="HBoxContainer" parent="settings/vbox"]

@@ -3,6 +3,7 @@ extends PanelContainer
 var mouse_in: bool = false
 var is_selected: bool = false
 var uuid: String
+@onready var apply_theme_from = $margin/hbox
 
 signal selected(uuid: String)
 signal unselected(uuid: String)
@@ -13,6 +14,7 @@ enum {ALL_GOOD, CANT_CONNECT, SOMTHING_WRONG}
 
 
 func _ready() -> void:
+	Globals.current_theme.apply_theme(apply_theme_from)
 	_apply_theme()
 
 
@@ -68,22 +70,22 @@ func _on_mouse_entered() -> void:
 	mouse_in = true
 	_apply_theme()
 
+
 func _on_mouse_exited() -> void:
 	mouse_in = false
 	_apply_theme()
 
 
 func _apply_theme():
-	ExworldsTheme.apply_theme($margin/hbox)
 	if is_selected:
-		if Globals.current_theme.is_resource_exsits("server-selection", "server-item/selected"):
-			add_theme_stylebox_override("panel", Globals.current_theme.get_resource_for("server-selection", "server-item/selected", "stylebox"))
+		if Globals.current_theme.is_resource_exist("server-item/selected"):
+			add_theme_stylebox_override("panel", Globals.current_theme.get_resource("server-item/selected")["data"])
 		return
 	elif mouse_in:
-		if Globals.current_theme.is_resource_exsits("server-selection", "server-item/hover"):
-			add_theme_stylebox_override("panel", Globals.current_theme.get_resource_for("server-selection", "server-item/hover", "stylebox"))
+		if Globals.current_theme.is_resource_exist("server-item/hover"):
+			add_theme_stylebox_override("panel", Globals.current_theme.get_resource("server-item/hover")["data"])
 		return
 	else:
-		if Globals.current_theme.is_resource_exsits("server-selection", "server-item/normal"):
-			add_theme_stylebox_override("panel", Globals.current_theme.get_resource_for("server-selection", "server-item/normal", "stylebox"))
+		if Globals.current_theme.is_resource_exist("server-item/normal"):
+			add_theme_stylebox_override("panel", Globals.current_theme.get_resource("server-item/normal")["data"])
 	

@@ -31,6 +31,7 @@ metadata/extheme_class = "server-item-server-name"
 
 [node name="server_orig" type="Label" parent="margin/hbox/base_info/title"]
 layout_mode = 2
+vertical_alignment = 2
 metadata/extheme_class = "server-item-server-orig"
 
 [node name="server_addr" type="Label" parent="margin/hbox/base_info"]

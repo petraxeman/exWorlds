@@ -6,13 +6,13 @@ var selected_server: String = ""
 
 
 func _ready():
-	Globals.current_theme.set_zone("server-selection")
 	_render()
 	$server_delete_confirm/margin/content/actions/Cancel.pressed.connect(func(): $server_delete_confirm.hide())
 
 
 func _render():
-	ExworldsTheme.apply_theme(self)
+	Globals.current_theme.set_zone("server-selection")
+	Globals.current_theme.apply_theme(self)
 	_render_server_settings_subwin()
 	_render_server_deletion_subwin()
 	_render_server_list()
@@ -129,11 +129,6 @@ func _delete_selected_server():
 	_render_server_list()
 	$server_delete_confirm.hide()
 
-func _apply_theme():
-	ExworldsTheme.apply_theme(self)
-	return
-	$background.texture = Globals.current_theme.get_resource_for("server-selection", "background", "texture")
-
 
 func _on_exit_pressed() -> void:
 	get_tree().quit()
@@ -157,6 +152,5 @@ func _on_delete_server_pressed() -> void:
 
 func _on_settings_pressed():
 	var settings_view_instance = settings_view.instantiate()
-	settings_view_instance.previous_view = self
 	get_tree().root.add_child(settings_view_instance)
-	get_tree().root.remove_child(self)
+	queue_free()

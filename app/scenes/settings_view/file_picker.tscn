@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://tcc062da8645"]
+
+[ext_resource type="Texture2D" uid="uid://bm5h42eveny0r" path="res://assets/icons/upload.png" id="1_jxs2t"]
+[ext_resource type="Script" path="res://scenes/settings_view/file_picker.gd" id="1_p0q3t"]
+
+[node name="file_picker" type="HBoxContainer"]
+alignment = 1
+script = ExtResource("1_p0q3t")
+
+[node name="panel" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+metadata/extheme_skip = true
+
+[node name="margin" type="MarginContainer" parent="panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="texture" type="TextureRect" parent="panel/margin"]
+layout_mode = 2
+texture = ExtResource("1_jxs2t")
+stretch_mode = 5
+metadata/extheme_skip = true

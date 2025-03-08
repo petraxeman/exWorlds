@@ -1,10 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://cdlbo2fs377w8"]
+[gd_scene load_steps=5 format=3 uid="uid://cdlbo2fs377w8"]
 
 [ext_resource type="Script" path="res://scenes/server_selection_view.gd" id="1_k53bw"]
 [ext_resource type="Texture2D" uid="uid://b2jglcqynuqjv" path="res://assets/icons/play.png" id="2_86iju"]
-[ext_resource type="PackedScene" uid="uid://cwyeoc3xp4fo5" path="res://scenes/server_selection/server_item.tscn" id="2_gtskr"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pdvi2"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_eq4gm"]
 
@@ -62,9 +59,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="server_item" parent="content/server_list/panel/maegin/scroll/server_list" instance=ExtResource("2_gtskr")]
-layout_mode = 2
-
 [node name="actions" type="MarginContainer" parent="content"]
 layout_mode = 2
 theme_override_constants/margin_left = 15
@@ -108,7 +102,7 @@ theme_override_constants/separation = 10
 
 [node name="enter" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
-theme_override_styles/focus = SubResource("StyleBoxEmpty_pdvi2")
+focus_mode = 0
 icon = ExtResource("2_86iju")
 icon_alignment = 1
 metadata/extheme_class = "button-play"
@@ -116,17 +110,20 @@ metadata/can_apply_theme = false
 
 [node name="delete" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "SERVER_SELECTION_DELETE"
 metadata/extheme_class = "button-delete-server"
 
 [node name="add_server" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "SERVER_SELECTION_ADD_SERVER"
 metadata/can_apply_theme = false
 metadata/extheme_class = "button-add-server"
 
 [node name="theme_editor" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
+focus_mode = 0
 disabled = true
 text = "SERVER_SELECTION_THEME_EDITOR"
 metadata/can_apply_theme = false
@@ -134,12 +131,14 @@ metadata/extheme_class = "button-theme-editor"
 
 [node name="settings" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "SERVER_SELECTION_SETTINGS"
 metadata/can_apply_theme = false
 metadata/extheme_class = "button-open-settings"
 
 [node name="exit" type="Button" parent="content/actions/panel/margin/vbox/buttons"]
 layout_mode = 2
+focus_mode = 0
 text = "SERVER_SELECTION_EXIT"
 metadata/can_apply_theme = false
 metadata/extheme_class = "button-exit"
@@ -254,12 +253,14 @@ layout_mode = 2
 [node name="ok" type="Button" parent="server_settings/settings/vbox/actions"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 text = "SERVER_SELECTION_SAVE_BUTTON"
 metadata/extheme_class = "server-settings-ok-button"
 
 [node name="cancel" type="Button" parent="server_settings/settings/vbox/actions"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 text = "SERVER_SELECTION_CANCEL_BUTTON"
 metadata/extheme_class = "server-settings-cancel-button"
 
@@ -312,12 +313,14 @@ layout_mode = 2
 [node name="Ok" type="Button" parent="server_delete_confirm/margin/content/actions"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 text = "Ok"
 metadata/extheme_class = "server-delete-conf-accept"
 
 [node name="Cancel" type="Button" parent="server_delete_confirm/margin/content/actions"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 text = "Cancel"
 metadata/extheme_class = "server-delete-conf-cancel"
 
