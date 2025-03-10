@@ -39,4 +39,22 @@ static func process_uploaded_zip(filepath: String):
 	for dir in DirAccess.get_directories_at("user://temp"):
 		if FileAccess.file_exists("user://temp/" + dir + "/theme.json"):
 			DirAccess.rename_absolute("user://temp/" + dir, "user://themes/" + uuid4.v4())
-			#DirAccess.copy_absolute("user://temp/" + dir, "user://themes")
+
+
+static func copy_directory_recursively(from: String, to: String) -> void:
+	if not DirAccess.dir_exists_absolute(to):
+		DirAccess.make_dir_recursive_absolute(to)
+	
+	var directory: DirAccess = DirAccess.open(from)
+	
+	if directory:
+		directory.list_dir_begin()
+		var file_name = directory.get_next()
+		while (file_name != "" && file_name != "." && file_name != ".."):
+			if directory.current_is_dir():
+				copy_directory_recursively("%s/%s" % [from, file_name], "%s/%s" % [to, file_name])
+			else:
+				directory.copy("%s/%s" % [from, file_name], "%s/%s" % [to, file_name])
+			file_name = directory.get_next()
+	else:
+		push_warning("Error copying " + from + " to " + to)

@@ -8,12 +8,14 @@ func _ready():
 	ThemeHandler.current_theme.set_zone("settings-view")
 	ThemeHandler.current_theme.apply_theme(self)
 	$settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/file_picker.files_processed.connect(_update_themes_list)
-	var localization_option_popup = $settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/localization/option.get_popup()
+	var localization_option_popup: PopupMenu = $settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/localization/option.get_popup()
 	localization_option_popup.set_meta("extheme_class", "localization-option-popup")
+	localization_option_popup.transparent = true
 	ThemeHandler.current_theme.apply_theme(localization_option_popup)
 	
-	var theme_option_popup = $settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/theme/option.get_popup()
-	theme_option_popup.set_meta("extheme_class", "localization-option-popup")
+	var theme_option_popup: PopupMenu = $settings/vbox/margin/scroll/vbox/base_settings/margin/vbox/theme/option.get_popup()
+	theme_option_popup.set_meta("extheme_class", "theme-option-popup")
+	theme_option_popup.transparent = true
 	ThemeHandler.current_theme.apply_theme(theme_option_popup)
 	
 	_render_text()

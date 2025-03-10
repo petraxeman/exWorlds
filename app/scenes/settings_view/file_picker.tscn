@@ -20,14 +20,22 @@ theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 15
 
-[node name="texture" type="TextureRect" parent="panel/margin"]
+[node name="vbox" type="VBoxContainer" parent="panel/margin"]
+layout_mode = 2
+
+[node name="texture" type="TextureRect" parent="panel/margin/vbox"]
 layout_mode = 2
 texture = ExtResource("1_jxs2t")
 stretch_mode = 5
 metadata/extheme_skip = true
 
+[node name="Label" type="Label" parent="panel/margin/vbox"]
+layout_mode = 2
+text = "SETTINGS_VIEW_FILE_PICKER_DROP_HERE"
+horizontal_alignment = 1
+
 [node name="select_folders" type="FileDialog" parent="."]
-title = "SETTINGS_VIEW_LOAD_THEME_LBL"
+title = "Open File(s)"
 initial_position = 1
 size = Vector2i(322, 180)
 ok_button_text = "Open"

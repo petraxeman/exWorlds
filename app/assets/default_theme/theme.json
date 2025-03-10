@@ -12,20 +12,42 @@
 
 		"default-panel": {"type": "stylebox", "corner": [0, 0, 0, 0], "color": [0.123, 0.179, 0.205, 0.4], "cont-margin": [5, 5, 5, 5]},
 
-		"default-subwin-border": {"type": "stylebox", "corner": [0, 0, 0, 0], "expand": [5, 35, 5, 5], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
+		"default-subwin-border": {"type": "stylebox", "corner": [15, 15, 0, 0], "expand": [5, 35, 5, 5], "color": [0.196, 0.294, 0.329], "cont-margin": [5, 5, 5, 5]},
 		
-		"pacifico-font": {"type": "label-font", "font": "theme://fonts/PacificoRegular.ttf"},
-		"black-font": {"inherit": "pacifico-font", "font-color": [0, 0, 0]}
+		"default-option-normal": {"inherit": "button-normal-stylebox"},
+		"default-option-hover": {"inherit": "button-hover-stylebox"},
+		"default-option-pressed": {"inherit": "button-pressed-stylebox", "corner": [15, 15, 0, 0]},
+		"default-option-disabled": {"inherit": "button-disabled-stylebox"},
+
+		"default-popup-panel": {"inherit": "default-subwin-border", "corner": [0, 0, 25, 25], "color": [0.123, 0.179, 0.205]},
+		"default-popup-hover": {"inherit": "button-hover-stylebox"},
+
+		"file-picker-normal": {"inherit": "button-normal-stylebox"},
+		"file-picker-hover": {"inherit": "button-hover-stylebox"},
+
+		"black-font": {"type": "label-font", "font-color": [0, 0, 0]},
+
+		"title-font": {"type": "label-font", "font": "theme://fonts/PacificoRegular.ttf"}
 	},
 	"zones": {
 		"default": {
 			"subwindow/border": "default-subwin-border",
 			"texturerect/texture": "paper_bg",
+
 			"container/panel": "default-panel",
+			
 			"button/normal": "button-normal-stylebox",
 			"button/hover": "button-hover-stylebox",
 			"button/pressed": "button-pressed-stylebox",
 			"button/disabled": "button-disabled-stylebox",
+
+			"option/normal": "default-option-normal",
+			"option/hover": "default-option-hover",
+			"option/pressed": "default-option-pressed",
+			"option/disabled": "default-option-disabled",
+			
+			"popup/panel": "default-popup-panel",
+			"popup/hover": "default-popup-hover",
 
 			"lineedit/normal": "lineedit-normal-stylebox",
 			"lineedit/focus": "lineedit-focus-stylebox"
@@ -35,18 +57,20 @@
 			"server-item/hover": "button-hover-stylebox",
 			"server-item/selected": "button-pressed-stylebox",
 
-			"exworlds-main-title/label-font": "pacifico-font",
+			"exworlds-main-title/font": "title-font",
 
-			"server-settings-title/label-font": "black-font",
-			"server-settings-mark-lbl/label-font": "black-font",
-			"server-settings-addr-lbl/label-font": "black-font",
-			"server-settings-login-lbl/label-font": "black-font",
-			"server-settings-passwd-lbl/label-font": "black-font",
+			"server-settings-title/font": "black-font",
+			"server-settings-mark-lbl/font": "black-font",
+			"server-settings-addr-lbl/font": "black-font",
+			"server-settings-login-lbl/font": "black-font",
+			"server-settings-passwd-lbl/font": "black-font",
 
-			"server-delete-conf-text/label-font": "black-font"
+			"server-delete-conf-text/font": "black-font"
 		},
 		"settings-view": {
-			"settings-view-title/label-font": "pacifico-font"
+			"settings-view-title/font": "pacifico-font",
+			"file-picker/normal": "file-picker-normal",
+			"file-picker/hover": "file-picker-hover"
 		}
 	}
 }

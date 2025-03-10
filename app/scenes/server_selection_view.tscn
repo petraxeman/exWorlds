@@ -44,17 +44,26 @@ theme_override_constants/margin_right = 15
 layout_mode = 2
 metadata/extheme_class = "server-list-panel"
 
-[node name="maegin" type="MarginContainer" parent="content/server_list/panel"]
+[node name="margin" type="MarginContainer" parent="content/server_list/panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = 15
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
-[node name="scroll" type="ScrollContainer" parent="content/server_list/panel/maegin"]
+[node name="scroll" type="ScrollContainer" parent="content/server_list/panel/margin"]
 layout_mode = 2
 
-[node name="server_list" type="VBoxContainer" parent="content/server_list/panel/maegin/scroll"]
+[node name="margin" type="MarginContainer" parent="content/server_list/panel/margin/scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="server_list" type="VBoxContainer" parent="content/server_list/panel/margin/scroll/margin"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -324,6 +333,7 @@ focus_mode = 0
 text = "Cancel"
 metadata/extheme_class = "server-delete-conf-cancel"
 
+[connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/enter" to="." method="_on_enter_server_pressed"]
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/delete" to="." method="_on_delete_server_pressed"]
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/add_server" to="." method="_on_add_server_pressed"]
 [connection signal="pressed" from="content/actions/panel/margin/vbox/buttons/settings" to="." method="_on_settings_pressed"]

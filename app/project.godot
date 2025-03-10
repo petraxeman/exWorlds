@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 ThemeHandler="*res://scripts/singletons/theme_handler.gd"
 Globals="*res://scripts/singletons/globals.gd"
+ServerHandler="*res://scripts/singletons/server_handler.gd"
 
 [input]
 

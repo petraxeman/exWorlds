@@ -6,18 +6,27 @@ var current_theme: ExworldsTheme
 
 
 func _ready():
+	_init_themes()
 	_find_themes()
+
+
+func _init_themes():
+	if not DirAccess.dir_exists_absolute("user://themes"):
+		DirAccess.make_dir_absolute("user://themes")
+	
+	# WARNING NEED TO CHANGE AFTER WORK WITH THEMES WILL DONE
+	#if not DirAccess.get_directories_at("user://themes") or not DirAccess.dir_exists_absolute("user://themes/default_theme"):
+		#EXUtils.copy_directory_recursively("res://assets/default_theme", "user://themes/default_theme")
 
 
 func set_theme(theme_codename: String):
 	_load_theme(theme_codename)
-	
+
 
 func _find_themes():
-	if not DirAccess.dir_exists_absolute("user://themes"):
-		DirAccess.make_dir_absolute("user://themes")
-	
-	var theme_pathes: Array = ["res://assets/default_theme"] 
+	# WARNING NEED TO CHANGE AFTER WORK WITH THEMES WILL DONE
+	var theme_pathes: Array = ["res://assets/default_theme"]
+	#var theme_pathes: Array = []
 	for theme_folder in DirAccess.get_directories_at("user://themes"):
 		theme_pathes.append("user://themes/%s" % theme_folder)
 	

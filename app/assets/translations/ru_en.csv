@@ -31,5 +31,6 @@ SETTINGS_VIEW_BASE_SETTING_TITLE,Базовые настройки,Base settings
 SETTINGS_VIEW_LOAD_THEME_LBL,Установка тем,Install themes
 SETTINGS_VIEW_LOCALIZATION_LBL,Локализация,Locale
 SETTINGS_VIEW_THEME_LBL,Тема,Theme
+SETTINGS_VIEW_FILE_PICKER_DROP_HERE,Перенесите файлы сюда,Drop files here
 SETTINGS_VIEW_SAVE_AND_EXIT,Сохранить и выйти,Save and exit
 SETTINGS_VIEW_CANCEL,Отменить,Cancel

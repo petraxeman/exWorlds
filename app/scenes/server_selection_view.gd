@@ -19,17 +19,17 @@ func _render():
 
 
 func _render_server_list():
-	for child in $content/server_list/panel/maegin/scroll/server_list.get_children():
+	for child in $content/server_list/panel/margin/scroll/margin/server_list.get_children():
 		child.queue_free()
 	
 	if not Globals.server_list:
 		var lbl: Label = Label.new()
 		lbl.text = tr("SERVER_SELECTION_NO_SERVERS")
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		$content/server_list/panel/maegin/scroll/server_list.add_child(lbl)
-		$content/server_list/panel/maegin/scroll/server_list.alignment = BoxContainer.ALIGNMENT_CENTER
+		$content/server_list/panel/margin/scroll/margin/server_list.add_child(lbl)
+		$content/server_list/panel/margin/scroll/margin/server_list.alignment = BoxContainer.ALIGNMENT_CENTER
 	else:
-		$content/server_list/panel/maegin/scroll/server_list.alignment = BoxContainer.ALIGNMENT_BEGIN
+		$content/server_list/panel/margin/scroll/margin/server_list.alignment = BoxContainer.ALIGNMENT_BEGIN
 		for serv_uuid in Globals.server_list:
 			var serv = Globals.server_list[serv_uuid]
 			var serv_item = server_item_scene.instantiate()
@@ -42,11 +42,11 @@ func _render_server_list():
 				)
 			serv_item.selected.connect(select_server)
 			serv_item.doubleclick.connect(change_server)
-			$content/server_list/panel/maegin/scroll/server_list.add_child(serv_item)
+			$content/server_list/panel/margin/scroll/margin/server_list.add_child(serv_item)
 
 
 func select_server(uuid: String):
-	for child in $content/server_list/panel/maegin/scroll/server_list.get_children():
+	for child in $content/server_list/panel/margin/scroll/margin/server_list.get_children():
 		if child.uuid == uuid:
 			child.is_selected = true
 		else:
@@ -154,3 +154,12 @@ func _on_settings_pressed():
 	var settings_view_instance = settings_view.instantiate()
 	get_tree().root.add_child(settings_view_instance)
 	queue_free()
+
+
+func _on_enter_server_pressed() -> void:
+	if not selected_server:
+		return
+	var server = Globals.server_list[selected_server]
+	print(server)
+	var parsed_addr: Dictionary = ServerHandler.parse_address(server["addr"])
+	print(parsed_addr)

@@ -156,6 +156,11 @@ Every **button** has a subclass:
 - label/font
 - lineedit/normal
 - lineedit/focus
+- option/normal
+- option/hover
+- option/pressed
+- option/disabled
+- option/font
 
 
 server-selection
@@ -200,3 +205,8 @@ server-selection
 
 - settings-view-background      : texture  : /texture
 
+- localization-option-popup
+- theme-option-popup
+
+- file-picker/hover
+- file-picker/normal

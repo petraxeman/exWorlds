@@ -330,17 +330,18 @@ func apply_theme(node: Node):
 					}
 			_:
 				continue
-		
+
 		for i in theme_classes["specific"].size():
 			var resource: Dictionary
 			
 			if is_resource_exist(theme_classes["specific"][i]["data"][1], theme_classes["specific"][i]["data"][0]):
 				resource = theme_classes["specific"][i]
-				
 			elif is_resource_exist(theme_classes["default"][i]["data"][1], theme_classes["default"][i]["data"][0]):
 				resource = theme_classes["default"][i]
 			else:
 				continue
+			
+
 			
 			var resources_to_apply: Array = []
 			match resource["loader"]:
@@ -374,8 +375,7 @@ static func load_from_dir(path: String) -> ExworldsTheme:
 	var manifesto_relevant = FileAccess.get_modified_time(path + "/theme.json") <= comp_datetime
 	var schema_relevant = FileAccess.get_modified_time(path + "/manifest.json") <= comp_datetime
 	if FileAccess.file_exists(path + "/comp.res") and (manifesto_relevant and schema_relevant):
-		var x: ExworldsTheme = load(path + "/comp.res")
-		return x
+		return load(path + "/comp.res") as ExworldsTheme
 	
 	var config_file: FileAccess = FileAccess.open(path + "/theme.json", FileAccess.READ)
 	var config_dict: Dictionary = JSON.parse_string(config_file.get_as_text())

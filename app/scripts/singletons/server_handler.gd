@@ -1,21 +1,46 @@
 extends Node
-class_name UrlLib
 
 const endpoints: Dictionary = {
 	# Auth
-	"auth": "/account/auth",
-	"registration": "/account/registration",
-	# Server
-	"server_info": "/server/info",
+	"auth": "/api/login",
+	"registration": "/api/register",
+	# Common
+	"server_info": "/api/server/info",
 }
 
+var current_server: String
+var http: HTTPRequest
+var addr_re: RegEx = RegEx.create_from_string(r"^(?<proto>http:\/\/|https:\/\/)?(?<address>[^\s]*)$")
 
 
-static func build(url: String, endpoint: String):
+func _ready() -> void:
+	http = HTTPRequest.new()
+
+
+func set_address():
+	pass
+
+
+func parse_address(_addr: String):
+	var result = addr_re.search(_addr)
+	var prepared: Dictionary = {}
+	
+	if not result:
+		return {"addr": "", "proto": ""}
+	for n in result.names:
+		prepared[n] = result.strings[result.names[n]]
+	
+	if not prepared.get("proto"):
+		prepared["proto"] = "https://"
+	
+	return prepared
+
+
+func build(url: String, endpoint: String):
 	return url + endpoints[endpoint]
 
 
-static func post(endpoint: String,
+func post(endpoint: String,
 				additional_headers: Array = [],
 				body: Dictionary = {},
 				expecting: String = "json",
@@ -28,7 +53,7 @@ static func post(endpoint: String,
 	headers += ["Content-Type: application/json"]
 	headers += additional_headers
 	http.request(
-		UrlLib.build(Globals.current_server.get("addr"), endpoint),
+		build(Globals.current_server.get("addr"), endpoint),
 		headers,
 		HTTPClient.METHOD_POST,
 		JSON.stringify(body)
@@ -46,13 +71,13 @@ static func post(endpoint: String,
 	return {"Ok": false}
 
 
-static func post_raw(endpoint: String, additional_headers: Array, body: PackedByteArray, expecting: String = "json"):
+func post_raw(endpoint: String, additional_headers: Array, body: PackedByteArray, expecting: String = "json"):
 	var http: HTTPRequest = HTTPRequest.new()
 	Globals.add_child(http)
 	var headers = ["Auth-Token: %s" % Globals.current_server["token"], "Content-Type: application/json"]
 	headers += additional_headers
 	http.request_raw(
-		UrlLib.build(Globals.current_server["addr"], endpoint),
+		build(Globals.current_server["addr"], endpoint),
 		headers,
 		HTTPClient.METHOD_POST,
 		body
