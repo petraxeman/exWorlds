@@ -145,25 +145,23 @@ A configuration builder for text. It includes not only font settings but also th
 
 ## Zones
 
+### Default zone
+
 Every **button** has a subclass:
-- button/normal
-- button/hover
-- button/pressed
-- button/disabled
-- texturerect/texture
-- container/panel
-- subwindow/border
-- label/font
-- lineedit/normal
-- lineedit/focus
-- option/normal
-- option/hover
-- option/pressed
-- option/disabled
-- option/font
+- button            : stylebox : /normal, /hover, /pressed, /disabled
+- button            : font     : /font
+- texturerect       : texture  : /texture
+- container         : stylebox : /panel
+- subwindow         : stylebox : /border
+- label             : font     : /font
+- lineedit          : stylebox : /normal, /focus
+- option            : stylebox : /normal, /hover, /pressed, /disabled
+- option            : font     : /font
+- popup             : stylebox : /panel, /hover, /separator
 
 
-server-selection
+
+### Server Selection view
 - main-view-background  : texture  : /texture
 - exworlds-main-title   : font     : /font
 - exworlds-main-version : font     : /font
@@ -180,6 +178,9 @@ server-selection
 - server-item-server-orig : font : /font
 - server-item-server-addr : font : /font
 
+
+#### Server settings subwindow
+
 - server-settings-subwindow   : stylebox : /border
 - server-settings-background  : texture  : /texture
 - server-settings-title       : font     : /font
@@ -188,12 +189,15 @@ server-selection
 - server-settings-login-lbl   : font     : /font
 - server-settings-passwd-lbl  : font     : /font
 
-- server-settings-nark-edit     : stylebox : /normal, /focus
+- server-settings-mark-edit     : stylebox : /normal, /focus
 - server-settings-addr-edit     : stylebox : /normal, /focus
 - server-settings-login-edit    : stylebox : /normal, /focus
 - server-settings-passwd-edit   : stylebox : /normal, /focus
 - server-settings-ok-button     : stylebox : /normal, /hover, /disabled, /pressed
 - server-settings-cancel-button : stylebox : /normal, /hover, /disabled, /pressed
+
+
+#### Server delition subwindow
 
 - server-delete-confirm-subwin  : stylebox : /border
 - server-delete-conf-background : texture  : /texture
@@ -201,12 +205,17 @@ server-selection
 - server-delete-conf-accept     : stylebox : /normal, /hover, /disabled, /pressed
 - server-delete-conf-cancel     : stylebox : /normal, /hover, /disabled, /pressed
 
+
+#### Server entering subwindow
+
+- server-entering-window        : stylebox : /border
+- server-entering-background    : texture  : /texture
+
 ---
 
 - settings-view-background      : texture  : /texture
 
-- localization-option-popup
-- theme-option-popup
+- localization-option-popup     : stylebox : /panel, /hover, /separator
+- theme-option-popup            : stylebox : /panel, /hover, /separator
 
-- file-picker/hover
-- file-picker/normal
+- file-picker                   : stylebox : /hover, /normal

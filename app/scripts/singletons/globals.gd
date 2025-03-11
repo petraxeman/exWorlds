@@ -38,6 +38,10 @@ func _load_config():
 
 func _save_config():
 	var config_file: FileAccess = FileAccess.open("user://config.json", FileAccess.WRITE)
+	
+	if ServerHandler.server_uuid:
+		server_list[ServerHandler.server_uuid] = ServerHandler.current_server
+	
 	config_file.store_string(JSON.stringify(
 		{
 			"current_theme_codename": ThemeHandler.current_theme.codename,

@@ -37,7 +37,7 @@ func _render_server_list():
 				serv.get("server-name", ""),
 				serv.get("mark", ""),
 				serv["addr"],
-				serv_item.CANT_CONNECT,
+				serv.get("is-work", 1),
 				serv_uuid
 				)
 			serv_item.selected.connect(select_server)
@@ -159,7 +159,31 @@ func _on_settings_pressed():
 func _on_enter_server_pressed() -> void:
 	if not selected_server:
 		return
-	var server = Globals.server_list[selected_server]
-	print(server)
-	var parsed_addr: Dictionary = ServerHandler.parse_address(server["addr"])
-	print(parsed_addr)
+	ServerHandler.set_server(Globals.server_list[selected_server], selected_server)
+	if ServerHandler.current_server:
+		$server_entering/margin/vbox/login/edit.text = ServerHandler.current_server.get("login", "")
+		$server_entering/margin/vbox/password/edit.text = ServerHandler.current_server.get("password", "")
+		$server_entering.show()
+
+
+func _on_server_entering_cancel_pressed() -> void:
+	$server_entering/margin/vbox/login/edit.text = ""
+	$server_entering/margin/vbox/password/edit.text = ""
+	$server_entering.hide()
+
+
+func _on_server_entering_enter_pressed() -> void:
+	var username: String = $server_entering/margin/vbox/login/edit.text
+	var password: String = $server_entering/margin/vbox/password/edit.text
+	
+	if ServerHandler.current_server.has("token"):
+		var server_info: Dictionary = await ServerHandler.post("server_info")
+		print(server_info)
+	
+	var response: Dictionary = await ServerHandler.post("auth", [], {"username": username, "password": password}, "json", false)
+	if response.get("Ok"):
+		ServerHandler.current_server["is-work"] = 0
+	else:
+		ServerHandler.current_server["is-work"] = 1
+	_render_server_list()
+	Globals._save_config()

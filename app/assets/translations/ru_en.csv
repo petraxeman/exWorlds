@@ -23,8 +23,12 @@ SERVER_SELECTION_SERVER_DELETE_MSG,Вы действительно хотите 
 
 SERVER_SELECTION_NO_SERVERS,У вас нет серверов в данный момент.,You have no servers at this moment.
 SERVER_SELECTION_SERVER_EDIT,Изменение сервера,Edit server
-SETVER_SELECTION_ADD_SERVER,Добавление сервера,Add server
+SERVER_SELECTION_ADD_SERVER,Добавление сервера,Add server
 
+SERVER_SELECTION_ENTERING_TITLE,Вход,Sign in
+SERVER_SELECTION_ENTERING_LOGIN,Логин,Login
+SERVER_SELECTION_ENTERING_PASSWORD,Пароль,Password
+SERVER_SELECTION_ENTERING_ENTER,Войти,Enter
 
 SETTINGS_VIEW_SETTINGS_TITLE,Настройки приложения,App settings
 SETTINGS_VIEW_BASE_SETTING_TITLE,Базовые настройки,Base settings

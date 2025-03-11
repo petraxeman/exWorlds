@@ -7,8 +7,8 @@
 		"button-pressed-stylebox": {"type": "stylebox", "corner": [25, 25, 25, 25], "color": [0.329, 0.502, 0.569], "cont-margin": [5, 5, 5, 5]},
 		"button-disabled-stylebox": {"type": "stylebox", "corner": [25, 25, 25, 25], "color": [0.388, 0.431, 0.451], "cont-margin": [5, 5, 5, 5]},
 		
-		"lineedit-normal-stylebox": {"type": "stylebox", "color": [0.369, 0.502, 0.467]},
-		"lineedit-focus-stylebox": {"type": "stylebox", "color": [0.2, 0.439, 0.38]},
+		"lineedit-normal-stylebox": {"type": "stylebox", "color": [0.369, 0.502, 0.467], "cont-margin": [5, 5, 5, 5]},
+		"lineedit-focus-stylebox": {"inherit": "lineedit-normal-stylebox", "color": [0.2, 0.439, 0.38]},
 
 		"default-panel": {"type": "stylebox", "corner": [0, 0, 0, 0], "color": [0.123, 0.179, 0.205, 0.4], "cont-margin": [5, 5, 5, 5]},
 
