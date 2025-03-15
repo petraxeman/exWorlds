@@ -26,6 +26,7 @@
 		"file-picker-hover": {"inherit": "button-hover-stylebox"},
 
 		"black-font": {"type": "label-font", "font-color": [0, 0, 0]},
+		"black-button-font": {"type": "button-font", "font-color": [0, 0, 0], "font-hover-color": [0,0,0], "font-pressed-color": [0,0,0], "font-disabled-color": [0.6,0.6,0.6]},
 
 		"title-font": {"type": "label-font", "font": "theme://fonts/PacificoRegular.ttf"}
 	},
@@ -65,7 +66,12 @@
 			"server-settings-login-lbl/font": "black-font",
 			"server-settings-passwd-lbl/font": "black-font",
 
-			"server-delete-conf-text/font": "black-font"
+			"server-delete-conf-text/font": "black-font",
+
+			"server-entering-login-lbl/font": "black-font",
+			"server-entering-passwd-lbl/font": "black-font",
+			"server-entering-title/font": "black-font",
+			"server-entering-save-logpass/font": "black-button-font"
 		},
 		"settings-view": {
 			"settings-view-title/font": "pacifico-font",

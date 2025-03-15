@@ -199,17 +199,26 @@ Every **button** has a subclass:
 
 #### Server delition subwindow
 
-- server-delete-confirm-subwin  : stylebox : /border
-- server-delete-conf-background : texture  : /texture
-- server-delete-conf-text       : font     : /font
-- server-delete-conf-accept     : stylebox : /normal, /hover, /disabled, /pressed
-- server-delete-conf-cancel     : stylebox : /normal, /hover, /disabled, /pressed
+- server-delete-confirm-subwin  : stylebox   : /border
+- server-delete-conf-background : texture    : /texture
+- server-delete-conf-text       : font (lbl) : /font
+- server-delete-conf-accept     : stylebox   : /normal, /hover, /disabled, /pressed
+- server-delete-conf-cancel     : stylebox   : /normal, /hover, /disabled, /pressed
 
 
 #### Server entering subwindow
 
-- server-entering-window        : stylebox : /border
-- server-entering-background    : texture  : /texture
+- server-entering-window        : stylebox   : /border
+- server-entering-background    : texture    : /texture
+- server-entering-title         : font (lbl) : /font
+- server-entering-login-lbl     : font (lbl) : /font
+- server-entering-passwd-lbl    : font (lbl) : /font
+- server-entering-login-edit    : stylebox   : /normal, /focus
+- server-entering-passwd-edit   : stylebox   : /normal, /focus
+- server-entering-ok-button     : stylebox   : /normal, /hover, /disabled, /pressed
+- server-entering-cancel-button : stylebox   : /normal, /hover, /disabled, /pressed
+- server-entering-save-logpass  : stylebox   : /normal, /hover, /disabled, /pressed
+- server-entering-save-logpass  : font (btn) : /font
 
 ---
 

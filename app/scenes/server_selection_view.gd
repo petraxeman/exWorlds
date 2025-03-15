@@ -15,7 +15,13 @@ func _render():
 	ThemeHandler.current_theme.apply_theme(self)
 	_render_server_settings_subwin()
 	_render_server_deletion_subwin()
+	_render_server_enter_subwin()
 	_render_server_list()
+
+
+func _render_server_enter_subwin():
+	$server_entering/margin/vbox/login/label.text = tr("SERVER_SELECTION_ENTERING_LOGIN") + ":"
+	$server_entering/margin/vbox/password/label.text = tr("SERVER_SELECTION_ENTERING_PASSWORD") + ":"
 
 
 func _render_server_list():
@@ -175,15 +181,28 @@ func _on_server_entering_cancel_pressed() -> void:
 func _on_server_entering_enter_pressed() -> void:
 	var username: String = $server_entering/margin/vbox/login/edit.text
 	var password: String = $server_entering/margin/vbox/password/edit.text
+	var save_logpass: bool = $server_entering/margin/vbox/save_logpass.button_pressed
 	
-	if ServerHandler.current_server.has("token"):
-		var server_info: Dictionary = await ServerHandler.post("server_info")
-		print(server_info)
+	var auth_valid: bool = false
 	
 	var response: Dictionary = await ServerHandler.post("auth", [], {"username": username, "password": password}, "json", false)
 	if response.get("Ok"):
 		ServerHandler.current_server["is-work"] = 0
+		ServerHandler.current_server["token"] = response["token"]
+		# WARNING
+		# CHANGE HERE SAVING LOG PASS FOR MORE SAFETY 
+		if save_logpass:
+			ServerHandler.current_server["login"] = username
+			ServerHandler.current_server["password"] = password
 	else:
 		ServerHandler.current_server["is-work"] = 1
+	
+	if response.get("Ok"):
+		var server_info: Dictionary = await ServerHandler.post("server-info")
+		ServerHandler.current_server["server-name"] = server_info.get("server_name", "")
+	
 	_render_server_list()
 	Globals._save_config()
+	
+	# TODO
+	# ADD HERE REDIRECT TO MAIN VIEW

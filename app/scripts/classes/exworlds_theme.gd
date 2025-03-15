@@ -284,6 +284,23 @@ func apply_theme(node: Node):
 						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
 					]
 				}
+			"CheckBox":
+				theme_classes = {
+					"default":[
+						{"loader": "standart", "data": ["default", "checkbox/normal"], "mode": "normal", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "checkbox/hover"], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "checkbox/pressed"], "mode": "pressed", "to": "stylebox"},
+						{"loader": "standart", "data": ["default", "checkbox/disabled"], "mode": "disabled", "to": "stylebox"},
+						{"loader": "unpack", "data": ["default", "checkbox/font"]}
+					],
+					"specific": [
+						{"loader": "standart", "data": [zone, "%s/normal" % extheme_class], "mode": "normal", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/pressed" % extheme_class], "mode": "pressed", "to": "stylebox"},
+						{"loader": "standart", "data": [zone, "%s/disabled" % extheme_class], "mode": "disabled", "to": "stylebox"},
+						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
+					]
+				}
 			"TextureRect":
 				theme_classes = {
 					"default": [{"loader": "standart", "data": ["default", "texturerect/texture"], "mode": "texture", "to": "texture"}],

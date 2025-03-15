@@ -5,7 +5,7 @@ const endpoints: Dictionary = {
 	"auth": "/api/login",
 	"registration": "/api/register",
 	# Common
-	"server_info": "/api/server/info",
+	"server-info": "/api/server/info",
 }
 
 var current_server: Dictionary

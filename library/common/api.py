@@ -17,5 +17,7 @@ def get_server_info():
     
     if not server_name:
         server_name = "Exworlds server"
+    else:
+        server_name = server_name["data"]["value"]
     
     return {"server_name": server_name, "server_version": current_app.config["version"]}, 200
