@@ -19,6 +19,11 @@
 		"default-option-pressed": {"inherit": "button-pressed-stylebox", "corner": [15, 15, 0, 0]},
 		"default-option-disabled": {"inherit": "button-disabled-stylebox"},
 
+		"default-menubtn-normal": {"inherit": "button-normal-stylebox"},
+		"default-menubtn-hover": {"inherit": "button-hover-stylebox"},
+		"default-menubtn-pressed": {"inherit": "button-pressed-stylebox", "corner": [15, 15, 0, 0]},
+		"default-menubtn-disabled": {"inherit": "button-disabled-stylebox"},
+
 		"default-popup-panel": {"inherit": "default-subwin-border", "corner": [0, 0, 25, 25], "color": [0.123, 0.179, 0.205]},
 		"default-popup-hover": {"inherit": "button-hover-stylebox"},
 
@@ -46,6 +51,11 @@
 			"option/hover": "default-option-hover",
 			"option/pressed": "default-option-pressed",
 			"option/disabled": "default-option-disabled",
+
+			"menubtn/normal": "default-menubtn-normal",
+			"menubtn/hover": "default-menubtn-hover",
+			"menubtn/pressed": "default-menubtn-pressed",
+			"menubtn/disabled": "default-menubtn-disabled",
 			
 			"popup/panel": "default-popup-panel",
 			"popup/hover": "default-popup-hover",

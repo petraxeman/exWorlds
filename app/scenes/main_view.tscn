@@ -1,0 +1,54 @@
+[gd_scene load_steps=2 format=3 uid="uid://0rjqonq2m5ow"]
+
+[ext_resource type="Script" path="res://scenes/main_view.gd" id="1_upykh"]
+
+[node name="main_view" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_upykh")
+
+[node name="background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/extheme_class = "main-view-background"
+
+[node name="vbox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="top" type="HBoxContainer" parent="vbox"]
+layout_mode = 2
+
+[node name="MenuButton" type="MenuButton" parent="vbox/top"]
+layout_mode = 2
+text = "Menu"
+item_count = 2
+popup/item_0/text = "1"
+popup/item_1/text = "2"
+popup/item_1/id = 1
+
+[node name="tab_bar" type="TabBar" parent="vbox/top"]
+layout_mode = 2
+focus_mode = 0
+clip_tabs = false
+tab_close_display_policy = 2
+
+[node name="tab_container" type="TabContainer" parent="vbox"]
+layout_mode = 2
+size_flags_vertical = 3
+tabs_visible = false
+
+[connection signal="tab_changed" from="vbox/top/tab_bar" to="." method="_on_tab_bar_tab_changed"]
+[connection signal="tab_close_pressed" from="vbox/top/tab_bar" to="." method="_on_tab_bar_tab_close_pressed"]

@@ -39,3 +39,12 @@ SETTINGS_VIEW_THEME_LBL,Тема,Theme
 SETTINGS_VIEW_FILE_PICKER_DROP_HERE,Перенесите файлы сюда,Drop files here
 SETTINGS_VIEW_SAVE_AND_EXIT,Сохранить и выйти,Save and exit
 SETTINGS_VIEW_CANCEL,Отменить,Cancel
+
+
+
+MAIN_VIEW_HOME_PAGE_GAMES_BTN,Игры,Games
+MAIN_VIEW_HOME_PAGE_GAME_WORLDS_BTN,Игровые миры,Game worlds
+MAIN_VIEW_HOME_PAGE_GAME_SYSTEMS_BTN,Игровые системы,Game systems
+MAIN_VIEW_HOME_PAGE_SERVER_MANAGER_BTN,Менеджер сервера,Server manager
+MAIN_VIEW_HOME_PAGE_SETTINGS_BTN,Настройки,Settings
+MAIN_VIEW_HOME_PAGE_EXIT_BTN,Выход,Exit

@@ -1,0 +1,76 @@
+[gd_scene load_steps=2 format=3 uid="uid://ckl1vkofamrkc"]
+
+[ext_resource type="Script" path="res://scenes/main_view_tabs/home_page.gd" id="1_p2pky"]
+
+[node name="home_page" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_p2pky")
+metadata/_tab_index = 0
+metadata/extheme_skip = true
+
+[node name="vbox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 25
+
+[node name="margin" type="MarginContainer" parent="vbox"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="actions" type="VBoxContainer" parent="vbox/margin"]
+layout_mode = 2
+
+[node name="games" type="Button" parent="vbox/margin/actions"]
+layout_mode = 2
+text = "MAIN_VIEW_HOME_PAGE_GAMES_BTN"
+
+[node name="worlds" type="Button" parent="vbox/margin/actions"]
+layout_mode = 2
+text = "MAIN_VIEW_HOME_PAGE_GAME_WORLDS_BTN"
+
+[node name="systems" type="Button" parent="vbox/margin/actions"]
+layout_mode = 2
+text = "MAIN_VIEW_HOME_PAGE_GAME_SYSTEMS_BTN"
+
+[node name="serv_manager" type="Button" parent="vbox/margin/actions"]
+layout_mode = 2
+size_flags_vertical = 10
+text = "MAIN_VIEW_HOME_PAGE_SERVER_MANAGER_BTN"
+
+[node name="settings" type="Button" parent="vbox/margin/actions"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "MAIN_VIEW_HOME_PAGE_SETTINGS_BTN"
+
+[node name="exit" type="Button" parent="vbox/margin/actions"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "MAIN_VIEW_HOME_PAGE_EXIT_BTN"
+
+[node name="margin2" type="MarginContainer" parent="vbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="vbox" type="VBoxContainer" parent="vbox/margin2"]
+layout_mode = 2
+alignment = 1
+
+[node name="title" type="Label" parent="vbox/margin2/vbox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Добро пожаловать, A!"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="vbox/margin/actions/exit" to="." method="_on_exit_pressed"]

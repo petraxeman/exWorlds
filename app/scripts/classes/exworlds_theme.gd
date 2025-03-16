@@ -68,7 +68,7 @@ func _parse_res_names():
 	
 	specific_res_names = []
 	if active_zone != "default":
-		for key in zones[active_zone]:
+		for key in zones.get(active_zone, {}):
 			specific_res_names.append(zones[active_zone][key])
 
 
@@ -77,7 +77,6 @@ func _load_resources():
 	resources = {}
 	for key in res_names:
 		if not key in raw_resources:
-			raw_resources[key] = null
 			continue
 		
 		var value: Dictionary = raw_resources[key]
@@ -206,6 +205,14 @@ func _build_button_font(settings: Dictionary):
 	return new_settings
 
 
+func _build_style(zone: String, stylename: String, categories: Array):
+	var styles = []
+	for cat in categories:
+		if cat in ["/normal", "/hover", "/pressed", "/disabled", "/panel", "/separator", "/focus"]:
+			styles.append({"loader": "standart", "data": [zone, stylename + cat], "mode": cat.substr(1), "to": "stylebox"})
+	return styles
+
+
 func _adapt_path(raw_path: String):
 	var points = raw_path.split("://")
 	if len(points) > 1:
@@ -253,53 +260,38 @@ func apply_theme(node: Node):
 			"Button":
 				theme_classes = {
 					"default":[
-						{"loader": "standart", "data": ["default", "button/normal"], "mode": "normal", "to": "stylebox"}, 
-						{"loader": "standart", "data": ["default", "button/hover"], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "button/pressed"], "mode": "pressed", "to": "stylebox"}, 
-						{"loader": "standart", "data": ["default", "button/disabled"], "mode": "disabled", "to": "stylebox"},
 						{"loader": "unpack", "data": ["default", "button/font"]}
-						],
+						] + _build_style("default", "button", ["/normal", "/hover", "/pressed", "/disabled"]),
 					"specific": [
-						{"loader": "standart", "data": [zone, "%s/normal" % extheme_class], "mode": "normal", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/pressed" % extheme_class], "mode": "pressed", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/disabled" % extheme_class], "mode": "disabled", "to": "stylebox"},
 						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
-						]
+						] + _build_style(zone, extheme_class, ["/normal", "/hover", "/pressed", "/disabled"]),
 					}
 			"OptionButton":
 				theme_classes = {
 					"default":[
-						{"loader": "standart", "data": ["default", "option/normal"], "mode": "normal", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "option/hover"], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "option/pressed"], "mode": "pressed", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "option/disabled"], "mode": "disabled", "to": "stylebox"},
 						{"loader": "unpack", "data": ["default", "option/font"]}
-					],
+						] + _build_style("default", "option", ["/normal", "/hover", "/pressed", "/disabled"]),
 					"specific": [
-						{"loader": "standart", "data": [zone, "%s/normal" % extheme_class], "mode": "normal", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/pressed" % extheme_class], "mode": "pressed", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/disabled" % extheme_class], "mode": "disabled", "to": "stylebox"},
 						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
-					]
+						] + _build_style(zone, extheme_class, ["/normal", "/hover", "/pressed", "/disabled"]),
 				}
 			"CheckBox":
 				theme_classes = {
 					"default":[
-						{"loader": "standart", "data": ["default", "checkbox/normal"], "mode": "normal", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "checkbox/hover"], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "checkbox/pressed"], "mode": "pressed", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "checkbox/disabled"], "mode": "disabled", "to": "stylebox"},
 						{"loader": "unpack", "data": ["default", "checkbox/font"]}
-					],
+						] + _build_style("default", "checkbox", ["/normal", "/hover", "/pressed", "/disabled"]),
 					"specific": [
-						{"loader": "standart", "data": [zone, "%s/normal" % extheme_class], "mode": "normal", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/pressed" % extheme_class], "mode": "pressed", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/disabled" % extheme_class], "mode": "disabled", "to": "stylebox"},
 						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
-					]
+						] + _build_style(zone, extheme_class, ["/normal", "/hover", "/pressed", "/disabled"]),
+				}
+			"MenuButton":
+				theme_classes = {
+					"default":[
+						{"loader": "unpack", "data": ["default", "menubtn/font"]}
+					] + _build_style("default", "menubtn", ["/normal", "/hover", "/pressed", "/disabled"]),
+					"specific":[
+						{"loader": "unpack", "data": [zone, "%s/font" % extheme_class]}
+					] + _build_style(zone, extheme_class, ["/normal", "/hover", "/pressed", "/disabled"]),
 				}
 			"TextureRect":
 				theme_classes = {
@@ -318,16 +310,8 @@ func apply_theme(node: Node):
 					}
 			"PopupMenu":
 				theme_classes = {
-					"default": [
-						{"loader": "standart", "data": ["default", "popup/panel"], "mode": "panel", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "popup/hover"], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": ["default", "popup/separator"], "mode": "separator", "to": "stylebox"},
-						],
-					"specific": [
-						{"loader": "standart", "data": [zone, "%s/panel" % extheme_class], "mode": "panel", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/hover" % extheme_class], "mode": "hover", "to": "stylebox"},
-						{"loader": "standart", "data": [zone, "%s/separator" % extheme_class], "mode": "separator", "to": "stylebox"},
-						]
+					"default": _build_style("default", "popup", ["/panel", "/hover", "/separator"]),
+					"specific":  _build_style(zone, extheme_class, ["/panel", "/hover", "/separator"])
 					}
 			"Label":
 				theme_classes = {

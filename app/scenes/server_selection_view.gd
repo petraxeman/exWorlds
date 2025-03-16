@@ -2,7 +2,9 @@ extends Control
 
 var server_item_scene: PackedScene = load("res://scenes/server_selection/server_item.tscn")
 var settings_view: PackedScene = load("res://scenes/settings_view.tscn")
+var main_view: PackedScene = load("res://scenes/main_view.tscn")
 var selected_server: String = ""
+
 
 
 func _ready():
@@ -204,5 +206,6 @@ func _on_server_entering_enter_pressed() -> void:
 	_render_server_list()
 	Globals._save_config()
 	
-	# TODO
-	# ADD HERE REDIRECT TO MAIN VIEW
+	var mvi = main_view.instantiate()
+	get_tree().root.add_child(mvi)
+	queue_free()
